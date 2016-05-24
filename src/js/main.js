@@ -1,50 +1,50 @@
 var template = {
     nodes: [
-    {
-        name: "1A",
-        x: 600,
-        y: 150
-    },
-    {
-        name: "1B",
-        x: 450,
-        y: 150
-    },
-    {
-        name: "2",
-        x: 225,
-        y: 200
-    },
-    {
-        name: "3",
-        x: 300,
-        y: 300
-    },
-    {
-        name: "4A",
-        x: 300,
-        y: 450
-    },
-    {
-        name: "5A",
-        x: 150,
-        y: 300
-    },
-    {
-        name: "5B",
-        x: 150,
-        y: 450
-    },
-    {
-        name: "6",
-        x: 600,
-        y: 300
-    },
-    {
-        name: "7A",
-        x: 225,
-        y: 100
-    }
+        {
+            name: "1A",
+            x: 600,
+            y: 150
+        },
+        {
+            name: "1B",
+            x: 450,
+            y: 150
+        },
+        {
+            name: "2",
+            x: 225,
+            y: 200
+        },
+        {
+            name: "3",
+            x: 300,
+            y: 300
+        },
+        {
+            name: "4A",
+            x: 300,
+            y: 450
+        },
+        {
+            name: "5A",
+            x: 150,
+            y: 300
+        },
+        {
+            name: "5B",
+            x: 150,
+            y: 450
+        },
+        {
+            name: "6",
+            x: 600,
+            y: 300
+        },
+        {
+            name: "7A",
+            x: 225,
+            y: 100
+        }
     ],
     // links: [{
     //     source: 0,
@@ -240,17 +240,5 @@ function createNetwork(div, data){
 
 function start(){
 
-    d3.json("data/rankings.json", function(error, json) {
-        if (error) return console.warn(error);
-
-        json.forEach(function(patient){
-
-            var patientNumber = parseInt(patient.id);
-            console.log(sites[patientNumber-1]);
-
-        });
-
-    });
-
-    createNetwork('#template', template);
+    //createNetwork('#template', template);
 }

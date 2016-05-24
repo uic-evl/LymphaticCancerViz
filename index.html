@@ -1,17 +1,25 @@
 <html>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
-
-<script src="src/js/main.js"></script>
-
 <head>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-debug.js"></script>
+
+    <script src="src/js/model.js"></script>
 
 </head>
 
 <body onload="start()">
 
-</body>
+<script src="src/js/main.js"></script>
 
-    <div id="template"></div>
+<ul data-bind="foreach: patients">
+    <li>
+        Name at position <span data-bind="text: id"> </span>:
+    </li>
+</ul>
+    <!--<div id="template"></div>-->
+</body>
 
 </html>
