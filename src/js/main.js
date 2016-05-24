@@ -1,4 +1,4 @@
-var data = {
+var template = {
     nodes: [
     {
         name: "1A",
@@ -21,7 +21,7 @@ var data = {
         y: 300
     },
     {
-        name: "4",
+        name: "4A",
         x: 300,
         y: 450
     },
@@ -42,8 +42,8 @@ var data = {
     },
     {
         name: "7A",
-        x: 450,
-        y: 300
+        x: 225,
+        y: 100
     }
     ],
     links: [{
@@ -89,28 +89,61 @@ var data = {
     ]
 };
 
-function start(){
+var sites = [
 
-    var c10 = d3.scale.category10();
+    {
+        patient: '1',
+        nodes: ['1B', '2']
+    },
+    {
+        patient: '2',
+        nodes: ['2']
+    },
+    {
+        patient: '3',
+        nodes: []
+    },
+    {
+        patient: '4',
+        nodes: ['2']
+    },
+    {
+        patient: '5',
+        nodes: ['4A', '2', '3']
+    },
+    {
+        patient: '6',
+        nodes: ['2', '3']
+    },
+    {
+        patient: '7',
+        nodes: []
+    },
+    {
+        patient: '8',
+        nodes: ['2']
+    },
+    {
+        patient: '9',
+        nodes: ['2']
+    },
+    {
+        patient: '10',
+        nodes: []
+    }//,
+    // {
+    //     patient: '11',
+    //     nodes: ['7A', '2', '2']
+    // }
 
-    var svg = d3.select("body")
+];
+
+function createNetwork(div, data){
+
+    var svg = d3.select(div)
         .append("svg")
         .attr("width", 1200)
         .attr("height", 800);
-
-    // var drag = d3.behavior.drag()
-    //     .on("drag", function(d, i) {
-    //         d.x += d3.event.dx;
-    //         d.y += d3.event.dy;
-    //         d3.select(this).attr("cx", d.x).attr("cy", d.y);
-    //         links.each(function(l, li) {
-    //             if (l.source == i) {
-    //                 d3.select(this).attr("x1", d.x).attr("y1", d.y);
-    //             } else if (l.target == i) {
-    //                 d3.select(this).attr("x2", d.x).attr("y2", d.y);
-    //             }
-    //         });
-    //     });
 
     var links = svg.selectAll("link")
         .data(data.links)
@@ -149,7 +182,16 @@ function start(){
         })
         .attr("r", 15)
         .attr("fill", function(d, i) {
-            return c10(i);
+
+            if(d.name == '1A') return '#feb24c';
+            else if(d.name == '1B') return '#fd8d3c';
+            else if(d.name == '2') return '#c7e9c0';
+            else if(d.name == '3') return '#74c476';
+            else if(d.name == '4A') return '#238b45';
+            else if(d.name == '5A') return '#9ecae1';
+            else if(d.name == '5B') return '#4292c6';
+            else if(d.name == '6') return '#fee0d2';
+            else if(d.name == '7A') return '#edf8b1';
         });
 
     nodes
@@ -161,10 +203,12 @@ function start(){
             return d.y;
         })
         .attr("dy", ".35em")
-        .style({'text-anchor':'middle', 'fill':'white'})
+        .style({'text-anchor':'middle', 'fill':'black'})
         .text(function(d) {
             return d.name;
         });
+}
 
-        //.call(drag);
+function start(){
+    createNetwork('#template', template);
 }
