@@ -46,47 +46,47 @@ var template = {
         y: 100
     }
     ],
-    links: [{
-        source: 0,
-        target: 1
-    },
-    {
-        source: 1,
-        target: 2
-    },
-    {
-        source: 2,
-        target: 3
-    },
-    {
-        source: 3,
-        target: 4
-    },
-    {
-        source: 4,
-        target: 6
-    },
-    {
-        source: 5,
-        target: 6
-    },
-    {
-        source: 5,
-        target: 2
-    },
-    {
-        source: 2,
-        target: 8
-    },
-    {
-        source: 1,
-        target: 7
-    },
-    {
-    source: 0,
-    target: 7
-    }
-    ]
+    // links: [{
+    //     source: 0,
+    //     target: 1
+    // },
+    // {
+    //     source: 1,
+    //     target: 2
+    // },
+    // {
+    //     source: 2,
+    //     target: 3
+    // },
+    // {
+    //     source: 3,
+    //     target: 4
+    // },
+    // {
+    //     source: 4,
+    //     target: 6
+    // },
+    // {
+    //     source: 5,
+    //     target: 6
+    // },
+    // {
+    //     source: 5,
+    //     target: 2
+    // },
+    // {
+    //     source: 2,
+    //     target: 8
+    // },
+    // {
+    //     source: 1,
+    //     target: 7
+    // },
+    // {
+    // source: 0,
+    // target: 7
+    // }
+    // ]
 };
 
 var sites = [
@@ -130,13 +130,26 @@ var sites = [
     {
         patient: '10',
         nodes: []
-    }//,
-    // {
-    //     patient: '11',
-    //     nodes: ['7A', '2', '2']
-    // }
+    },
+    {
+        patient: '11',
+        nodes: ['7A', '2', '2']
+    }
 
 ];
+
+var groupPath = function(d) {
+    console.log(d);
+    return "M" +
+        d3.geom.hull(d.values.map(function(i) { return [i.x, i.y]; }))
+            .join("L")
+        + "Z";
+};
+
+var fill = d3.scale.category10();
+
+var groupFill = function(d, i) { return fill(i & 3); };
+
 
 function createNetwork(div, data){
 
@@ -145,33 +158,38 @@ function createNetwork(div, data){
         .attr("width", 1200)
         .attr("height", 800);
 
-    var links = svg.selectAll("link")
-        .data(data.links)
-        .enter()
-        .append("line")
-        .attr("class", "link")
-        .attr("x1", function(l) {
-            var sourceNode = data.nodes.filter(function(d, i) {
-                return i == l.source
-            })[0];
-            d3.select(this).attr("y1", sourceNode.y);
-            return sourceNode.x
-        })
-        .attr("x2", function(l) {
-            var targetNode = data.nodes.filter(function(d, i) {
-                return i == l.target
-            })[0];
-            d3.select(this).attr("y2", targetNode.y);
-            return targetNode.x
-        })
-        .attr("fill", "none")
-        .attr("stroke", "black");
+    var groups = d3.nest().key(function(d) {
+        console.log(d);
+        return d & 3; }).entries(data.nodes);
 
-    var nodes = svg.selectAll("node")
-        .data(data.nodes)
-        .enter().append('g');
+    // var links = svg.selectAll("link")
+    //     .data(data.links)
+    //     .enter()
+    //     .append("line")
+    //     .attr("class", "link")
+    //     .attr("x1", function(l) {
+    //         var sourceNode = data.nodes.filter(function(d, i) {
+    //             return i == l.source
+    //         })[0];
+    //         d3.select(this).attr("y1", sourceNode.y);
+    //         return sourceNode.x
+    //     })
+    //     .attr("x2", function(l) {
+    //         var targetNode = data.nodes.filter(function(d, i) {
+    //             return i == l.target
+    //         })[0];
+    //         d3.select(this).attr("y2", targetNode.y);
+    //         return targetNode.x
+    //     })
+    //     .attr("fill", "none")
+    //     .attr("stroke", "black");
+
+    var nodes = svg.selectAll("circle.node");
+        // .enter().append('g');
 
     nodes
+        .data(data.nodes)
+        .enter()
         .append("circle")
         .attr("class", "node")
         .attr("cx", function(d) {
@@ -194,21 +212,45 @@ function createNetwork(div, data){
             else if(d.name == '7A') return '#edf8b1';
         });
 
-    nodes
-        .append("text")
-        .attr("x", function(d) {
-            return d.x;
-        })
-        .attr("y", function(d) {
-            return d.y;
-        })
-        .attr("dy", ".35em")
-        .style({'text-anchor':'middle', 'fill':'black'})
-        .text(function(d) {
-            return d.name;
-        });
+    svg.selectAll("path")
+        .data(groups)
+        .attr("d", groupPath)
+        .enter().insert("path", "circle")
+        .style("fill", groupFill)
+        .style("stroke", groupFill)
+        .style("stroke-width", 40)
+        .style("stroke-linejoin", "round")
+        .style("opacity", .2)
+        .attr("d", groupPath);
+
+    // nodes
+    //     .append("text")
+    //     .attr("x", function(d) {
+    //         return d.x;
+    //     })
+    //     .attr("y", function(d) {
+    //         return d.y;
+    //     })
+    //     .attr("dy", ".35em")
+    //     .style({'text-anchor':'middle', 'fill':'black'})
+    //     .text(function(d) {
+    //         return d.name;
+    //     });
 }
 
 function start(){
+
+    d3.json("data/rankings.json", function(error, json) {
+        if (error) return console.warn(error);
+
+        json.forEach(function(patient){
+
+            var patientNumber = parseInt(patient.id);
+            console.log(sites[patientNumber-1]);
+
+        });
+
+    });
+
     createNetwork('#template', template);
 }
