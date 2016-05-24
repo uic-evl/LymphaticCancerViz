@@ -2,91 +2,91 @@ var template = {
     nodes: [
         {
             name: "1A",
-            x: 600,
-            y: 150
+            x: 225,
+            y: 75
         },
         {
             name: "1B",
-            x: 450,
-            y: 150
+            x: 150,
+            y: 75
         },
         {
             name: "2",
-            x: 225,
-            y: 200
+            x: 115,
+            y: 100
         },
         {
             name: "3",
-            x: 300,
-            y: 300
+            x: 150,
+            y: 150
         },
         {
             name: "4A",
-            x: 300,
-            y: 450
+            x: 150,
+            y: 225
         },
         {
             name: "5A",
-            x: 150,
-            y: 300
+            x: 75,
+            y: 150
         },
         {
             name: "5B",
-            x: 150,
-            y: 450
+            x: 75,
+            y: 225
         },
         {
             name: "6",
-            x: 600,
-            y: 300
+            x: 300,
+            y: 150
         },
         {
             name: "7A",
-            x: 225,
-            y: 100
+            x: 110,
+            y: 50
         }
     ],
-    // links: [{
-    //     source: 0,
-    //     target: 1
-    // },
-    // {
-    //     source: 1,
-    //     target: 2
-    // },
-    // {
-    //     source: 2,
-    //     target: 3
-    // },
-    // {
-    //     source: 3,
-    //     target: 4
-    // },
-    // {
-    //     source: 4,
-    //     target: 6
-    // },
-    // {
-    //     source: 5,
-    //     target: 6
-    // },
-    // {
-    //     source: 5,
-    //     target: 2
-    // },
-    // {
-    //     source: 2,
-    //     target: 8
-    // },
-    // {
-    //     source: 1,
-    //     target: 7
-    // },
-    // {
-    // source: 0,
-    // target: 7
-    // }
-    // ]
+    links: [{
+        source: 0,
+        target: 1
+    },
+    {
+        source: 1,
+        target: 2
+    },
+    {
+        source: 2,
+        target: 3
+    },
+    {
+        source: 3,
+        target: 4
+    },
+    {
+        source: 4,
+        target: 6
+    },
+    {
+        source: 5,
+        target: 6
+    },
+    {
+        source: 5,
+        target: 2
+    },
+    {
+        source: 2,
+        target: 8
+    },
+    {
+        source: 1,
+        target: 7
+    },
+    {
+    source: 0,
+    target: 7
+    }
+    ]
 };
 
 var sites = [
@@ -139,11 +139,22 @@ var sites = [
 ];
 
 var groupPath = function(d) {
-    console.log(d);
-    return "M" +
-        d3.geom.hull(d.values.map(function(i) { return [i.x, i.y]; }))
-            .join("L")
-        + "Z";
+
+    // add fake points to the hull if there are < 3
+    var fakePoints = [];
+    if (d.values.length < 3) {
+        fakePoints = [ [d.values[0].x + 0.001, d.values[0].y - 0.001],
+            [d.values[0].x - 0.001, d.values[0].y + 0.001],
+            [d.values[0].x - 0.001, d.values[0].y + 0.001]];
+    }
+
+    // construct the convex hull
+    var hull = "M" +
+        d3.geom.hull(d.values.map(function(i) {
+            return [i.x, i.y]; }
+        ).concat(fakePoints)) .join("L") + "Z";
+
+    return hull;
 };
 
 var fill = d3.scale.category10();
@@ -151,38 +162,40 @@ var fill = d3.scale.category10();
 var groupFill = function(d, i) { return fill(i & 3); };
 
 
-function createNetwork(div, data){
+function createNetwork(div, data, tumors){
 
     var svg = d3.select(div)
         .append("svg")
-        .attr("width", 1200)
-        .attr("height", 800);
+        .attr("width", 350)
+        .attr("height", 350);
 
     var groups = d3.nest().key(function(d) {
-        console.log(d);
-        return d & 3; }).entries(data.nodes);
+        return (_.indexOf(tumors, d.name) >= 0) ? d & 3 : 1;
+    }).entries(data.nodes);
 
-    // var links = svg.selectAll("link")
-    //     .data(data.links)
-    //     .enter()
-    //     .append("line")
-    //     .attr("class", "link")
-    //     .attr("x1", function(l) {
-    //         var sourceNode = data.nodes.filter(function(d, i) {
-    //             return i == l.source
-    //         })[0];
-    //         d3.select(this).attr("y1", sourceNode.y);
-    //         return sourceNode.x
-    //     })
-    //     .attr("x2", function(l) {
-    //         var targetNode = data.nodes.filter(function(d, i) {
-    //             return i == l.target
-    //         })[0];
-    //         d3.select(this).attr("y2", targetNode.y);
-    //         return targetNode.x
-    //     })
-    //     .attr("fill", "none")
-    //     .attr("stroke", "black");
+    groups = _.filter(groups, function(o) { return o.key === "0"; });
+
+    var links = svg.selectAll("link")
+        .data(data.links)
+        .enter()
+        .append("line")
+        .attr("class", "link")
+        .attr("x1", function(l) {
+            var sourceNode = data.nodes.filter(function(d, i) {
+                return i == l.source
+            })[0];
+            d3.select(this).attr("y1", sourceNode.y);
+            return sourceNode.x
+        })
+        .attr("x2", function(l) {
+            var targetNode = data.nodes.filter(function(d, i) {
+                return i == l.target
+            })[0];
+            d3.select(this).attr("y2", targetNode.y);
+            return targetNode.x
+        })
+        .attr("fill", "none")
+        .attr("stroke", "black");
 
     var nodes = svg.selectAll("circle.node");
         // .enter().append('g');
@@ -198,7 +211,7 @@ function createNetwork(div, data){
         .attr("cy", function(d) {
             return d.y
         })
-        .attr("r", 15)
+        .attr("r", 10)
         .attr("fill", function(d, i) {
 
             if(d.name == '1A') return '#feb24c';
@@ -210,7 +223,8 @@ function createNetwork(div, data){
             else if(d.name == '5B') return '#4292c6';
             else if(d.name == '6') return '#fee0d2';
             else if(d.name == '7A') return '#edf8b1';
-        });
+        })
+        .style("stroke", "gray");
 
     svg.selectAll("path")
         .data(groups)
@@ -238,7 +252,10 @@ function createNetwork(div, data){
     //     });
 }
 
-function start(){
+function createVisualizations(ranking){
 
-    //createNetwork('#template', template);
+    ranking.forEach(function(patient){
+        createNetwork('#patient' + patient.patient, template, patient.nodes);
+    });
+
 }

@@ -4,10 +4,30 @@ var App = App || {};
 function Patients() {
     var self = this;
 
-    self.patients = ko.observableArray();
+    // rankings of the patients
+    self.rankings = ko.observableArray();
 
+    self.patients = ko.observableArray();
     App.data.forEach(function(patient){
         self.patients.push(patient);
+    });
+
+    // the current selection
+    self.currentPatient = ko.observable(self.patients[0]);
+
+    // subscribe to the change of the selection
+    self.currentPatient.subscribe(function(newValue)
+    {
+        var patient = _.find(App.data, function(o) { return o.id == newValue.id; });
+
+        // clear the array
+        self.rankings.removeAll();
+
+        patient.similarity.forEach(function(id){
+            self.rankings.push(sites[id-1]);
+        });
+
+        createVisualizations(self.rankings());
     });
 
 }
