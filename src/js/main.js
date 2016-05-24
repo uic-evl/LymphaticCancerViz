@@ -37,7 +37,7 @@ var template = {
         },
         {
             name: "6",
-            x: 300,
+            x: 250,
             y: 150
         },
         {
@@ -160,7 +160,6 @@ var groupPath = function(d) {
 var fill = d3.scale.category10();
 
 var groupFill = function(d, i) { return fill(i & 3); };
-
 
 function createNetwork(div, data, tumors){
 
