@@ -14,11 +14,18 @@
 
 <script src="src/js/main.js"></script>
 
-<ul data-bind="foreach: patients">
-    <li>
-        Name at position <span data-bind="text: id"> </span>:
-    </li>
-</ul>
+<select data-bind="options: patients,
+                    optionsText: function(item) {
+                       return 'Patient ' + item.id;
+                   },
+                    value: id">
+</select>
+
+<!--<ul >-->
+    <!--<li>-->
+        <!--Name at position <span data-bind="text: id"> </span>:-->
+    <!--</li>-->
+<!--</ul>-->
     <!--<div id="template"></div>-->
 </body>
 
