@@ -19,12 +19,13 @@
 
 <script src="src/js/main.js"></script>
 
-
-<select style='margin-top: 10px; margin-bottom:10px; margin-left: 20px;' data-bind="options: patients,
+<select id='patientSelection' style='margin-top: 10px; margin-bottom:10px; margin-left: 20px;' data-bind="
+                    options: patients,
                     optionsText: function(item) {
                        return 'Patient ' + item.id;
                    },
-                    value: currentPatient">
+                    value: currentPatient,
+                    optionsCaption: optionsCaption">
 </select>
 
 <div class="container-fluid" data-bind="foreach: rankings">

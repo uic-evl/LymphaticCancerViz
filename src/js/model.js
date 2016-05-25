@@ -6,18 +6,20 @@ function Patients() {
 
     // rankings of the patients
     self.rankings = ko.observableArray();
+    self.optionsCaption = ko.observable('Select a Patient');
 
     self.patients = ko.observableArray();
     App.data.forEach(function(patient){
         self.patients.push(patient);
     });
 
-    // the current selection
     self.currentPatient = ko.observable(self.patients[0]);
 
     // subscribe to the change of the selection
     self.currentPatient.subscribe(function(newValue)
     {
+        self.optionsCaption(undefined);
+
         var patient = _.find(App.data, function(o) { return o.id == newValue.id; });
 
         // clear the array
@@ -29,7 +31,6 @@ function Patients() {
 
         createVisualizations(self.rankings());
     });
-
 }
 
 /*** IFE to load the data and apply the KO bindings ***/
