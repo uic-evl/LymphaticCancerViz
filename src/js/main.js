@@ -159,7 +159,7 @@ var groupPath = function(d) {
 
 var fill = d3.scale.category10();
 
-var groupFill = function(d, i) { return fill(i & 3); };
+var groupFill = function(d, i) { return '#de2d26'; };
 
 function createNetwork(div, data, tumors){
 
@@ -174,6 +174,7 @@ function createNetwork(div, data, tumors){
 
     groups = _.filter(groups, function(o) { return o.key === "0"; });
 
+    /** Adds the links between the nodes **/
     var links = svg.selectAll("link")
         .data(data.links)
         .enter()
@@ -183,6 +184,7 @@ function createNetwork(div, data, tumors){
             var sourceNode = data.nodes.filter(function(d, i) {
                 return i == l.source
             })[0];
+
             d3.select(this).attr("y1", sourceNode.y);
             return sourceNode.x
         })
@@ -190,18 +192,20 @@ function createNetwork(div, data, tumors){
             var targetNode = data.nodes.filter(function(d, i) {
                 return i == l.target
             })[0];
+
             d3.select(this).attr("y2", targetNode.y);
             return targetNode.x
         })
         .attr("fill", "none")
         .attr("stroke", "black");
 
-    var nodes = svg.selectAll("circle.node");
-        // .enter().append('g');
-
-    nodes
+    var nodes = svg.selectAll("circle.node")
+        .append('g')
         .data(data.nodes)
-        .enter()
+        .enter();
+
+    /** Adds the nodes **/
+    nodes
         .append("circle")
         .attr("class", "node")
         .attr("cx", function(d) {
@@ -210,21 +214,38 @@ function createNetwork(div, data, tumors){
         .attr("cy", function(d) {
             return d.y
         })
-        .attr("r", 10)
+        .attr("r", 15)
         .attr("fill", function(d, i) {
 
             if(d.name == '1A') return '#feb24c';
             else if(d.name == '1B') return '#fd8d3c';
             else if(d.name == '2') return '#c7e9c0';
             else if(d.name == '3') return '#74c476';
-            else if(d.name == '4A') return '#238b45';
+            else if(d.name == '4A') return '#41ae76';
             else if(d.name == '5A') return '#9ecae1';
-            else if(d.name == '5B') return '#4292c6';
+            else if(d.name == '5B') return '#7fcdbb';
             else if(d.name == '6') return '#fee0d2';
             else if(d.name == '7A') return '#edf8b1';
         })
         .style("stroke", "gray");
+//        .style('opacity', '0.75');
 
+    /** Adds the text ontop of the nodes **/
+    nodes
+        .append("text")
+        .attr("x", function(d) {
+            return d.x;
+        })
+        .attr("y", function(d) {
+            return d.y;
+        })
+        .attr("dy", ".35em")
+        .style({'text-anchor':'middle', 'fill':'black'})
+        .text(function(d) {
+            return d.name;
+        });
+
+    /** Adds the convex hulls **/
     svg.selectAll("path")
         .data(groups)
         .attr("d", groupPath)
@@ -233,22 +254,8 @@ function createNetwork(div, data, tumors){
         .style("stroke", groupFill)
         .style("stroke-width", 40)
         .style("stroke-linejoin", "round")
-        .style("opacity", .2)
+        .style("opacity", .4)
         .attr("d", groupPath);
-
-    // nodes
-    //     .append("text")
-    //     .attr("x", function(d) {
-    //         return d.x;
-    //     })
-    //     .attr("y", function(d) {
-    //         return d.y;
-    //     })
-    //     .attr("dy", ".35em")
-    //     .style({'text-anchor':'middle', 'fill':'black'})
-    //     .text(function(d) {
-    //         return d.name;
-    //     });
 }
 
 function createVisualizations(ranking){
