@@ -236,15 +236,6 @@ function createNetwork(div, data, tumors){
         .attr("r", 15)
         .attr("fill", function(d, i) {
             return "#f0f0f0";
-            // if(d.name == '1A') return '#feb24c';
-            // else if(d.name == '1B') return '#fd8d3c';
-            // else if(d.name == '2') return '#c7e9c0';
-            // else if(d.name == '3') return '#74c476';
-            // else if(d.name == '4A') return '#41ae76';
-            // else if(d.name == '5A') return '#9ecae1';
-            // else if(d.name == '5B') return '#7fcdbb';
-            // else if(d.name == '6') return '#fee0d2';
-            // else if(d.name == '7A') return '#edf8b1';
         })
         .style("stroke", "gray");
 //        .style('opacity', '0.75');
