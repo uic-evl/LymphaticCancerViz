@@ -2,13 +2,13 @@
 
 <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="src/css/custom.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-debug.js"></script>
 
     <script src="https://code.jquery.com/jquery-2.1.2.min.js"></script>
-
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
     <script src="src/js/model.js"></script>
@@ -19,7 +19,8 @@
 
 <script src="src/js/main.js"></script>
 
-<select data-bind="options: patients,
+
+<select style='margin-top: 10px; margin-bottom:10px; margin-left: 20px;' data-bind="options: patients,
                     optionsText: function(item) {
                        return 'Patient ' + item.id;
                    },
@@ -29,7 +30,17 @@
 <div class="container-fluid" data-bind="foreach: rankings">
 
     <div data-bind="css: { row: $index%4 >= 0 }">
-        <div class="col-md-3" data-bind="attr: {id: 'patient'+patient}"></div>
+        <div class="col-md-3">
+            <div class="x_panel tile">
+                <div class="x_title">
+                    <h2 data-bind="text: 'Patient '+patient"></h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div data-bind="attr: {id: 'patient'+patient}" ></div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

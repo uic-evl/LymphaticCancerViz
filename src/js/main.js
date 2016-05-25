@@ -2,47 +2,47 @@ var template = {
     nodes: [
         {
             name: "1A",
-            x: 225,
+            x: 175,
             y: 75
         },
         {
             name: "1B",
-            x: 150,
+            x: 125,
             y: 75
         },
         {
             name: "2",
-            x: 115,
+            x: 65,
             y: 100
         },
         {
             name: "3",
-            x: 150,
+            x: 100,
             y: 150
         },
         {
             name: "4A",
-            x: 150,
+            x: 100,
             y: 225
         },
         {
             name: "5A",
-            x: 75,
+            x: 25,
             y: 150
         },
         {
             name: "5B",
-            x: 75,
+            x: 25,
             y: 225
         },
         {
             name: "6",
-            x: 250,
+            x: 200,
             y: 150
         },
         {
             name: "7A",
-            x: 110,
+            x: 60,
             y: 50
         }
     ],
@@ -165,8 +165,8 @@ function createNetwork(div, data, tumors){
 
     var svg = d3.select(div)
         .append("svg")
-        .attr("width", 350)
-        .attr("height", 350);
+        .attr("width", 250)
+        .attr("height", 250);
 
     var groups = d3.nest().key(function(d) {
         return (_.indexOf(tumors, d.name) >= 0) ? d & 3 : 1;
