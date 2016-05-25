@@ -67,6 +67,14 @@ var template = {
         target: 6
     },
     {
+        source: 4,
+        target: 7
+    },
+    {
+        source: 5,
+        target: 7
+    },
+    {
         source: 5,
         target: 6
     },
@@ -93,47 +101,58 @@ var sites = [
 
     {
         patient: '1',
-        nodes: ['1B', '2']
+        nodes: ['1B', '2'],
+        position: 'Right'
     },
     {
         patient: '2',
-        nodes: ['2']
+        nodes: ['2'],
+        position: 'Left'
     },
     {
         patient: '3',
-        nodes: []
+        nodes: [],
+        position: 'Right'
     },
     {
         patient: '4',
-        nodes: ['2']
+        nodes: ['2'],
+        position: 'Left'
     },
     {
         patient: '5',
-        nodes: ['4A', '2', '3']
+        nodes: ['4A', '2', '3'],
+        position: 'Right'
     },
     {
         patient: '6',
-        nodes: ['2', '3']
+        nodes: ['2', '3'],
+        position: 'Left'
     },
     {
         patient: '7',
-        nodes: []
+        nodes: [],
+        position: 'Left'
     },
     {
         patient: '8',
-        nodes: ['2']
+        nodes: ['2'],
+        position: 'Right'
     },
     {
         patient: '9',
-        nodes: ['2']
+        nodes: ['2'],
+        position: 'Bilateral'
     },
     {
         patient: '10',
-        nodes: []
+        nodes: [],
+        position: 'Right'
     },
     {
         patient: '11',
-        nodes: ['7A', '2', '2']
+        nodes: ['7A', '2', '2'],
+        position: 'Right'
     }
 
 ];
@@ -216,16 +235,16 @@ function createNetwork(div, data, tumors){
         })
         .attr("r", 15)
         .attr("fill", function(d, i) {
-
-            if(d.name == '1A') return '#feb24c';
-            else if(d.name == '1B') return '#fd8d3c';
-            else if(d.name == '2') return '#c7e9c0';
-            else if(d.name == '3') return '#74c476';
-            else if(d.name == '4A') return '#41ae76';
-            else if(d.name == '5A') return '#9ecae1';
-            else if(d.name == '5B') return '#7fcdbb';
-            else if(d.name == '6') return '#fee0d2';
-            else if(d.name == '7A') return '#edf8b1';
+            return "#f0f0f0";
+            // if(d.name == '1A') return '#feb24c';
+            // else if(d.name == '1B') return '#fd8d3c';
+            // else if(d.name == '2') return '#c7e9c0';
+            // else if(d.name == '3') return '#74c476';
+            // else if(d.name == '4A') return '#41ae76';
+            // else if(d.name == '5A') return '#9ecae1';
+            // else if(d.name == '5B') return '#7fcdbb';
+            // else if(d.name == '6') return '#fee0d2';
+            // else if(d.name == '7A') return '#edf8b1';
         })
         .style("stroke", "gray");
 //        .style('opacity', '0.75');

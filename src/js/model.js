@@ -29,6 +29,7 @@ function Patients() {
             self.rankings.push(sites[id-1]);
         });
 
+
         createVisualizations(self.rankings());
     });
 }
