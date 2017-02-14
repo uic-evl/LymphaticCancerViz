@@ -2,7 +2,7 @@ var App = App || {};
 
 /*** KO Class ***/
 function Patients() {
-    var self = this;
+    let self = this;
 
     // rankings of the patients
     self.rankings = ko.observableArray();
@@ -20,7 +20,7 @@ function Patients() {
     {
         self.optionsCaption(undefined);
 
-        var patient = _.find(App.data, function(o) { return o.id == newValue.id; });
+        let patient = _.find(App.data, function(o) { return o.id == newValue.id; });
 
         // clear the array
         self.rankings.removeAll();
@@ -46,7 +46,16 @@ function Patients() {
 
       /* Iterate through the data and pull out each patient's information */
       App.data.forEach(function(patient){
-        var site = {
+
+        // Check to see if the code lymph node 5 is infected
+        let lymphNode5 = patient.nodes.indexOf("5");
+        /* If so, we want to split 5 into 5A and 5B */
+        if(lymphNode5 > -1){
+          patient.nodes[lymphNode5] = "5A";
+          patient.nodes.push("5B");
+        }
+
+        let site = {
           "patient"  : patient.id,
           "nodes"    : patient.nodes,
           "position" : patient.position

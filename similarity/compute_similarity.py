@@ -94,7 +94,7 @@ def compute_similarity():
         f.write('"similarity": [' + list + '], ' )
         list = ",".join(str(e) for e in scores)
         f.write('"scores": [' + list + '], ')
-        list = '","'.join(str(e) for e in graphA.get_nodes())
+        list = '","'.join(str(e).upper() for e in graphA.get_nodes())
         f.write('"nodes": ["' + list + '"] }')
 
         # check for end of data
