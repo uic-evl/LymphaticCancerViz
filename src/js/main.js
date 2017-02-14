@@ -21,7 +21,7 @@ var template = {
             y: 150
         },
         {
-            name: "4A",
+            name: "4",
             x: 100,
             y: 225
         },
@@ -41,7 +41,7 @@ var template = {
             y: 150
         },
         {
-            name: "7A",
+            name: "7",
             x: 60,
             y: 50
         }
@@ -96,66 +96,6 @@ var template = {
     }
     ]
 };
-
-var sites = [
-
-    {
-        patient: '1',
-        nodes: ['1B', '2'],
-        position: 'Right'
-    },
-    {
-        patient: '2',
-        nodes: ['2'],
-        position: 'Left'
-    },
-    {
-        patient: '3',
-        nodes: [],
-        position: 'Right'
-    },
-    {
-        patient: '4',
-        nodes: ['2'],
-        position: 'Left'
-    },
-    {
-        patient: '5',
-        nodes: ['4A', '2', '3'],
-        position: 'Right'
-    },
-    {
-        patient: '6',
-        nodes: ['2', '3'],
-        position: 'Left'
-    },
-    {
-        patient: '7',
-        nodes: [],
-        position: 'Left'
-    },
-    {
-        patient: '8',
-        nodes: ['2'],
-        position: 'Right'
-    },
-    {
-        patient: '9',
-        nodes: ['2'],
-        position: 'Bilateral'
-    },
-    {
-        patient: '10',
-        nodes: [],
-        position: 'Right'
-    },
-    {
-        patient: '11',
-        nodes: ['7A', '2', '2'],
-        position: 'Right'
-    }
-
-];
 
 var groupPath = function(d) {
 
@@ -240,7 +180,7 @@ function createNetwork(div, data, tumors){
         .style("stroke", "gray");
 //        .style('opacity', '0.75');
 
-    /** Adds the text ontop of the nodes **/
+    /** Adds the text on top of the nodes **/
     nodes
         .append("text")
         .attr("x", function(d) {
