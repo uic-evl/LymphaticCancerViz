@@ -26,8 +26,12 @@ function Patients() {
         self.rankings.removeAll();
 
         patient.similarity.forEach(function(id){
-            self.rankings.push(App.sites[id-1]);
+            let site = _.find(App.sites, {patient: id});
+            self.rankings.push(site);
         });
+
+        console.log(self.rankings());
+
         // Render to the screen
         createVisualizations(self.rankings());
     });
@@ -45,14 +49,6 @@ function Patients() {
 
       /* Iterate through the data and pull out each patient's information */
       App.data.forEach(function(patient){
-
-        // Check to see if the code lymph node 5 is infected
-        let lymphNode5 = patient.nodes.indexOf("5");
-        /* If so, we want to split 5 into 5A and 5B */
-        if(lymphNode5 > -1){
-          patient.nodes[lymphNode5] = "5A";
-          patient.nodes.push("5B");
-        }
 
         let site = {
           "patient"  : patient.id,
