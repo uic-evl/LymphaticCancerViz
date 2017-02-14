@@ -3,34 +3,53 @@ import numpy as np
 
 class Graph(object):
 
-    def __init__(self, size_a, size_b):
+    def __init__(self, rows, cols):
 
         # initialize the matrix to all zeros
-        self.matrix = np.zeros((size_a, size_b))
+        self.matrix = np.zeros((len(rows), len(cols)))
         # store the row and column sizes
-        self.row_length = size_a
-        self.col_length = size_b
+        self.row_length = len(rows)
+        self.col_length = len(cols)
 
         # store a list of node names to map between indices
-        self.map = ["1a", "1b", "2", "3", "4", "5a", "5b", "6", "7"]
+        self.rows = rows
+        self.cols = cols
+
+        self.nodes = []
 
     def set_value_at(self, i, j, value):
+
         # get the row and column of the matrix from the values
-        row = self.map.index(i[1:].lower())
-        col = self.map.index(j[1:].lower())
+        row = self.rows.index(i.lower())
+        col = self.cols.index(j.lower())
 
         self.matrix[row][col] = value
 
+    def set_node_value(self, node):
+        if node not in self.nodes:
+            self.nodes.append(node.lower())
+
+    def get_nodes(self):
+        return self.nodes
+
     def get_value_at(self, i, j):
-        return self.matrix[i][j]
+        # get the indices
+        row = self.rows.index(i.lower())
+        col = self.cols.index(j.lower())
+
+        return self.matrix[row][col]
+
+    def get_rows(self):
+        return self.rows
+
+    def get_cols(self):
+        return self.cols
+
+    def get_row(self, index):
+        return self.matrix[index, :]
 
     def print_matrix(self):
-        print '{:>4} {:>4} {:>4} {:>4} {:>4} {:>4} {:>4} {:>4} {:>4}'\
-                .format(self.map[0], self.map[1], self.map[2], self.map[3], self.map[4], self.map[5], self.map[6],
-                        self.map[7], self.map[8])
+        print ''.join('{:>4} '.format(x) for x in self.cols)
 
         for row in self.matrix:
-            line = '{:>4} {:>4} {:>4} {:>4} {:>4} {:>4} {:>4} {:>4} {:>4}'\
-                .format(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
-            #print '  '.join('%s' % int(i) for i in row)
-            print line
+            print ''.join('{:>4} '.format(x) for x in row)

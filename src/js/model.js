@@ -26,7 +26,7 @@ function Patients() {
         self.rankings.removeAll();
 
         patient.similarity.forEach(function(id){
-            self.rankings.push(sites[id-1]);
+            self.rankings.push(App.sites[id-1]);
         });
 
 
@@ -37,10 +37,23 @@ function Patients() {
 /*** IFE to load the data and apply the KO bindings ***/
 (function(){
 
-    d3.json("data/rankings.json", function(error, json) {
+    d3.json("data/data.json", function(error, json) {
         if (error) return console.warn(error);
 
         App.data = json;
+
+        App.sites = [];
+
+      /* Iterate through the data and pull out each patient's information */
+      App.data.forEach(function(patient){
+        var site = {
+          "patient"  : patient.id,
+          "nodes"    : patient.nodes,
+          "position" : patient.position
+        };
+        App.sites.push(site);
+      });
+
         ko.applyBindings(new Patients());
 
     });
