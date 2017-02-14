@@ -28,8 +28,7 @@ function Patients() {
         patient.similarity.forEach(function(id){
             self.rankings.push(App.sites[id-1]);
         });
-
-
+        // Render to the screen
         createVisualizations(self.rankings());
     });
 }
