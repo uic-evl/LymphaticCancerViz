@@ -7,7 +7,7 @@ node_index = 12
 # store all of the graphs in a list
 graphs = {}
 
-lymph_nodes = ["1a", "1b", "2", "3", "4", "5", "6", "7"]
+lymph_nodes = ["1a", "1b", "2", "3", "4", "5a", "5b", "6", "7"]
 
 tumors = []
 
@@ -66,16 +66,17 @@ def compute_similarity():
     scores = []
 
     # small function to sort the patients by their scores
-    def getScore(index):
+    def getScore(idx):
+        i = graphs.keys().index(idx)
+        # print len(scores)
         # we want the first element to stay the same
-        return scores[index-1]
+        return scores[i]
 
     # iterate over the graphs and compute the similarity
     for keyA, graphA in graphs.iteritems():
         scores = []
         # create a list of the other patients
         otherGraphs = copy.deepcopy(graphs)
-        #del otherGraphs[keyA]
 
         for keyB, graphB in otherGraphs.iteritems():
             if keyB == keyA:
@@ -98,7 +99,7 @@ def compute_similarity():
         f.write('"nodes": ["' + list + '"] }')
 
         # check for end of data
-        if int(keyA) == len(graphs):
+        if keyA == graphs.keys()[-1]:
             f.write("\n")
         else:
             f.write(",\n")
@@ -119,7 +120,7 @@ if __name__ == "__main__":
 
             # parse the nodes from the row
             nodes = row[node_index].split(';')
-            # strip out the white space from each string
+            # strip out the white space from eanode[1:], node[1:]ch string
             # I am also replacing rpln with a 7 to fit our previous model
             parsed_nodes = [x.strip(' ').replace(' RPLN', '7') for x in nodes]
 
@@ -147,13 +148,12 @@ if __name__ == "__main__":
             for node in parsed_nodes:
                 g.set_node_value(node[1:])
                 g.set_value_at(node[1:], node[1:], 1)
-
             graphs.update({patient:g})
 
             # print g.get_nodes()
             # print
 
-            if patient == 12:
+            if patient == 139:
                 break
 
     # computer the similarity of the constructed graphs
