@@ -33,7 +33,7 @@
     <div data-bind="css: { row: $index%4 >= 0 }">
         <div class="col-md-2">
             <div class="x_panel tile">
-                <div class="x_title">
+                <div class="x_title" databind="css: { male: gender=='male'}">
                     <h2 data-bind="text: 'Patient '+patient"></h2>
                     <h2 class='tumor' data-bind="text: 'Tumor: '+position"></h2>
                     <div class="clearfix"></div>

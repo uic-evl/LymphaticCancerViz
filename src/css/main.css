@@ -2,3 +2,11 @@ h2.tumor {
     float: right;
     font-size: 12px !important;
 }
+
+.male {
+    background: #a6cee3;
+}
+
+.female {
+    background: #fb9a99;
+}

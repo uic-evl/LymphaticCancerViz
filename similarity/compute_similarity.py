@@ -11,6 +11,8 @@ lymph_nodes = ["1a", "1b", "2", "3", "4", "5a", "5b", "6", "7"]
 
 tumors = []
 
+genders = []
+
 # output file
 f = None
 
@@ -90,7 +92,8 @@ def compute_similarity():
         sorted_by_score = sorted(otherGraphs, key=getScore, reverse=True)
 
         # write the output
-        f.write( '{ "id": ' + str(keyA) + ', "position": "' + tumors[int(keyA)-1] + '", '  )
+        f.write( '{ "id": ' + str(keyA) + ', "gender": "' + genders[int(keyA)-1] + '", ')
+        f.write('"position": "' + tumors[int(keyA)-1] + '", '  )
         list = ",".join(str(e) for e in sorted_by_score)
         f.write('"similarity": [' + list + '], ' )
         list = ",".join(str(e) for e in scores)
@@ -129,6 +132,7 @@ if __name__ == "__main__":
 
             # get the patient number
             patient = int(row[0])
+            genders.append(str(row[1]).lower())
 
             tumor_position = row[6]
             if len(tumor_position) > 1 or len(tumor_position) == 0:
