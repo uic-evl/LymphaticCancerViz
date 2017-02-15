@@ -822,7 +822,6 @@ h2 {
     position: relative;
     width: 100%;
     margin-bottom: 10px;
-    padding: 10px 17px;
     display: inline-block;
     background: #fff;
     border: 1px solid #E6E9ED;
@@ -836,9 +835,9 @@ h2 {
     -ms-transition: all .2s ease;
     transition: all .2s ease;
 }
+
 .x_title {
     border-bottom: 2px solid #E6E9ED;
-    padding: 1px 5px 2px;
     /*margin-bottom: 10px;*/
 }
 .x_title .filter {
@@ -852,6 +851,7 @@ h2 {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    padding: 10px 17px;
 }
 .x_title h2 small {
     margin-left: 10px;

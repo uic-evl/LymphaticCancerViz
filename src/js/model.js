@@ -30,8 +30,6 @@ function Patients() {
             self.rankings.push(site);
         });
 
-        console.log(self.rankings());
-
         // Render to the screen
         createVisualizations(self.rankings());
     });
@@ -53,8 +51,11 @@ function Patients() {
         let site = {
           "patient"  : patient.id,
           "nodes"    : patient.nodes,
-          "position" : patient.position
+          "position" : patient.position,
+          "gender"   : patient.gender
         };
+
+        console.log(site);
         App.sites.push(site);
       });
 
