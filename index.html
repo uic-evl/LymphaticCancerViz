@@ -30,7 +30,7 @@
 
 <div class="container-fluid" data-bind="foreach: rankings">
 
-    <div data-bind="css: { row: $index%4 >= 0 }">
+    <div data-bind="css: { row: $index%4 == 0 }">
         <div class="col-md-2">
             <div class="x_panel tile">
                 <div class="x_title" data-bind="css: { male: gender=='male', female: gender=='female'}">
