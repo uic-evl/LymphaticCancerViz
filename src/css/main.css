@@ -1,12 +1,13 @@
 h2.tumor {
     float: right;
     font-size: 12px !important;
+    text-align: right;
 }
 
 .male {
-    background: #a6cee3;
+    background: rgba(179,205,227,0.4);
 }
 
 .female {
-    background: #fb9a99;
+    background: rgba(251,154,153,0.4);
 }
