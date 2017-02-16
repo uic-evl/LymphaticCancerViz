@@ -223,8 +223,8 @@ body .container.body .right_col {
 }
 @media (max-width: 1200px) {
     .x_title h2 {
-        width: 62%;
-        font-size: 12px;
+        width: 50%;
+        font-size: 14px;
     }
     .tile, .graph {
         zoom: 85%;
@@ -851,7 +851,8 @@ h2 {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    padding: 10px 17px;
+    padding: 10px 13px;
+    font-weight: bolder;
 }
 .x_title h2 small {
     margin-left: 10px;

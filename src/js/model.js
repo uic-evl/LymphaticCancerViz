@@ -54,13 +54,9 @@ function Patients() {
           "position" : patient.position,
           "gender"   : patient.gender
         };
-
-        console.log(site);
         App.sites.push(site);
       });
-
         ko.applyBindings(new Patients());
-
     });
 
 })();
