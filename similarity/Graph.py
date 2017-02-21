@@ -16,6 +16,7 @@ class Graph(object):
         self.cols = cols
 
         self.nodes = []
+        self.positions = []
 
     def set_value_at(self, i, j, value):
 
@@ -29,8 +30,15 @@ class Graph(object):
         if node not in self.nodes:
             self.nodes.append(node.lower())
 
+    def set_node_position(self, node):
+        if node not in self.nodes:
+            self.positions.append(node.lower())
+
     def get_nodes(self):
         return self.nodes
+
+    def get_node_positions(self):
+        return self.positions
 
     def get_value_at(self, i, j):
         # get the indices
