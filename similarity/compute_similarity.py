@@ -1,5 +1,6 @@
 import sys, csv, copy
 from Graph import Graph
+from Patient import Patient
 
 # the index corresponding to the list of affected nodes
 node_index = 13
@@ -7,7 +8,7 @@ gender_index = 2
 tumor_index = 7
 
 # store all of the graphs in a list
-graphs = {}
+patients = {}
 
 lymph_nodes = ["1a", "1b", "2", "3", "4", "5a", "5b", "6", "7"]
 
@@ -71,31 +72,39 @@ def compute_similarity():
 
     # small function to sort the patients by their scores
     def getScore(idx):
-        i = graphs.keys().index(idx)
+        i = patients.keys().index(idx)
         # print len(scores)
         # we want the first element to stay the same
         return scores[i]
 
     # iterate over the graphs and compute the similarity
-    for keyA, graphA in graphs.iteritems():
+    for keyA, patientA in patients.iteritems():
+
+        # get the left graph of patient A
+        graphA = patientA.get_graph("Left")
+
         scores = []
         # create a list of the other patients
-        otherGraphs = copy.deepcopy(graphs)
+        otherPatients = copy.deepcopy(patients)
 
-        for keyB, graphB in otherGraphs.iteritems():
+        for keyB, patientB in otherPatients.iteritems():
             if keyB == keyA:
                 scores.append(sys.maxint)
                 continue
+
+            # get the left graph of patient A
+            graphB = patientA.get_graph("Left")
+
             # compute the neighbor similarity of the two graphs
             graph_similarity = compute_graph_similarity(graphA, graphB)
             scores.append(graph_similarity)
 
         # sort the patients by their scores
-        sorted_by_score = sorted(otherGraphs, key=getScore, reverse=True)
+        sorted_by_score = sorted(otherPatients, key=getScore, reverse=True)
 
         # write the output
-        f.write( '{ "id": ' + str(keyA) + ', "gender": "' + genders[int(keyA)-1] + '", ')
-        f.write('"position": "' + tumors[int(keyA)-1] + '", '  )
+        f.write( '{ "id": ' + str(keyA) + ', "gender": "' + patientA.get_gender() + '", ')
+        f.write('"position": "' + patientA.get_tumor_position() + '", '  )
         list = ",".join(str(e) for e in sorted_by_score)
         f.write('"similarity": [' + list + '], ' )
         list = ",".join(str(e) for e in scores)
@@ -104,7 +113,7 @@ def compute_similarity():
         f.write('"nodes": ["' + list + '"] }')
 
         # check for end of data
-        if keyA == graphs.keys()[-1]:
+        if keyA == patients.keys()[-1]:
             f.write("\n")
         else:
             f.write(",\n")
@@ -123,6 +132,10 @@ if __name__ == "__main__":
             if not row[0].isdigit():
                 continue
 
+            # get the patient number and create the patient object
+            patient_id= int(row[0])
+            patient = Patient(patient_id)
+
             # parse the nodes from the row
             nodes = row[node_index].split(';')
             # strip out the white space from eanode[1:], node[1:]ch string
@@ -132,49 +145,56 @@ if __name__ == "__main__":
             # get the longest item (test purposes)
             longest_item = max(parsed_nodes, key=len)
 
-            # get the patient number
-            patient = int(row[0])
-            genders.append(str(row[gender_index]).lower())
+            # get and set the patient gender
+            gender = str(row[gender_index]).lower()
+            patient.set_gender(gender)
 
+            # get and set the tumor position
             tumor_position = row[tumor_index]
             if len(tumor_position) > 1 or len(tumor_position) == 0:
-                tumors.append('N/A')
+                tumor_position = 'N/A'
             elif tumor_position.lower() == 'l':
-                tumors.append("Left")
+                tumor_position = "Left"
             elif tumor_position.lower() == 'r':
-                tumors.append("Right")
+                tumor_position = "Right"
+            patient.set_tumor_position(tumor_position)
 
             # until cleaned, I am only working with single coded lymph nodes
             if len(longest_item) > 3:
                 continue
 
-            # create the graph
-            g = Graph(lymph_nodes, lymph_nodes)
+            # create the graph for the left and right lymph nodes
+            left = Graph(lymph_nodes, lymph_nodes)
+            right = Graph(lymph_nodes, lymph_nodes)
+
             # add the nodes to the graph
             for node in parsed_nodes:
-                newNodes = []
+
+                new_nodes = [node]
+                current_graph = left
+
+                if node[1] == 'R':
+                    current_graph = right
 
                 # if the node is 5, then we add both a and b
                 if node[1:] == "5" or node[1:] == "1":
-                    newNodes = [node+'A', node+'B']
+                    new_nodes = []
+                    new_nodes = [node+'A', node+'B']
 
-                if len(newNodes) > 0:
-                    for n in newNodes:
-                        g.set_node_value(n[1:])
-                        g.set_value_at(n[1:], n[1:], 0.5)
-                        g.set_node_position(n)
-                else:
-                    g.set_node_value(node[1:])
-                    g.set_value_at(node[1:], node[1:], 1)
-                    g.set_node_position(node)
+                # add the nodes to the graph
+                for n in new_nodes:
+                    current_graph.set_node_value(n[1:])
+                    # the score is based on whether we had to split the node or not
+                    current_graph.set_value_at(n[1:], n[1:], 1.0 / len(new_nodes))
+                    current_graph.set_node_position(n)
 
-            graphs.update({patient:g})
+            # set the patient graphs
+            patient.set_graphs(left, right)
+            # add the graphs to the dictionary
+            patients.update({patient_id: patient})
 
             # print g.get_nodes()
             # print
-
-            if patient == 139:
-                break
 
     # computer the similarity of the constructed graphs
     compute_similarity()
