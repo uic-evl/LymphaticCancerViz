@@ -100,7 +100,7 @@ def compute_similarity():
         f.write('"similarity": [' + list + '], ' )
         list = ",".join(str(e) for e in scores)
         f.write('"scores": [' + list + '], ')
-        list = '","'.join(str(e).upper() for e in graphA.get_nodes())
+        list = '","'.join(str(e).upper() for e in graphA.get_node_positions())
         f.write('"nodes": ["' + list + '"] }')
 
         # check for end of data
@@ -156,15 +156,17 @@ if __name__ == "__main__":
 
                 # if the node is 5, then we add both a and b
                 if node[1:] == "5" or node[1:] == "1":
-                    newNodes = [node[1:]+'A', node[1:]+'B']
+                    newNodes = [node+'A', node+'B']
 
                 if len(newNodes) > 0:
                     for n in newNodes:
-                        g.set_node_value(n)
-                        g.set_value_at(n, n, 0.5)
+                        g.set_node_value(n[1:])
+                        g.set_value_at(n[1:], n[1:], 0.5)
+                        g.set_node_position(n)
                 else:
                     g.set_node_value(node[1:])
                     g.set_value_at(node[1:], node[1:], 1)
+                    g.set_node_position(node)
 
             graphs.update({patient:g})
 
