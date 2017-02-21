@@ -2,7 +2,9 @@ import sys, csv, copy
 from Graph import Graph
 
 # the index corresponding to the list of affected nodes
-node_index = 12
+node_index = 13
+gender_index = 2
+tumor_index = 7
 
 # store all of the graphs in a list
 graphs = {}
@@ -132,9 +134,9 @@ if __name__ == "__main__":
 
             # get the patient number
             patient = int(row[0])
-            genders.append(str(row[1]).lower())
+            genders.append(str(row[gender_index]).lower())
 
-            tumor_position = row[6]
+            tumor_position = row[tumor_index]
             if len(tumor_position) > 1 or len(tumor_position) == 0:
                 tumors.append('N/A')
             elif tumor_position.lower() == 'l':
@@ -150,8 +152,20 @@ if __name__ == "__main__":
             g = Graph(lymph_nodes, lymph_nodes)
             # add the nodes to the graph
             for node in parsed_nodes:
-                g.set_node_value(node[1:])
-                g.set_value_at(node[1:], node[1:], 1)
+                newNodes = []
+
+                # if the node is 5, then we add both a and b
+                if node[1:] == "5" or node[1:] == "1":
+                    newNodes = [node[1:]+'A', node[1:]+'B']
+
+                if len(newNodes) > 0:
+                    for n in newNodes:
+                        g.set_node_value(n)
+                        g.set_value_at(n, n, 0.5)
+                else:
+                    g.set_node_value(node[1:])
+                    g.set_value_at(node[1:], node[1:], 1)
+
             graphs.update({patient:g})
 
             # print g.get_nodes()
