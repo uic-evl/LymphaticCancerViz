@@ -138,19 +138,20 @@ def compute_similarity():
             if not isinstance(graphA, list) and not isinstance(graphB, list):
                 # compute the neighbor similarity of the two graphs
                 graph_similarity = compute_graph_similarity(graphA, graphB)
+            elif not isinstance(graphA, list) and isinstance(graphB, list):
+                           # take the max score of the two comparisons
+                           first_score = compute_graph_similarity(graphA, graphB[0])
+                           second_score = compute_graph_similarity(graphA, graphB[1])
+                           graph_similarity = max(first_score, second_score)
             elif isinstance(graphA, list) and not isinstance(graphB, list):
                 # take the max score of the two comparisons
                 first_score = compute_graph_similarity(graphA[0], graphB)
                 second_score = compute_graph_similarity(graphA[1], graphB)
                 graph_similarity = max(first_score, second_score)
-            elif isinstance(graphB, list) and not isinstance(graphA, list):
-                # take the max score of the two comparisons
-                first_score = compute_graph_similarity(graphA, graphB[0])
-                second_score = compute_graph_similarity(graphA, graphB[1])
-                graph_similarity = max(first_score, second_score)
-            # both patients have infected nodes on both sides of the head/neck
-            # find the best match by comparing
             else:
+                 # both patients have infected nodes on both sides of the head/neck
+                 # find the best match by comparing
+                print "both have 2"
                 # compute the score in relation to the left side of patient A
                 left_left = compute_graph_similarity(graphA[0], graphB[0])
                 right_right = compute_graph_similarity(graphA[1], graphB[1])
@@ -167,6 +168,7 @@ def compute_similarity():
                 # else, take the max of the two scores
                 else:
                     graph_similarity = max(left_left+right_right, left_right, right_left) / 2.0
+                    print graph_similarity
 
             scores.append(graph_similarity)
 
@@ -232,7 +234,7 @@ if __name__ == "__main__":
                 new_nodes = [node]
                 current_graph = left
 
-                if node[1] == 'R':
+                if node[0] == 'R':
                     current_graph = right
 
                 # if the node is 5, then we add both a and b
