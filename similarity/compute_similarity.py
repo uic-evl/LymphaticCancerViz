@@ -19,6 +19,41 @@ genders = []
 # output file
 f = None
 
+
+def write_to_file(current_patient, scores):
+    # write the output
+    f.write('{ "id": ' + str(current_patient.get_id()) + ', "gender": "' + current_patient.get_gender() + '", ')
+    f.write('"position": "' + current_patient.get_tumor_position() + '", ')
+    output = ",".join(str(e) for e in scores)
+    f.write('"similarity": [' + output + '], ')
+    output = ",".join(str(e) for e in scores)
+    f.write('"scores": [' + output + '], ')
+    output = '","'.join(str(e).upper() for e in current_patient.get_graph("Left").get_node_positions())
+    f.write('"nodes": ["' + output + '"] }')
+
+    # check for end of data
+    if current_patient.get_id() == patients.keys()[-1]:
+        f.write("\n")
+    else:
+        f.write(",\n")
+
+
+def get_patient_graphs(current_patient):
+
+    # get the left graph of current_patient A
+    graphA_left = current_patient.get_graph("Left")
+    graphA_right = current_patient.get_graph("Right")
+
+    # if one of the graphs is devoid of infected nodes, only look at one
+    if len(graphA_left.get_nodes()) == 0:
+        return graphA_right
+    elif len(graphA_right.get_nodes()) == 0:
+        return graphA_left
+    # both have infected nodes on each side of the head
+    else:
+        return [graphA_left, graphA_right]
+
+
 def compute_neighbors_similarity(graph_a, graph_b):
     # get the nodes in graph A and graph B
     aNodes = graph_a.get_nodes()
@@ -65,6 +100,7 @@ def compute_graph_similarity(graph_a, graph_b):
     # normalize the weights with the minimum number of nodes
     return summed_weights / ( len(max_nodes) + total_diff )
 
+
 def compute_similarity():
 
     # store the scores of the test
@@ -80,43 +116,66 @@ def compute_similarity():
     # iterate over the graphs and compute the similarity
     for keyA, patientA in patients.iteritems():
 
-        # get the left graph of patient A
-        graphA = patientA.get_graph("Left")
-
         scores = []
+
+        # get the valid graph from the patient
+        graphA = get_patient_graphs(patientA)
+
         # create a list of the other patients
         otherPatients = copy.deepcopy(patients)
 
         for keyB, patientB in otherPatients.iteritems():
+            # patient is most similar to his/her self
             if keyB == keyA:
                 scores.append(sys.maxint)
                 continue
 
-            # get the left graph of patient A
-            graphB = patientA.get_graph("Left")
+            # get the valid graph from the patient
+            graphB = get_patient_graphs(patientB)
 
-            # compute the neighbor similarity of the two graphs
-            graph_similarity = compute_graph_similarity(graphA, graphB)
+            graph_similarity = 0
+            # if both patients only have one side of their head infected
+            if not isinstance(graphA, list) and not isinstance(graphB, list):
+                # compute the neighbor similarity of the two graphs
+                graph_similarity = compute_graph_similarity(graphA, graphB)
+            elif isinstance(graphA, list) and not isinstance(graphB, list):
+                # take the max score of the two comparisons
+                first_score = compute_graph_similarity(graphA[0], graphB)
+                second_score = compute_graph_similarity(graphA[1], graphB)
+                graph_similarity = max(first_score, second_score)
+            elif isinstance(graphB, list) and not isinstance(graphA, list):
+                # take the max score of the two comparisons
+                first_score = compute_graph_similarity(graphA, graphB[0])
+                second_score = compute_graph_similarity(graphA, graphB[1])
+                graph_similarity = max(first_score, second_score)
+            # both patients have infected nodes on both sides of the head/neck
+            # find the best match by comparing
+            else:
+                # compute the score in relation to the left side of patient A
+                left_left = compute_graph_similarity(graphA[0], graphB[0])
+                right_right = compute_graph_similarity(graphA[1], graphB[1])
+
+                # compute the score in relation to the right side of patient A
+                left_right = compute_graph_similarity(graphA[0], graphB[1])
+                right_left = compute_graph_similarity(graphA[1], graphB[0])
+
+                # test if either group is a perfect match
+                if left_left == 1.0 and right_right == 1.0:
+                    graph_similarity = 2.0
+                elif left_right == 1.0 and right_left == 1.0:
+                    graph_similarity = 2.0
+                # else, take the max of the two scores
+                else:
+                    graph_similarity = max(left_left+right_right, left_right, right_left) / 2.0
+
             scores.append(graph_similarity)
 
         # sort the patients by their scores
         sorted_by_score = sorted(otherPatients, key=getScore, reverse=True)
 
-        # write the output
-        f.write( '{ "id": ' + str(keyA) + ', "gender": "' + patientA.get_gender() + '", ')
-        f.write('"position": "' + patientA.get_tumor_position() + '", '  )
-        list = ",".join(str(e) for e in sorted_by_score)
-        f.write('"similarity": [' + list + '], ' )
-        list = ",".join(str(e) for e in scores)
-        f.write('"scores": [' + list + '], ')
-        list = '","'.join(str(e).upper() for e in graphA.get_node_positions())
-        f.write('"nodes": ["' + list + '"] }')
+        # write the results to the file
+        write_to_file(patientA, sorted_by_score)
 
-        # check for end of data
-        if keyA == patients.keys()[-1]:
-            f.write("\n")
-        else:
-            f.write(",\n")
 
 # Driver starts here
 if __name__ == "__main__":
@@ -198,5 +257,7 @@ if __name__ == "__main__":
 
     # computer the similarity of the constructed graphs
     compute_similarity()
+
+    # write the ending of the json file
     f.write(']')
     f.close()
