@@ -30,8 +30,8 @@
 
 <div class="container-fluid" data-bind="foreach: rankings">
 
-    <div data-bind="css: { row: $index%4 == 0 }">
-        <div class="col-md-2">
+    <div data-bind="css: { row: ($index()+1) % $parent.maxNodes == 0 }">
+        <div class="col-md-2 patient_container">
             <div class="x_panel tile">
                 <div class="x_title" data-bind="css: { male: gender=='male', female: gender=='female'}">
                     <h2 class="patient" data-bind="text: 'Patient '+patient"></h2>
