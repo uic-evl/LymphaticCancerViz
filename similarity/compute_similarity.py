@@ -151,7 +151,7 @@ def compute_similarity():
             else:
                  # both patients have infected nodes on both sides of the head/neck
                  # find the best match by comparing
-                print "both have 2"
+
                 # compute the score in relation to the left side of patient A
                 left_left = compute_graph_similarity(graphA[0], graphB[0])
                 right_right = compute_graph_similarity(graphA[1], graphB[1])
@@ -168,7 +168,6 @@ def compute_similarity():
                 # else, take the max of the two scores
                 else:
                     graph_similarity = max(left_left+right_right, left_right, right_left) / 2.0
-                    print graph_similarity
 
             scores.append(graph_similarity)
 
