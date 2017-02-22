@@ -119,9 +119,9 @@ let fill = d3.scale.category10();
 
 let groupFill = function (d, i) {
   if(i === 0)
-    return '#f46d43';
+    return '#d73027';
   else
-    return "#74add1";
+    return "#4575b4";
 };
 
 function createBubbles(svg, nodes, tumors) {

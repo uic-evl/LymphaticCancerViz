@@ -29,6 +29,7 @@ def write_to_file(current_patient, scores):
     output = ",".join(str(e) for e in scores)
     f.write('"scores": [' + output + '], ')
     output = '","'.join(str(e).upper() for e in current_patient.get_graph("Left").get_node_positions())
+    output += '","'.join(str(e).upper() for e in current_patient.get_graph("Right").get_node_positions())
     f.write('"nodes": ["' + output + '"] }')
 
     # check for end of data
@@ -160,14 +161,16 @@ def compute_similarity():
                 left_right = compute_graph_similarity(graphA[0], graphB[1])
                 right_left = compute_graph_similarity(graphA[1], graphB[0])
 
+                left  = left_left  + right_right
+                right = left_right + right_left
+
                 # test if either group is a perfect match
                 if left_left == 1.0 and right_right == 1.0:
-                    graph_similarity = 2.0
+                    left = left + 1
                 elif left_right == 1.0 and right_left == 1.0:
-                    graph_similarity = 2.0
-                # else, take the max of the two scores
-                else:
-                    graph_similarity = max(left_left+right_right, left_right, right_left) / 2.0
+                    right = right + 1
+
+                graph_similarity = max(left, right) / 2.0
 
             scores.append(graph_similarity)
 
