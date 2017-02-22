@@ -4,6 +4,9 @@ var App = App || {};
 function Patients() {
     let self = this;
 
+    /* Determine how many nodes will fit onto the screen in a single row */
+    self.maxNodes = window.innerWidth / (App.graphSVGWidth + 2 * App.padding);
+
     // rankings of the patients
     self.rankings = ko.observableArray();
     self.optionsCaption = ko.observable('Select a Patient');
@@ -31,7 +34,7 @@ function Patients() {
         });
 
         // Render to the screen
-        createVisualizations(self.rankings());
+        App.createVisualizations(self.rankings());
     });
 }
 
@@ -42,7 +45,6 @@ function Patients() {
         if (error) return console.warn(error);
 
         App.data = json;
-
         App.sites = [];
 
       /* Iterate through the data and pull out each patient's information */
