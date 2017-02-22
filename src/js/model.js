@@ -52,8 +52,8 @@ function Patients() {
           "patient"  : patient.id,
           "nodes"    :
               _.chain(patient.nodes)
-                  // .filter(function(p){ return p[0] === 'L';})
-                  .map(function(p){ return p.substring(1)}).value(),
+                  .partition(function(p){ return p[0] === 'L';}).value(),
+                  //.partition(function(p){ return p.substring(1)}).value(),
           "position" : patient.position,
           "gender"   : patient.gender
         };
