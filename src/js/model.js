@@ -9,6 +9,7 @@ function Patients() {
 
     // rankings of the patients
     self.rankings = ko.observableArray();
+    self.scores   = [];
     self.optionsCaption = ko.observable('Select a Patient');
 
     self.patients = ko.observableArray();
@@ -27,12 +28,14 @@ function Patients() {
 
         // clear the array
         self.rankings.removeAll();
+        self.scores = [];
 
-        patient.similarity.forEach(function(id){
+        patient.similarity.forEach(function(id, i){
             let site = _.find(App.sites, {patient: id});
             self.rankings.push(site);
+            self.scores.push(patient.scores[i]);
         });
-
+        console.log(self.scores);
         // Render to the screen
         App.createVisualizations(self.rankings());
     });
@@ -52,9 +55,7 @@ function Patients() {
 
         let site = {
           "patient"  : patient.id,
-          "nodes"    :
-              _.chain(patient.nodes)
-                  .partition(function(p){ return p[0] === 'L';}).value(),
+          "nodes"    : _.chain(patient.nodes).partition(function(p){ return p[0] === 'L';}).value(),
           "position" : patient.position,
           "gender"   : patient.gender
         };
