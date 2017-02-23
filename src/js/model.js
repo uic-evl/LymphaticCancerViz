@@ -5,7 +5,7 @@ function Patients() {
     let self = this;
 
     /* Determine how many nodes will fit onto the screen in a single row */
-    self.maxNodes = window.innerWidth / (App.graphSVGWidth + 2 * App.padding);
+    self.maxNodes = parseInt(window.innerWidth / (App.graphSVGWidth + 2 * App.padding));
 
     // rankings of the patients
     self.rankings = ko.observableArray();
