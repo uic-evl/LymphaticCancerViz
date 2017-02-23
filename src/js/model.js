@@ -9,6 +9,7 @@ function Patients() {
 
     console.log(self.maxNodes);
     console.log(window.innerWidth);
+    console.log( (App.graphSVGWidth + 2 * App.padding));
 
     // rankings of the patients
     self.rankings = ko.observableArray();
