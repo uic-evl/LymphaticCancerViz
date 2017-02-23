@@ -8,6 +8,7 @@ function Patients() {
     self.maxNodes = window.innerWidth / (App.graphSVGWidth + 2 * App.padding);
 
     console.log(self.maxNodes);
+    console.log(window.innerWidth);
 
     // rankings of the patients
     self.rankings = ko.observableArray();
