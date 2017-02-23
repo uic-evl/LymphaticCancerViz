@@ -27,6 +27,9 @@ class Patient(object):
     def set_tumor_position(self, tumorPosition):
         self.tumor_position = tumorPosition
 
+    def get_all_nodes(self):
+        return self.left_graph.get_node_positions() + self.right_graph.get_node_positions()
+
     def get_tumor_position(self):
         return self.tumor_position
 
