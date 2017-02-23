@@ -105,7 +105,7 @@ var App = App || {};
   /* Initialize the styling variables*/
   App.graphSVGWidth = 250;
   App.graphSVGHeight = 250;
-  App.padding = parseInt($('.patient_container').css('padding-left'));
+  App.padding = parseInt($('.patient_container').css('padding-left')) || 10;
 
   /* The radius of a graph node */
   App.nodeRadius = 15;
