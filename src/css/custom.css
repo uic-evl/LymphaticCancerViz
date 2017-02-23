@@ -223,7 +223,7 @@ body .container.body .right_col {
 }
 @media (max-width: 1200px) {
     .x_title h2 {
-        width: 50%;
+        /*width: 50%;*/
         font-size: 14px;
     }
     .tile, .graph {

@@ -15,12 +15,12 @@ lymph_nodes = ["1a", "1b", "2", "3", "4", "5a", "5b", "6", "7"]
 f = None
 
 
-def write_to_file(current_patient, scores):
+def write_to_file(current_patient, patient_order, scores):
     # write the output
     f.write('{ "id": ' + str(current_patient.get_id()) + ', "gender": "' + current_patient.get_gender() + '", ')
     f.write('"position": "' + current_patient.get_tumor_position() + '", ')
 
-    output = ",".join(str(e) for e in scores)
+    output = ",".join(str(e) for e in patient_order)
     f.write('"similarity": [' + output + '], ')
 
     output = ",".join(str(e) for e in scores)
@@ -82,7 +82,6 @@ def compute_neighbors_similarity(graph_a, graph_b):
             # get the two weights of the graphs, then average their value
             # will not always be one if a graph has a bilateral node
             weight = compare_neighbor_weight(graph_a, graph_b, a_node)
-
             neighbors.set_value_at(a_node, a_node, weight)
 
     return neighbors
@@ -142,22 +141,35 @@ def compute_similarity():
             # get the valid graph from the patient
             graph_b = get_patient_graphs(patientB)
 
-            jaccard = compute_jaccard_distance(patientA.get_all_nodes(), patientB.get_all_nodes())
+            jaccard = 0
             graph_similarity = 0
             # if both patients only have one side of their head infected
             if not isinstance(graph_a, list) and not isinstance(graph_b, list):
                 # compute the neighbor similarity of the two graphs
                 graph_similarity = compute_graph_similarity(graph_a, graph_b)
+                jaccard = compute_jaccard_distance(graph_a.get_nodes(), graph_b.get_nodes())
             elif not isinstance(graph_a, list) and isinstance(graph_b, list):
                 # take the max score of the two comparisons
                 first_score = compute_graph_similarity(graph_a, graph_b[0])
                 second_score = compute_graph_similarity(graph_a, graph_b[1])
+
                 graph_similarity = max(first_score, second_score)
+
+                if graph_similarity == first_score:
+                    jaccard = compute_jaccard_distance(graph_a.get_nodes(), graph_b[0].get_nodes())
+                else:
+                    jaccard = compute_jaccard_distance(graph_a.get_nodes(), graph_b[0].get_nodes())
             elif isinstance(graph_a, list) and not isinstance(graph_b, list):
                 # take the max score of the two comparisons
                 first_score = compute_graph_similarity(graph_a[0], graph_b)
                 second_score = compute_graph_similarity(graph_a[1], graph_b)
                 graph_similarity = max(first_score, second_score)
+
+                if graph_similarity == first_score:
+                    jaccard = compute_jaccard_distance(graph_a[0].get_nodes(), graph_b.get_nodes())
+                else:
+                    jaccard = compute_jaccard_distance(graph_a[1].get_nodes(), graph_b.get_nodes())
+
             else:
                 # both patients have infected nodes on both sides of the head/neck
                 # find the best match by comparing
@@ -173,10 +185,17 @@ def compute_similarity():
                 left_score = left_left + right_right
                 right_score = left_right + right_left
 
-                graph_similarity = max(left_score, right_score) / 2.0
+                graph_similarity = max(left_score, right_score)
+
+                if graph_similarity == left_score:
+                    jaccard = compute_jaccard_distance(graph_a[0].get_nodes(), graph_b[0].get_nodes())
+                    jaccard += compute_jaccard_distance(graph_a[1].get_nodes(), graph_b[1].get_nodes())
+                else:
+                    jaccard = compute_jaccard_distance(graph_a[1].get_nodes(), graph_b[0].get_nodes())
+                    jaccard += compute_jaccard_distance(graph_a[0].get_nodes(), graph_b[1].get_nodes())
 
             # normalize the score with the jaccard distance
-            graph_similarity += 1.0
+            graph_similarity
             graph_similarity /= jaccard
 
             scores.append(graph_similarity)
@@ -185,7 +204,7 @@ def compute_similarity():
         sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
 
         # write the results to the file
-        write_to_file(patientA, sorted_by_score)
+        write_to_file(patientA, sorted_by_score, scores)
 
 
 # Driver starts here
