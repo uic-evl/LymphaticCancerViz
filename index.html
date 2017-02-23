@@ -28,9 +28,10 @@
                     optionsCaption: optionsCaption">
 </select>
 
-<div class="container-fluid" data-bind="foreach: rankings">
+<div class="container-fluid">
 
-    <div data-bind="css: { row: ($index()+1) % $parent.maxNodes == 0 }">
+    <!--<div data-bind="css: { row: ($index()+1) % $parent.maxNodes == 0 }">-->
+    <div class="row"  data-bind="foreach: rankings">
         <div class="col-md-2 patient_container">
             <div class="x_panel tile">
                 <div class="x_title" data-bind="css: { male: gender=='male', female: gender=='female'}">
