@@ -11,7 +11,6 @@
 
     <script src="https://code.jquery.com/jquery-2.1.2.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
 </head>
 
 <body>
@@ -31,8 +30,8 @@
 <div class="container-fluid">
 
     <!--<div data-bind="css: { row: ($index()+1) % $parent.maxNodes == 0 }">-->
-    <div class="row"  data-bind="foreach: rankings">
-        <div class="col-md-2 patient_container">
+    <div class="row" data-bind="foreach: rankings">
+        <div class="patient_container" data-bind=" css: { 'col-md-2': $parent.maxNodes > 5, 'col-md-3': $parent.maxNodes < 6  } ">
             <div class="x_panel tile">
                 <div class="x_title" data-bind="css: { male: gender=='male', female: gender=='female'}">
                     <h2 class="patient" data-bind="text: 'Patient '+patient"></h2>
