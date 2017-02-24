@@ -195,7 +195,6 @@ def compute_similarity():
                     jaccard += compute_jaccard_distance(graph_a[0].get_nodes(), graph_b[1].get_nodes())
 
             # normalize the score with the jaccard distance
-            graph_similarity
             graph_similarity /= jaccard
 
             scores.append(graph_similarity)
