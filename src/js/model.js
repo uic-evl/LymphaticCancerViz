@@ -10,7 +10,6 @@ function Patients() {
 
     // rankings of the patients
     self.rankings = ko.observableArray();
-    self.scores   = [];
     self.optionsCaption = ko.observable('Select a Patient');
 
     self.patients = ko.observableArray();
@@ -34,7 +33,6 @@ function Patients() {
         patient.similarity.forEach(function(id, i){
             let site = _.find(App.sites, {patient: id});
             self.rankings.push(site);
-            self.scores.push(patient.scores[i]);
         });
 
         // Render to the screen
