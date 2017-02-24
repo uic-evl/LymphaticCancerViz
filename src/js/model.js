@@ -6,7 +6,6 @@ function Patients() {
 
     /* Determine how many nodes will fit onto the screen in a single row */
     self.maxNodes = parseInt(window.innerWidth / (App.graphSVGWidth + 2 * App.padding));
-    console.log(self.maxNodes);
 
     // rankings of the patients
     self.rankings = ko.observableArray();
@@ -28,10 +27,10 @@ function Patients() {
 
         // clear the array
         self.rankings.removeAll();
-        self.scores = [];
 
         patient.similarity.forEach(function(id, i){
             let site = _.find(App.sites, {patient: id});
+            site.score = patient.scores[i];
             self.rankings.push(site);
         });
 
@@ -52,11 +51,15 @@ function Patients() {
       /* Iterate through the data and pull out each patient's information */
       App.data.forEach(function(patient){
 
+        if(patient.id === 14)
+          console.log(patient.scores);
+
         let site = {
           "patient"  : patient.id,
           "nodes"    : _.chain(patient.nodes).partition(function(p){ return p[0] === 'L';}).value(),
           "position" : patient.position,
-          "gender"   : patient.gender
+          "gender"   : patient.gender,
+          "score"   : []
         };
         App.sites.push(site);
       });
