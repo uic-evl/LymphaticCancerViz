@@ -11,6 +11,8 @@
 
     <script src="https://code.jquery.com/jquery-2.1.2.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+
 </head>
 
 <body>
@@ -25,6 +27,11 @@
                    },
                     value: currentPatient,
                     optionsCaption: optionsCaption">
+</select>
+
+<select id='sortingAlgorithms' style='margin-top: 10px; margin-bottom:10px; margin-left: 20px;'
+        data-bind=" options: sortingAlgorithms,
+                      value: currentSorting" >
 </select>
 
 <div class="container-fluid">

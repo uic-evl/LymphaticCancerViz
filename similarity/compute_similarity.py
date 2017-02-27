@@ -1,6 +1,7 @@
 import sys, csv, copy
 from Graph import Graph
 from Patient import Patient
+import Similarity as sim
 
 # the index corresponding to the list of affected nodes
 node_index = 13
@@ -52,9 +53,9 @@ def get_patient_graphs(current_patient):
         return [graph_a_left, graph_a_right]
 
 
-def get_min_max_nodes(graph_a, graph_b):
-    min_nodes = min(graph_a.get_nodes(), graph_b.get_nodes())
-    max_nodes = max(graph_a.get_nodes(), graph_b.get_nodes())
+def get_min_max_nodes(patient_a, patient_b):
+    min_nodes = min( len(patient_a.get_all_nodes()), len(patient_b.get_all_nodes()) )
+    max_nodes = min( len(patient_a.get_all_nodes()), len(patient_b.get_all_nodes()) )
 
     return [min_nodes, max_nodes]
 
@@ -87,15 +88,6 @@ def compute_neighbors_similarity(graph_a, graph_b):
     return neighbors
 
 
-def compute_jaccard_distance(items_a, items_b):
-    # find the intersection
-    intersection = set(items_a) & set(items_b)
-    intersection_length = len(intersection)
-
-    # return the Jaccard distance: ( |A /\ B| / (|A| + |B| -|A /\ B|) )
-    return float(intersection_length) / float((len(items_a) + len(items_b) - intersection_length)) + 1
-
-
 def compute_graph_similarity(graph_a, graph_b):
     neighbor_similarity_matrix = compute_neighbors_similarity(graph_a, graph_b)
 
@@ -117,7 +109,6 @@ def compute_similarity():
     # small function to sort the patients by their scores
     def getScore(idx):
         i = patients.keys().index(idx)
-        # print len(scores)
         # we want the first element to stay the same
         return scores[i]
 
@@ -125,9 +116,6 @@ def compute_similarity():
     for keyA, patientA in patients.iteritems():
 
         scores = []
-
-        # get the valid graph from the patient
-        graph_a = get_patient_graphs(patientA)
 
         # create a list of the other patients
         other_patients = copy.deepcopy(patients)
@@ -138,78 +126,26 @@ def compute_similarity():
                 scores.append(sys.maxint)
                 continue
 
-            # get the valid graph from the patient
-            graph_b = get_patient_graphs(patientB)
+            vector_a = patientA.get_vector()
+            vector_b = patientB.get_vector()
 
-            jaccard = 0
-            graph_similarity = 0
-            # if both patients only have one side of their head infected
-            if not isinstance(graph_a, list) and not isinstance(graph_b, list):
-                # compute the neighbor similarity of the two graphs
-                graph_similarity = compute_graph_similarity(graph_a, graph_b)
-                jaccard = compute_jaccard_distance(graph_a.get_nodes(), graph_b.get_nodes())
-            elif not isinstance(graph_a, list) and isinstance(graph_b, list):
-                # take the max score of the two comparisons
-                first_score = compute_graph_similarity(graph_a, graph_b[0])
-                second_score = compute_graph_similarity(graph_a, graph_b[1])
+            tanimoto = sim.compute_tanimoto_coeff(vector_a, vector_b)
+            jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
+                                                patientB.get_all_unique_nodes())
 
-                graph_similarity = max(first_score, second_score)
-
-                if graph_similarity == first_score:
-                    jaccard = compute_jaccard_distance(graph_a.get_nodes(), graph_b[0].get_nodes())
-                else:
-                    jaccard = compute_jaccard_distance(graph_a.get_nodes(), graph_b[0].get_nodes())
-            elif isinstance(graph_a, list) and not isinstance(graph_b, list):
-                # take the max score of the two comparisons
-                first_score = compute_graph_similarity(graph_a[0], graph_b)
-                second_score = compute_graph_similarity(graph_a[1], graph_b)
-                graph_similarity = max(first_score, second_score)
-
-                if graph_similarity == first_score:
-                    jaccard = compute_jaccard_distance(graph_a[0].get_nodes(), graph_b.get_nodes())
-                else:
-                    jaccard = compute_jaccard_distance(graph_a[1].get_nodes(), graph_b.get_nodes())
-
-            else:
-                # both patients have infected nodes on both sides of the head/neck
-                # find the best match by comparing
-
-                # compute the score in relation to the left side of patient A
-                left_left = compute_graph_similarity(graph_a[0], graph_b[0])
-                right_right = compute_graph_similarity(graph_a[1], graph_b[1])
-
-                # compute the score in relation to the right side of patient A
-                left_right = compute_graph_similarity(graph_a[0], graph_b[1])
-                right_left = compute_graph_similarity(graph_a[1], graph_b[0])
-
-                left_score = left_left + right_right
-                right_score = left_right + right_left
-
-                graph_similarity = max(left_score, right_score)
-
-                if graph_similarity == left_score:
-                    jaccard = compute_jaccard_distance(graph_a[0].get_nodes(), graph_b[0].get_nodes())
-                    jaccard += compute_jaccard_distance(graph_a[1].get_nodes(), graph_b[1].get_nodes())
-                else:
-                    jaccard = compute_jaccard_distance(graph_a[1].get_nodes(), graph_b[0].get_nodes())
-                    jaccard += compute_jaccard_distance(graph_a[0].get_nodes(), graph_b[1].get_nodes())
-
-            # normalize the score with the jaccard distance
-            graph_similarity /= jaccard
-
-            scores.append(graph_similarity)
+            scores.append(tanimoto)
 
         # sort the patients by their scores
         sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+        sorted_scores = sorted(scores, reverse=True)
 
         # write the results to the file
-        write_to_file(patientA, sorted_by_score, scores)
-
+        write_to_file(patientA, sorted_by_score, sorted_scores)
 
 # Driver starts here
 if __name__ == "__main__":
     infile = sys.argv[1]
-    f = open('data/data.json', 'w')
+    f = open('data/tanimoto.json', 'w')
     f.write('[\n')
     with open(infile, 'r') as csvFile:
         # create a csv reader
@@ -223,6 +159,9 @@ if __name__ == "__main__":
             # get the patient number and create the patient object
             patient_id = int(row[0])
             patient = Patient(patient_id)
+
+            # add the possible lymph nodes to the patient
+            patient.set_lymph_nodes(lymph_nodes)
 
             # parse the nodes from the row
             nodes = row[node_index].split(';')

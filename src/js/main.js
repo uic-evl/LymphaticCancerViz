@@ -1,3 +1,5 @@
+"use strict";
+
 var App = App || {};
 
 (function() {
@@ -135,9 +137,9 @@ var App = App || {};
 
   let groupFill = function (d, i) {
     if(i === 0)
-      return '#d73027';
+      return '#1b9e77';
     else
-      return "#4575b4";
+      return "#7570b3";
   };
 
   function createBubbles(svg, nodes, tumors) {
