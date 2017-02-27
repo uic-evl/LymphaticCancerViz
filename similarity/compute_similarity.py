@@ -123,7 +123,7 @@ def compute_similarity():
         for keyB, patientB in other_patients.iteritems():
             # patient is most similar to his/her self
             if keyB == keyA:
-                scores.append(sys.maxint)
+                scores.append(1.0)
                 continue
 
             vector_a = patientA.get_vector()
@@ -133,7 +133,7 @@ def compute_similarity():
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
 
-            scores.append(tanimoto)
+            scores.append(jaccard)
 
         # sort the patients by their scores
         sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
@@ -145,7 +145,7 @@ def compute_similarity():
 # Driver starts here
 if __name__ == "__main__":
     infile = sys.argv[1]
-    f = open('data/tanimoto.json', 'w')
+    f = open('data/jaccard.json', 'w')
     f.write('[\n')
     with open(infile, 'r') as csvFile:
         # create a csv reader
