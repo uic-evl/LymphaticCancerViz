@@ -24,7 +24,6 @@ function Patients() {
   self.currentPatient = ko.observable(self.patients[0]);
   self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
 
-
   // subscribe to the change of the selection
   self.currentPatient.subscribe(function (newValue) {
     self.optionsCaption(undefined);
@@ -41,10 +40,9 @@ function Patients() {
       /* I just want the first 50 */
       // if (i > 50) return;
 
-      let site = _.find(App.sites, {patient: id}),
-          score = patient.scores[i];
+      let site = _.find(App.sites, {patient: id});
 
-      site.score = score;
+      site.score = patient.scores[i].toFixed(5);
       // if(score )
       self.rankings.push(site);
     });
