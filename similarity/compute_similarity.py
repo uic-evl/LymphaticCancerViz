@@ -117,9 +117,6 @@ def compute_similarity():
 
         scores = []
 
-        # get the valid graph from the patient
-        graph_a = get_patient_graphs(patientA)
-
         # create a list of the other patients
         other_patients = copy.deepcopy(patients)
 
@@ -129,103 +126,26 @@ def compute_similarity():
                 scores.append(sys.maxint)
                 continue
 
-            # get the valid graph from the patient
-            graph_b = get_patient_graphs(patientB)
-
-            jaccard = 0
-            graph_similarity = 0
-
             vector_a = patientA.get_vector()
             vector_b = patientB.get_vector()
 
-            graph_similarity = sim.compute_tanimoto_coeff(vector_a, vector_b)
-            scores.append(graph_similarity)
+            tanimoto = sim.compute_tanimoto_coeff(vector_a, vector_b)
+            jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
+                                                patientB.get_all_unique_nodes())
 
-            # # if both patients only have one side of their head infected
-            # if not isinstance(graph_a, list) and not isinstance(graph_b, list):
-            #     # compute the neighbor similarity of the two graphs
-            #     graph_similarity = compute_graph_similarity(graph_a, graph_b)
-            #     jaccard = sim.compute_jaccard_coeff(graph_a.get_nodes(), graph_b.get_nodes())
-            #
-            # elif not isinstance(graph_a, list) and isinstance(graph_b, list):
-            #     # take the max score of the two comparisons
-            #     first_score = compute_graph_similarity(graph_a, graph_b[0])
-            #     second_score = compute_graph_similarity(graph_a, graph_b[1])
-            #
-            #     graph_similarity = max(first_score, second_score)
-            #
-            #     if graph_similarity == first_score:
-            #         jaccard = sim.compute_jaccard_coeff(graph_a.get_nodes(), graph_b[0].get_nodes())
-            #     else:
-            #         jaccard = sim.compute_jaccard_coeff(graph_a.get_nodes(), graph_b[1].get_nodes())
-            #
-            # elif isinstance(graph_a, list) and not isinstance(graph_b, list):
-            #     # take the max score of the two comparisons
-            #     first_score = compute_graph_similarity(graph_a[0], graph_b)
-            #     second_score = compute_graph_similarity(graph_a[1], graph_b)
-            #
-            #     min_nodes, max_nodes = get_min_max_nodes(patientA, patientB)
-            #     graph_similarity = max(first_score, second_score)
-            #
-            #     if graph_similarity == first_score:
-            #         jaccard = sim.compute_jaccard_coeff(graph_a[0].get_nodes(), graph_b.get_nodes())
-            #
-            #         difference = len(set(graph_a[0].get_nodes()) ^ set(graph_b.get_nodes()))
-            #         graph_similarity /= (difference+1.0)
-            #     else:
-            #         jaccard = sim.compute_jaccard_coeff(graph_a[1].get_nodes(), graph_b.get_nodes())
-            #         difference = len(set(graph_a[1].get_nodes()) ^ set(graph_b.get_nodes()))
-            #         graph_similarity /= (difference+1.0)
-            #
-            # else:
-            #     # compute the score in relation to the left side of patient A
-            #     left_left = compute_graph_similarity(graph_a[0], graph_b[0])
-            #     right_right = compute_graph_similarity(graph_a[1], graph_b[1])
-            #
-            #     # compute the score in relation to the right side of patient A
-            #     left_right = compute_graph_similarity(graph_a[0], graph_b[1])
-            #     right_left = compute_graph_similarity(graph_a[1], graph_b[0])
-            #
-            #     left_score = left_left + right_right
-            #     right_score = left_right + right_left
-            #
-            #     min_nodes, max_nodes = get_min_max_nodes(patientA, patientB)
-            #     graph_similarity = max(left_score, right_score)
-            #
-            #     if graph_similarity == left_score:
-            #
-            #         difference = len(set(graph_a[0].get_nodes()) ^ set(graph_b[0].get_nodes()))
-            #         difference += len(set(graph_a[1].get_nodes()) ^ set(graph_b[1].get_nodes()))
-            #         graph_similarity /= (difference+1.0)
-            #
-            #         jaccard = sim.compute_jaccard_coeff(graph_a[0].get_nodes(), graph_b[0].get_nodes())
-            #         jaccard += sim.compute_jaccard_coeff(graph_a[1].get_nodes(), graph_b[1].get_nodes())
-            #     else:
-            #
-            #         difference = len(set(graph_a[0].get_nodes()) ^ set(graph_b[1].get_nodes()))
-            #         difference += len(set(graph_a[1].get_nodes()) ^ set(graph_b[0].get_nodes()))
-            #         graph_similarity /= (difference+1.0)
-            #
-            #         jaccard = sim.compute_jaccard_coeff(graph_a[1].get_nodes(), graph_b[0].get_nodes())
-            #         jaccard += sim.compute_jaccard_coeff(graph_a[0].get_nodes(), graph_b[1].get_nodes())
-            #
-            # # normalize the score with the jaccard distance
-            # graph_similarity *= jaccard
-            #
-            # scores.append(graph_similarity)
+            scores.append(tanimoto)
 
         # sort the patients by their scores
         sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
-        sorted_scores = sorted(scores, reverse=False)
+        sorted_scores = sorted(scores, reverse=True)
 
         # write the results to the file
         write_to_file(patientA, sorted_by_score, sorted_scores)
 
-
 # Driver starts here
 if __name__ == "__main__":
     infile = sys.argv[1]
-    f = open('data/data.json', 'w')
+    f = open('data/tanimoto.json', 'w')
     f.write('[\n')
     with open(infile, 'r') as csvFile:
         # create a csv reader
