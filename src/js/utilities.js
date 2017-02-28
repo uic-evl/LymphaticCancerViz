@@ -48,7 +48,6 @@ var App = App || {};
       return current_group;
     }
 
-
     /* Function to test of a node is isolated from the rest */
     function connected_components(infected_nodes, all_nodes) {
 

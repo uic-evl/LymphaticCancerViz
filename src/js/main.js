@@ -132,7 +132,11 @@ var App = App || {};
   App.graphWidth = _.find(App.template.nodes, {"name": "6"}).x - _.find(App.template.nodes, {"name": "5A"}).x;
   App.graphHeight = _.find(App.template.nodes, {"name": "4"}).y - _.find(App.template.nodes, {"name": "7"}).y;
 
+  /* Utility functions */
+  let utils = App.Utilities();
+
   let groupPath = function (d) {
+
     // add fake points to the hull if there are < 3
     let fakePoints = [];
     if (d.values.length < 3) {
@@ -149,10 +153,9 @@ var App = App || {};
       ).concat(fakePoints)).join("L") + "Z";
   };
 
-  let fill = d3.scale.category10();
-
-  let groupFill = function (d, i) {
-    if (i === 0)
+  let groupFill = function (d) {
+    // console.log(d);
+    if (d.orientation === "left")
       return '#1b9e77';
     else
       return "#7570b3";
@@ -163,25 +166,35 @@ var App = App || {};
     /* Store the two groups of nodes for the convex hull -- left and right */
     let groups = [];
 
-    tumors.forEach(function (t) {
+    tumors.forEach(function (t,i) {
 
       /* Parse the data from the partitions */
       let group = _.chain(t).map(function (p) {
         return p.substring(1)
       }).value();
 
+      let connected_components = [group];
+      /* Check the connectedness of the nodes */
+      if(group.length > 1){
+        connected_components = utils.connectedComponents(group, App.template.edgeList);
+      }
 
-      /* Collect the nodes to be used in the convex hull*/
-      let group_nodes = d3.nest().key(function (d) {
-        return (_.indexOf(group, d.name) >= 0) ? d & 3 : 1;
-      }).entries(nodes);
+      /* Iterate over the node groupings */
+      connected_components.forEach(function (component_nodes) {
 
-      group_nodes = _.filter(group_nodes, function (o) {
-        return o.key === "0";
+        /* Collect the nodes to be used in the convex hull*/
+        let group_nodes = d3.nest().key(function (d) {
+          return (_.indexOf(component_nodes, d.name) >= 0) ? d & 3 : 1;
+        }).entries(nodes);
+
+        group_nodes = _.filter(group_nodes, function (o) {
+          return o.key === "0";
+        });
+
+        /* Add the nodes to the list */
+        groups.push({orientation: (i===0) ? "left" : "right", nodes: group_nodes});
+
       });
-
-      /* Add the nodes to the list */
-      groups.push(group_nodes);
 
     });
 
@@ -196,8 +209,8 @@ var App = App || {};
       .style("stroke-linejoin", "round")
       .style("opacity", .4)
       .attr("d", function (d) {
-        if (d.length > 0)
-          return groupPath(d[0]);
+        if (d.nodes.length > 0)
+          return groupPath(d.nodes[0]);
       });
   }
 
