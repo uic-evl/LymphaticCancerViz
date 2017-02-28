@@ -2,7 +2,7 @@
 
 var App = App || {};
 
-(function() {
+(function () {
 
   /* The current graph template */
   App.template = {
@@ -53,54 +53,70 @@ var App = App || {};
         y: 50
       }
     ],
-    links: [{
-      source: 0,
-      target: 1
-    },
+    links: [
+      {
+        source: 0,
+        target: 1,
+      },
       {
         source: 1,
-        target: 2
+        target: 2,
       },
       {
         source: 2,
-        target: 3
+        target: 3,
       },
       {
         source: 3,
-        target: 4
+        target: 4,
       },
       {
         source: 4,
-        target: 6
+        target: 6,
       },
       {
         source: 4,
-        target: 7
+        target: 7,
       },
       {
         source: 5,
-        target: 7
+        target: 7,
       },
       {
         source: 5,
-        target: 6
+        target: 6,
       },
       {
         source: 5,
-        target: 2
+        target: 2,
       },
       {
         source: 2,
-        target: 8
+        target: 8,
       },
       {
         source: 1,
-        target: 7
+        target: 7,
       },
       {
         source: 0,
-        target: 7
+        target: 7,
       }
+    ],
+    edgeList: [
+
+      ["1A", "1B"],
+      ["1B", "2" ],
+      ["2" , "3" ],
+      ["3" , "4" ],
+      ["4" , "6" ],
+      ["5A", "6" ],
+      ["5A", "5B"],
+      ["5A", "2" ],
+      ["2" , "7" ],
+      ["1B", "6" ],
+      ["1A", "6" ]
+
     ]
   };
 
@@ -113,8 +129,8 @@ var App = App || {};
   App.nodeRadius = 15;
 
   /* Define the end-to-end size of the graph */
-  App.graphWidth  = _.find(App.template.nodes, {"name":"6"}).x - _.find(App.template.nodes, {"name":"5A"}).x;
-  App.graphHeight = _.find(App.template.nodes, {"name":"4"}).y - _.find(App.template.nodes, {"name":"7"}).y ;
+  App.graphWidth = _.find(App.template.nodes, {"name": "6"}).x - _.find(App.template.nodes, {"name": "5A"}).x;
+  App.graphHeight = _.find(App.template.nodes, {"name": "4"}).y - _.find(App.template.nodes, {"name": "7"}).y;
 
   let groupPath = function (d) {
     // add fake points to the hull if there are < 3
@@ -136,7 +152,7 @@ var App = App || {};
   let fill = d3.scale.category10();
 
   let groupFill = function (d, i) {
-    if(i === 0)
+    if (i === 0)
       return '#1b9e77';
     else
       return "#7570b3";
@@ -147,10 +163,13 @@ var App = App || {};
     /* Store the two groups of nodes for the convex hull -- left and right */
     let groups = [];
 
-    tumors.forEach(function(t){
+    tumors.forEach(function (t) {
 
       /* Parse the data from the partitions */
-      let group = _.chain(t).map(function(p){ return p.substring(1)}).value();
+      let group = _.chain(t).map(function (p) {
+        return p.substring(1)
+      }).value();
+
 
       /* Collect the nodes to be used in the convex hull*/
       let group_nodes = d3.nest().key(function (d) {
@@ -176,8 +195,8 @@ var App = App || {};
       .style("stroke-width", 40)
       .style("stroke-linejoin", "round")
       .style("opacity", .4)
-      .attr("d", function(d) {
-        if(d.length > 0)
+      .attr("d", function (d) {
+        if (d.length > 0)
           return groupPath(d[0]);
       });
   }
@@ -256,15 +275,15 @@ var App = App || {};
       .attr("height", App.graphSVGHeight);
 
     /*Add a group to house each graph and center it in the container */
-    let transformX = (App.graphSVGWidth  - App.graphWidth)/2.0 +
-                      (App.nodeRadius - _.find(App.template.nodes, {"name":"5A"}).x)*2.0,
+    let transformX = (App.graphSVGWidth - App.graphWidth) / 2.0 +
+        (App.nodeRadius - _.find(App.template.nodes, {"name": "5A"}).x) * 2.0,
 
-        transformY = (App.graphSVGHeight - App.graphHeight)/2.0 +
-          (App.nodeRadius - _.find(App.template.nodes, {"name":"5B"}).x)*2.0;
+      transformY = (App.graphSVGHeight - App.graphHeight) / 2.0 +
+        (App.nodeRadius - _.find(App.template.nodes, {"name": "5B"}).x) * 2.0;
 
     let g = svg.append("g")
-      .attr("transform", "translate(" + transformX + ",-"
-                                      + transformY + ")")
+        .attr("transform", "translate(" + transformX + ",-"
+          + transformY + ")")
       ;
 
     /* Add the links to the network*/
@@ -277,7 +296,7 @@ var App = App || {};
     createBubbles(g, data.nodes, tumors);
   }
 
-  App.createVisualizations = function(ranking) {
+  App.createVisualizations = function (ranking) {
 
     ranking.forEach(function (patient) {
       createNetwork('#patient' + patient.patient, App.template, patient.nodes);
