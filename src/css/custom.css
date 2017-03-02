@@ -326,7 +326,6 @@ body .container.body .right_col {
     background: #D9DEE4;
 }
 body {
-    color: #73879C;
     background: #f0f0f0;
     /*#ECF0F1; #FCFCFC*/
     font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
@@ -853,6 +852,7 @@ h2 {
     white-space: nowrap;
     padding: 10px 13px;
     font-weight: bolder;
+    color: black;
 }
 .x_title h2 small {
     margin-left: 10px;
