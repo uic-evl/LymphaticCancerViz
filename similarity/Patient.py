@@ -11,6 +11,7 @@ class Patient(object):
         self.tumor_position = ""
         self.gender = ""
         self.lymph_nodes = []
+        self.adjacency_matrix = []
 
     def set_lymph_nodes(self, lymph_nodes):
         self.lymph_nodes = lymph_nodes
@@ -18,6 +19,32 @@ class Patient(object):
     def set_graphs(self, left_graph, right_graph):
         self.left_graph = left_graph
         self.right_graph = right_graph
+
+        for node in self.left_graph.get_nodes():
+            row = self.lymph_nodes.index(node)
+            for idx, col in enumerate(self.adjacency_matrix[row]):
+                neighbor = self.lymph_nodes[idx]
+                # check for the connecting edges
+                if node == neighbor and (node == '6' or node == '1a'):
+                    self.left_graph.set_edge(node, node)
+
+                elif int(col) == 1 and node != neighbor:
+                    self.left_graph.set_edge(node, neighbor)
+
+        for node in self.right_graph.get_nodes():
+            row = self.lymph_nodes.index(node)
+            for idx, col in enumerate(self.adjacency_matrix[row]):
+                neighbor = self.lymph_nodes[idx]
+
+                # check for the connecting edges
+                if node == neighbor and (node == '6' or node == '1a'):
+                    self.right_graph.set_edge(node, node)
+
+                elif int(col) == 1 and node != neighbor:
+                    self.right_graph.set_edge(node, neighbor)
+
+    def set_adjacency_matrix(self, matrix):
+        self.adjacency_matrix = matrix
 
     def set_gender(self, gender):
         self.gender = gender
@@ -37,6 +64,12 @@ class Patient(object):
     def get_all_nodes(self):
         return self.left_graph.get_nodes() + self.right_graph.get_nodes()
 
+    def get_all_edges(self):
+        return list(self.right_graph.get_edges().keys() + self.left_graph.get_edges().keys())
+
+    def get_all_unique_edges(self):
+        return list( set(self.right_graph.get_edges().keys() + self.left_graph.get_edges().keys()) )
+
     def get_all_unique_nodes(self):
         return list(set(self.left_graph.get_nodes() + self.right_graph.get_nodes()))
 
@@ -46,7 +79,7 @@ class Patient(object):
     def get_gender(self):
         return self.gender
 
-    def get_vector(self):
+    def get_nodes_vector(self):
         left_nodes = self.left_graph.get_nodes()
         right_nodes = self.right_graph.get_nodes()
 
@@ -57,6 +90,22 @@ class Patient(object):
                 vector[l] += 1
 
             if self.lymph_nodes[l] in right_nodes:
+                vector[l] += 1
+
+        return vector
+
+    def get_edges_vector(self, common_edges):
+
+        left_edges = self.left_graph.get_edges()
+        right_edges = self.right_graph.get_edges()
+
+        vector = np.zeros(len(common_edges))
+
+        for l in range(len(common_edges)):
+            if common_edges[l] in left_edges:
+                vector[l] += 1
+
+            if common_edges[l] in right_edges:
                 vector[l] += 1
 
         return vector

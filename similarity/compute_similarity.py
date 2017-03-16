@@ -10,11 +10,12 @@ tumor_index = 7
 
 # A list of all the patients that are read in
 patients = {}
-lymph_nodes = ["1a", "1b", "2", "3", "4", "5a", "5b", "6", "7"]
+
+lymph_nodes = []
+adjacency_matrix = []
 
 # output file
 f = None
-
 
 def write_to_file(current_patient, patient_order, scores):
     # write the output
@@ -38,6 +39,25 @@ def write_to_file(current_patient, patient_order, scores):
         f.write(",\n")
 
 
+def read_matrix_data(file):
+
+    global lymph_nodes
+    global adjacency_matrix
+
+    with open(file, 'r') as csvFile:
+        # create a csv reader
+        reader = csv.reader(csvFile, delimiter=',')
+        # iterate over the rows of the csv file
+        for row in reader:
+
+            # first row, read the lymph node headers
+            if not row[0]:
+                lymph_nodes = row[1:]
+            else:
+                adjacency_matrix.append(row[1:])
+
+
+
 def get_patient_graphs(current_patient):
     # get the left graph of current_patient A
     graph_a_left = current_patient.get_graph("Left")
@@ -56,6 +76,13 @@ def get_patient_graphs(current_patient):
 def get_min_max_nodes(patient_a, patient_b):
     min_nodes = min( len(patient_a.get_all_nodes()), len(patient_b.get_all_nodes()) )
     max_nodes = min( len(patient_a.get_all_nodes()), len(patient_b.get_all_nodes()) )
+
+    return [min_nodes, max_nodes]
+
+
+def get_min_max_edges(patient_a, patient_b):
+    min_nodes = min( len(patient_a.get_all_edges()), len(patient_b.get_all_edges()) )
+    max_nodes = min( len(patient_a.get_all_edges()), len(patient_b.get_all_edges()) )
 
     return [min_nodes, max_nodes]
 
@@ -103,7 +130,7 @@ def compute_graph_similarity(graph_a, graph_b):
 
 
 def compute_similarity():
-    # store the scores of the test
+
     scores = []
 
     # small function to sort the patients by their scores
@@ -115,39 +142,70 @@ def compute_similarity():
     # iterate over the graphs and compute the similarity
     for keyA, patientA in patients.iteritems():
 
-        scores = []
+        # store the scores of the test
+        tanimoto_edges_scores = []
+        tanimoto_nodes_scores = []
+        jaccard_scores = []
 
         # create a list of the other patients
         other_patients = copy.deepcopy(patients)
 
         for keyB, patientB in other_patients.iteritems():
+
             # patient is most similar to his/her self
-            if keyB == keyA:
-                scores.append(1.0)
-                continue
+            # if keyB == keyA:
+            #     scores.append(0.0)
+            #     patient_idx = idx
+            #     continue
 
-            vector_a = patientA.get_vector()
-            vector_b = patientB.get_vector()
+            common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
 
-            tanimoto = sim.compute_tanimoto_coeff(vector_a, vector_b)
-            jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
-                                                patientB.get_all_unique_nodes())
+            vector_a_edges = patientA.get_edges_vector(common_list)
+            vector_b_edges = patientB.get_edges_vector(common_list)
 
-            scores.append(jaccard)
+            vector_a_nodes = patientA.get_nodes_vector()
+            vector_b_nodes = patientB.get_nodes_vector()
+
+            tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
+            tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
+
+            jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_edges(),
+                                                patientB.get_all_unique_edges())
+
+            tanimoto_edges_scores.append(tanimoto_edges)
+            tanimoto_nodes_scores.append(tanimoto_nodes)
+            jaccard_scores.append(jaccard)
+
+        tanimoto_edges_scores = [float(i) / max(tanimoto_edges_scores) for i in tanimoto_edges_scores]
+        tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
+        jaccard_scores        = [float(i) / max(jaccard_scores) for i in jaccard_scores]
+
+        tanimoto = [ tanimoto_edges_scores[i] * 0.75 + tanimoto_nodes_scores[i] * 0.25 for i in range(len(tanimoto_edges_scores)) ]
 
         # sort the patients by their scores
+        scores = tanimoto_nodes_scores
         sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
-        sorted_scores = sorted(scores, reverse=True)
+        sorted_scores_tanimoto = sorted(tanimoto_nodes_scores, reverse=True)
+
+        # scores = jaccard_scores
+        # sorted_scores_jaccard = sorted(jaccard_scores, reverse=True)
 
         # write the results to the file
-        write_to_file(patientA, sorted_by_score, sorted_scores)
+        write_to_file(patientA, sorted_by_score, sorted_scores_tanimoto)
 
 # Driver starts here
 if __name__ == "__main__":
-    infile = sys.argv[1]
-    f = open('data/jaccard.json', 'w')
+
+    data = sys.argv[1]
+    connectivity = sys.argv[2]
+
+    f = open('data/tanimoto_edges.json', 'w')
     f.write('[\n')
-    with open(infile, 'r') as csvFile:
+
+    # read in the adjacency matrix
+    read_matrix_data(connectivity)
+
+    with open(data, 'r') as csvFile:
         # create a csv reader
         reader = csv.reader(csvFile, delimiter=',')
         # iterate over the rows of the csv file
@@ -162,6 +220,7 @@ if __name__ == "__main__":
 
             # add the possible lymph nodes to the patient
             patient.set_lymph_nodes(lymph_nodes)
+            patient.set_adjacency_matrix(adjacency_matrix)
 
             # parse the nodes from the row
             nodes = row[node_index].split(';')
@@ -212,7 +271,7 @@ if __name__ == "__main__":
                 for n in new_nodes:
                     current_graph.set_node_value(n[1:])
                     # the score is based on whether we had to split the node or not
-                    current_graph.set_value_at(n[1:], n[1:], 1.0 / len(new_nodes))
+                    current_graph.set_value_at(n[1:], n[1:], 1.0 )
                     current_graph.set_node_position(n)
 
             # set the patient graphs

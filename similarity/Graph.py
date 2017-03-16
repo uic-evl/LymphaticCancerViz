@@ -17,6 +17,7 @@ class Graph(object):
 
         self.nodes = []
         self.positions = []
+        self.edges = {}
 
     def set_value_at(self, i, j, value):
 
@@ -36,6 +37,23 @@ class Graph(object):
 
     def get_nodes(self):
         return self.nodes
+
+    def set_edge(self, edge_a, edge_b):
+
+        index   = str(edge_a) + '_' + str(edge_b)
+        reverse = str(edge_b) + '_' + str(edge_a)
+
+        if index in self.edges:
+            self.edges[index] += 1
+
+        elif reverse in self.edges:
+            self.edges[reverse] +=1
+
+        else:
+            self.edges[index] = 1
+
+    def get_edges(self):
+        return self.edges
 
     def get_node_positions(self):
         return self.positions

@@ -19,7 +19,7 @@ function Patients() {
     self.patients.push(patient);
   });
 
-  self.sortingAlgorithms = ko.observableArray(["Jaccard", "Tanimoto"]);
+  self.sortingAlgorithms = ko.observableArray(["Tanimoto Edges"]);
 
   self.currentPatient = ko.observable(self.patients[0]);
   self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
@@ -53,11 +53,11 @@ function Patients() {
 
   /*Subscribe the the change in similarity metric */
   self.currentSorting.subscribe(function (newValue) {
-    if (newValue === "Jaccard") {
-      App.data = App.jaccard;
+    if (newValue === "Tanimoto Edges") {
+      App.data = App.edges;
     }
     else {
-      App.data = App.tanimoto;
+      App.data = App.nodes;
     }
 
     /* Touch the current observable to re-render the scene */
@@ -73,18 +73,18 @@ function Patients() {
 (function () {
 
   queue()
-    .defer(d3.json, "data/jaccard.json")
-    .defer(d3.json, "data/tanimoto.json")
-    .await(function (error, jaccard, tanimoto) {
+    .defer(d3.json, "data/tanimoto_edges.json")
+    .defer(d3.json, "data/tanimoto_nodes.json")
+    .await(function (error, edges, nodes) {
       if (error) return console.warn(error);
 
-      App.jaccard = jaccard;
-      App.tanimoto = tanimoto;
+      App.edges = edges;
+      App.nodes = nodes;
 
       App.sites = [];
 
       /* Iterate through the data and pull out each patient's information */
-      App.jaccard.forEach(function (patient) {
+      App.edges.forEach(function (patient) {
 
         let site = {
           "patient": patient.id,
@@ -98,7 +98,7 @@ function Patients() {
         App.sites.push(site);
       });
 
-      App.data = App.jaccard;
+      App.data = App.edges;
 
       ko.applyBindings(new Patients());
     });
