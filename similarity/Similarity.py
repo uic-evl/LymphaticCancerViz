@@ -11,15 +11,16 @@ def compute_jaccard_coeff(items_a, items_b):
 
 def compute_tanimoto_coeff(vector_a, vector_b):
     a_dot_b = np.dot(vector_a, vector_b)
-    len_a = np.sum(vector_a)
-    len_b = np.sum(vector_b)
+
+    mag_a = np.linalg.norm(vector_a)
+    mag_b = np.linalg.norm(vector_b)
 
     # denominator is zero, no similarity
-    if (len_a * len_a + len_b * len_b - a_dot_b) == 0:
+    if (mag_a * mag_a + mag_b * mag_b - a_dot_b) == 0:
         return 0
 
     # return the Tanimoto coefficient: ( (A dot B) / (|A|^2 + |B|^2 - (A dot B)) )
-    tanimoto_coeff = a_dot_b / (len_a * len_a + len_b * len_b - a_dot_b)
+    tanimoto_coeff = a_dot_b / (mag_a * mag_a + mag_b * mag_b - a_dot_b)
     # print tanimoto_coeff
 
     return tanimoto_coeff
