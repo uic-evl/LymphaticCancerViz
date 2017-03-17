@@ -19,7 +19,7 @@ function Patients() {
     self.patients.push(patient);
   });
 
-  self.sortingAlgorithms = ko.observableArray(["Tanimoto Edges"]);
+  self.sortingAlgorithms = ko.observableArray(["Tanimoto Edges", "Tanimoto Nodes", "Tanimoto Weighted"]);
 
   self.currentPatient = ko.observable(self.patients[0]);
   self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
@@ -56,8 +56,11 @@ function Patients() {
     if (newValue === "Tanimoto Edges") {
       App.data = App.edges;
     }
-    else {
+    else if (newValue === "Tanimoto Nodes") {
       App.data = App.nodes;
+    }
+    else {
+      App.data = App.weighted;
     }
 
     /* Touch the current observable to re-render the scene */
@@ -75,11 +78,13 @@ function Patients() {
   queue()
     .defer(d3.json, "data/tanimoto_edges.json")
     .defer(d3.json, "data/tanimoto_nodes.json")
-    .await(function (error, edges, nodes) {
+    .defer(d3.json, "data/tanimoto_weighted.json")
+    .await(function (error, edges, nodes, weighted) {
       if (error) return console.warn(error);
 
       App.edges = edges;
       App.nodes = nodes;
+      App.weighted = weighted;
 
       App.sites = [];
 

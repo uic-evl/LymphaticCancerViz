@@ -14,8 +14,11 @@ patients = {}
 lymph_nodes = []
 adjacency_matrix = []
 
+output = ""
+
 # output file
 f = None
+
 
 def write_to_file(current_patient, patient_order, scores):
     # write the output
@@ -131,6 +134,7 @@ def compute_graph_similarity(graph_a, graph_b):
 
 def compute_similarity():
 
+    global output
     scores = []
 
     # small function to sort the patients by their scores
@@ -180,26 +184,43 @@ def compute_similarity():
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
         jaccard_scores        = [float(i) / max(jaccard_scores) for i in jaccard_scores]
 
-        tanimoto = [ tanimoto_edges_scores[i] * 0.75 + tanimoto_nodes_scores[i] * 0.25 for i in range(len(tanimoto_edges_scores)) ]
+        tanimoto = [ tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in range(len(tanimoto_edges_scores)) ]
 
+        sorted_scores = []
         # sort the patients by their scores
-        scores = tanimoto_nodes_scores
-        sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
-        sorted_scores_tanimoto = sorted(tanimoto_nodes_scores, reverse=True)
+        if output == "edges":
+            scores = tanimoto_edges_scores
+            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+            sorted_scores = sorted(tanimoto_edges_scores, reverse=True)
+        elif output == "nodes":
+            scores = tanimoto_nodes_scores
+            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+            sorted_scores = sorted(tanimoto_nodes_scores, reverse=True)
+        elif output == "weighted":
+            scores = tanimoto
+            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+            sorted_scores = sorted(tanimoto, reverse=True)
 
         # scores = jaccard_scores
         # sorted_scores_jaccard = sorted(jaccard_scores, reverse=True)
 
         # write the results to the file
-        write_to_file(patientA, sorted_by_score, sorted_scores_tanimoto)
+        write_to_file(patientA, sorted_by_score, sorted_scores)
 
 # Driver starts here
 if __name__ == "__main__":
 
     data = sys.argv[1]
     connectivity = sys.argv[2]
+    output = sys.argv[3]
 
-    f = open('data/tanimoto_edges.json', 'w')
+    if output == "edges":
+        f = open('./data/tanimoto_edges.json', 'w')
+    elif output == "nodes":
+        f = open('./data/tanimoto_nodes.json', 'w')
+    else:
+        f = open('./data/tanimoto_weighted.json', 'w')
+
     f.write('[\n')
 
     # read in the adjacency matrix
