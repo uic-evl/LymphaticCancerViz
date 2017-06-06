@@ -9,6 +9,7 @@ def compute_jaccard_coeff(items_a, items_b):
     # return the Jaccard coefficient: ( |A /\ B| / (|A| + |B| -|A /\ B|) )
     return float(intersection_length) / float((len(items_a) + len(items_b) - intersection_length))
 
+
 def compute_tanimoto_coeff(vector_a, vector_b):
     a_dot_b = np.dot(vector_a, vector_b)
 
