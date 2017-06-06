@@ -187,6 +187,7 @@ def compute_similarity():
         tanimoto = [ tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in range(len(tanimoto_edges_scores)) ]
 
         sorted_scores = []
+        sorted_by_score = []
         # sort the patients by their scores
         if output == "edges":
             scores = tanimoto_edges_scores
@@ -212,31 +213,35 @@ if __name__ == "__main__":
 
     data = sys.argv[1]
     connectivity = sys.argv[2]
-    output = sys.argv[3]
+    # output = sys.argv[3]
 
-    if output == "edges":
-        f = open('./data/tanimoto_edges.json', 'w')
-    elif output == "nodes":
-        f = open('./data/tanimoto_nodes.json', 'w')
-    else:
-        f = open('./data/tanimoto_weighted.json', 'w')
-
-    f.write('[\n')
+    # if output == "edges":
+    #     f = open('./data/tanimoto_edges.json', 'w')
+    # elif output == "nodes":
+    #     f = open('./data/tanimoto_nodes.json', 'w')
+    # else:
+    #     f = open('./data/tanimoto_weighted.json', 'w')
+    #
+    # f.write('[\n')
 
     # read in the adjacency matrix
     read_matrix_data(connectivity)
+    result = {}
 
     with open(data, 'r') as csvFile:
-        # create a csv reader
-        reader = csv.reader(csvFile, delimiter=',')
-        # iterate over the rows of the csv file
+        reader = csv.DictReader(csvFile, delimiter='~')
+
         for row in reader:
-            # header row and blank lines
-            if not row[0].isdigit():
-                continue
+            key = row.pop('Dummy ID')
+            if key in result:
+                pass
+            result[key] = row
+
+        # iterate over the rows of the csv file
+        for id in result:
 
             # get the patient number and create the patient object
-            patient_id = int(row[0])
+            patient_id = int(id)
             patient = Patient(patient_id)
 
             # add the possible lymph nodes to the patient
@@ -244,65 +249,68 @@ if __name__ == "__main__":
             patient.set_adjacency_matrix(adjacency_matrix)
 
             # parse the nodes from the row
-            nodes = row[node_index].split(';')
+            nodes = result[id]['Affected lymph nodes'].split(',')
+
             # strip out the white space from eanode[1:], node[1:]ch string
             # I am also replacing rpln with a 7 to fit our previous model
             parsed_nodes = [x.strip(" ").replace(' RPLN', '7') for x in nodes]
 
+            result[id]['Affected lymph nodes'] = parsed_nodes
+
             # get the longest item (test purposes)
             longest_item = max(parsed_nodes, key=len)
 
-            # get and set the patient gender
-            gender = str(row[gender_index]).lower()
-            patient.set_gender(gender)
-
-            # get and set the tumor position
-            tumor_position = row[tumor_index]
-            if len(tumor_position) > 1 or len(tumor_position) == 0:
-                tumor_position = 'N/A'
-            elif tumor_position.lower() == 'l':
-                tumor_position = "Left"
-            elif tumor_position.lower() == 'r':
-                tumor_position = "Right"
-            patient.set_tumor_position(tumor_position)
-
-            # until cleaned, I am only working with single coded lymph nodes
-            if len(longest_item) > 3:
-                continue
-
-            # create the graph for the left and right lymph nodes
-            left = Graph(lymph_nodes, lymph_nodes)
-            right = Graph(lymph_nodes, lymph_nodes)
-
-            # add the nodes to the graph
-            for node in parsed_nodes:
-
-                new_nodes = [node]
-                current_graph = left
-
-                if node[0] == 'R':
-                    current_graph = right
-
-                # if the node is 5, then we add both a and b
-                if node[1:] == "5" or node[1:] == "1":
-                    new_nodes = []
-                    new_nodes = [node + 'A', node + 'B']
-
-                # add the nodes to the graph
-                for n in new_nodes:
-                    current_graph.set_node_value(n[1:])
-                    # the score is based on whether we had to split the node or not
-                    current_graph.set_value_at(n[1:], n[1:], 1.0 )
-                    current_graph.set_node_position(n)
-
-            # set the patient graphs
-            patient.set_graphs(left, right)
-            # add the graphs to the dictionary
-            patients.update({patient_id: patient})
+            # # get and set the patient gender
+            # gender = str(row[gender_index]).lower()
+            # patient.set_gender(gender)
+            #
+            # # get and set the tumor position
+            # tumor_position = row[tumor_index]
+            # if len(tumor_position) > 1 or len(tumor_position) == 0:
+            #     tumor_position = 'N/A'
+            # elif tumor_position.lower() == 'l':
+            #     tumor_position = "Left"
+            # elif tumor_position.lower() == 'r':
+            #     tumor_position = "Right"
+            # patient.set_tumor_position(tumor_position)
+            #
+            # # until cleaned, I am only working with single coded lymph nodes
+            # if len(longest_item) > 3:
+            #     continue
+            #
+            # # create the graph for the left and right lymph nodes
+            # left = Graph(lymph_nodes, lymph_nodes)
+            # right = Graph(lymph_nodes, lymph_nodes)
+            #
+            # # add the nodes to the graph
+            # for node in parsed_nodes:
+            #
+            #     new_nodes = [node]
+            #     current_graph = left
+            #
+            #     if node[0] == 'R':
+            #         current_graph = right
+            #
+            #     # if the node is 5, then we add both a and b
+            #     if node[1:] == "5" or node[1:] == "1":
+            #         new_nodes = []
+            #         new_nodes = [node + 'A', node + 'B']
+            #
+            #     # add the nodes to the graph
+            #     for n in new_nodes:
+            #         current_graph.set_node_value(n[1:])
+            #         # the score is based on whether we had to split the node or not
+            #         current_graph.set_value_at(n[1:], n[1:], 1.0 )
+            #         current_graph.set_node_position(n)
+            #
+            # # set the patient graphs
+            # patient.set_graphs(left, right)
+            # # add the graphs to the dictionary
+            # patients.update({patient_id: patient})
 
     # computer the similarity of the constructed graphs
-    compute_similarity()
+    #compute_similarity()
 
     # write the ending of the json file
-    f.write(']')
-    f.close()
+    #f.write(']')
+    #f.close()
