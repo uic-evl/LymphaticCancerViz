@@ -47,7 +47,27 @@ function Patients() {
       self.rankings.push(site);
     });
 
-    // Render to the screen
+    /* Ensure the patient is first */
+    let pat = _.find(self.rankings(), {patient: patient.id});
+    let index =self.rankings().indexOf(pat);
+    if(index > 0){
+      self.rankings.remove(pat);
+      self.rankings.unshift(pat);
+    }
+
+    self.rankings().sort(function(l,r){
+      if(l.patient === patient.id) return true;
+      if(l.score !== r.score){
+        return r.score - l.score;
+      }
+      else{
+        let a = (l.position === "Right") ? 2 : (l.position === "Left") ? 1 : 0;
+        let b = (r.position === "Right") ? 2 : (r.position === "Left") ? 1 : 0;
+        return b-a;
+      }
+    });
+
+    /// / Render to the screen
     App.createVisualizations(self.rankings());
   });
 
