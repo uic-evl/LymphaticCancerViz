@@ -262,7 +262,7 @@ var App = App || {};
       .classed("link", true)
       .attr("x1", function (l) {
         let sourceNode = data.nodes.filter(function (d, i) {
-          return i == l.source
+          return i === l.source
         })[0];
 
         d3.select(this).attr("y1", sourceNode.y);
@@ -270,7 +270,7 @@ var App = App || {};
       })
       .attr("x2", function (l) {
         let targetNode = data.nodes.filter(function (d, i) {
-          return i == l.target
+          return i === l.target
         })[0];
 
         d3.select(this).attr("y2", targetNode.y);

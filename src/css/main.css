@@ -4,6 +4,19 @@ h2.tumor {
     text-align: right;
 }
 
+h2.stats {
+    /*float: right;*/
+    font-size: 10px !important;
+    text-align: right;
+}
+
+
+.bold {
+    font-weight: bolder;
+    font-size: 10px !important;
+    text-align: right;
+    color: red;
+}
 /*.male {*/
     /*background: rgba(179,205,227,0.4);*/
 /*}*/
