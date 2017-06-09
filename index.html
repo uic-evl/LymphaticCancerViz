@@ -35,8 +35,12 @@
                       value: currentSorting" >
 </select>
 
-<div class="container-fluid">
+<select id='numberOfPatients' style='margin-top: 10px; margin-bottom:10px; margin-left: 20px;'
+        data-bind=" options: numberToDisplay,
+                      value: currentDisplay" >
+</select>
 
+<div class="container-fluid">
     <!--<div data-bind="css: { row: ($index()+1) % $parent.maxNodes == 0 }">-->
     <div class="row" data-bind="foreach: rankings">
         <div class="patient_container" data-bind=" css: { 'col-md-2': $parent.maxNodes > 5, 'col-md-3': $parent.maxNodes < 6  } ">
@@ -48,12 +52,12 @@
                 </div>
                 <div class="x_content">
                     <div data-bind="attr: {id: 'patient'+patient}" style="display: table; margin: auto;"></div>
-                    <h2 class='tumor' data-bind="text: 'Similarity Coeff.: '+ score"></h2>
-                </div>
+                    <h2 class="stats">Similarity Coeff.: <span class="bold" data-bind="text: score"></span></h2>
+                    <h2 class="stats">Aspiration (pre/post): <span class="bold" data-bind="text: aspiration_pre + ' / ' + aspiration_post"></span></h2>
+                    <h2 class="stats">Feeding Tube (pre/post): <span class="bold" data-bind="text: feedingTube_pre + ' / ' + feedingTube_post"></span></h2></div>
             </div>
         </div>
     </div>
-
 </div>
 
 </body>

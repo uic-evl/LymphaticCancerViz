@@ -14,22 +14,23 @@ function Patients() {
   self.optionsCaption = ko.observable('Select a Patient');
 
   self.patients = ko.observableArray();
-
   App.data.forEach(function (patient) {
     self.patients.push(patient);
   });
 
-  self.sortingAlgorithms = ko.observableArray(["Tanimoto Edges", "Tanimoto Nodes", "Tanimoto Weighted"]);
+  self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Edges", "Tanimoto Nodes"]);
+  self.numberToDisplay = ko.observableArray([50, 100, 150, 200, 'All']);
 
   self.currentPatient = ko.observable(self.patients[0]);
   self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
+  self.currentDisplay = ko.observable(self.numberToDisplay[0]);
 
   // subscribe to the change of the selection
   self.currentPatient.subscribe(function (newValue) {
     self.optionsCaption(undefined);
 
     let patient = _.find(App.data, function (o) {
-      return o.id == newValue.id;
+      return o.id === newValue.id;
     });
 
     // clear the array
@@ -38,12 +39,11 @@ function Patients() {
     patient.similarity.forEach(function (id, i) {
 
       /* I just want the first 50 */
-      // if (i > 50) return;
+      if ( parseInt(self.currentDisplay()) <= i) return;
 
       let site = _.find(App.sites, {patient: id});
 
       site.score = patient.scores[i].toFixed(5);
-      // if(score )
       self.rankings.push(site);
     });
 
@@ -61,6 +61,22 @@ function Patients() {
     }
     else {
       App.data = App.weighted;
+    }
+
+    /* Touch the current observable to re-render the scene */
+    if(self.currentPatient()) {
+      self.currentPatient(self.currentPatient());
+    }
+
+  });
+
+  self.currentDisplay.subscribe(function (newValue) {
+
+    if(newValue === "All"){
+      self.currentDisplay(App.data.length);
+    }
+    else {
+      self.currentDisplay(newValue);
     }
 
     /* Touch the current observable to re-render the scene */
@@ -98,7 +114,11 @@ function Patients() {
           }).value(),
           "position": patient.position,
           "gender": patient.gender,
-          "score": []
+          "score": [],
+          "feedingTube_post": patient["Feeding_tube_6m"] ? patient["Feeding_tube_6m"] : "NA",
+          "feedingTube_pre": !!patient["Tube_removal"]? "N": patient["Feeding_tube_6m"],
+          "aspiration_pre" : patient["Aspiration_rate_Pre-therapy"] ? patient["Aspiration_rate_Pre-therapy"] : "NA" ,
+          "aspiration_post" : patient["Aspiration_rate_Post-therapy"] ? patient["Aspiration_rate_Post-therapy"] : "NA"
         };
         App.sites.push(site);
       });
