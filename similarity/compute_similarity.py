@@ -194,7 +194,7 @@ def compute_similarity():
             sorted_scores = sorted(tanimoto_edges_scores, reverse=True)
         elif output == "nodes":
             scores = tanimoto_nodes_scores
-            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+            sorted_by_score = sorted(other_patients, key=lambda x: (getScore, x.tumor_position), reverse=True)
             sorted_scores = sorted(tanimoto_nodes_scores, reverse=True)
         elif output == "weighted":
             scores = tanimoto
@@ -225,7 +225,6 @@ if __name__ == "__main__":
         reader = csv.DictReader(csvFile, delimiter='~')
 
         # parse the input into a dictionary
-        for row in reader:
             key = row.pop('Dummy ID')
             if key in result:
                 pass
