@@ -15,7 +15,8 @@ function Patients() {
 
   self.patients = ko.observableArray();
   App.data.forEach(function (patient) {
-    self.patients.push(patient);
+    if(patient.nodes.length > 1)
+      self.patients.push(patient);
   });
 
   self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Edges", "Tanimoto Nodes"]);
@@ -127,6 +128,9 @@ function Patients() {
       /* Iterate through the data and pull out each patient's information */
       App.edges.forEach(function (patient) {
 
+        if(patient.nodes.length <= 1)
+          return;
+
         let site = {
           "patient": patient.id,
           "nodes": _.chain(patient.nodes).partition(function (p) {
@@ -140,7 +144,9 @@ function Patients() {
           "aspiration_pre" : patient["Aspiration_rate_Pre-therapy"] ? patient["Aspiration_rate_Pre-therapy"] : "NA" ,
           "aspiration_post" : patient["Aspiration_rate_Post-therapy"] ? patient["Aspiration_rate_Post-therapy"] : "NA"
         };
+
         App.sites.push(site);
+
       });
 
       App.data = App.edges;
