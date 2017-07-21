@@ -113,9 +113,9 @@ function Patients() {
 (function () {
 
   queue()
-    .defer(d3.json, "data/tanimoto_edges.json")
-    .defer(d3.json, "data/tanimoto_nodes.json")
-    .defer(d3.json, "data/tanimoto_weighted.json")
+    .defer(d3.json, "data/json/tanimoto_edges.json")
+    .defer(d3.json, "data/json/tanimoto_nodes.json")
+    .defer(d3.json, "data/json/tanimoto_weighted.json")
     .await(function (error, edges, nodes, weighted) {
       if (error) return console.warn(error);
 
