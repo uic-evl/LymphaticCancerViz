@@ -20,7 +20,7 @@ function Patients() {
   });
 
   self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Edges", "Tanimoto Nodes", "Jaccard"]);
-  self.numberToDisplay = ko.observableArray([50, 100, 150, 'All']);
+  self.numberToDisplay = ko.observableArray([50, 100, 'All']);
 
   self.currentPatient = ko.observable(self.patients[0]);
   self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
@@ -43,7 +43,7 @@ function Patients() {
       if ( parseInt(self.currentDisplay()) <= i) return;
 
       let site = _.find(App.sites, {patient: id});
-
+      if(!site) return;
       site.score = patient.scores[i].toFixed(5);
       self.rankings.push(site);
     });
@@ -97,7 +97,7 @@ function Patients() {
   self.currentDisplay.subscribe(function (newValue) {
 
     if(newValue === "All"){
-      self.currentDisplay(App.data.length);
+      self.currentDisplay(App.sites.length);
     }
     else {
       self.currentDisplay(newValue);
