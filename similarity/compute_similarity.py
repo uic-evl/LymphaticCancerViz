@@ -194,15 +194,16 @@ def compute_similarity():
             sorted_scores = sorted(tanimoto_edges_scores, reverse=True)
         elif output == "nodes":
             scores = tanimoto_nodes_scores
-            sorted_by_score = sorted(other_patients, key=lambda x: (getScore, x.tumor_position), reverse=True)
+            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
             sorted_scores = sorted(tanimoto_nodes_scores, reverse=True)
         elif output == "weighted":
             scores = tanimoto
             sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
             sorted_scores = sorted(tanimoto, reverse=True)
-
-        # scores = jaccard_scores
-        # sorted_scores_jaccard = sorted(jaccard_scores, reverse=True)
+        elif output == "jaccard":
+            scores = jaccard_scores
+            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+            sorted_scores = sorted(jaccard_scores, reverse=True)
 
         # write the results to the file
         write_to_file(patientA, sorted_by_score, sorted_scores)
@@ -224,7 +225,7 @@ if __name__ == "__main__":
     with open(data, 'r') as csvFile:
         reader = csv.DictReader(csvFile, delimiter='~')
 
-        # parse the input into a dictionary
+        for row in reader:
             key = row.pop('Dummy ID')
             if key in result:
                 pass
@@ -267,7 +268,7 @@ if __name__ == "__main__":
 
             # get and set the tumor position
             tumor_position = result[id]["Tumor_Laterality"].strip(" ")
-            print tumor_position
+            #print tumor_position
             if len(tumor_position) > 1 or len(tumor_position) == 0:
                 tumor_position = 'N/A'
             elif tumor_position.lower() == 'l':
@@ -317,15 +318,18 @@ if __name__ == "__main__":
             patient_attr[id] = result[id]
     
     # calculate the similarity and output it to the files 
-    for output in ['edges', 'nodes', 'weighted']:
+    for output in ['edges', 'nodes', 'weighted', 'jaccard']:
+
+        print output
 
         if output == "edges":
-            f = open('./data/tanimoto_edges.json', 'w')
+            f = open('./data/json/tanimoto_edges.json', 'w')
         elif output == "nodes":
-            f = open('./data/tanimoto_nodes.json', 'w')
+            f = open('./data/json/tanimoto_nodes.json', 'w')
         elif output == "weighted":
-            f = open('./data/tanimoto_weighted.json', 'w')
-
+            f = open('./data/json/tanimoto_weighted.json', 'w')
+        elif output == "jaccard":
+            f = open('./data/json/jaccard.json', 'w')
         f.write('[\n')
 
         # computer the similarity of the constructed graphs
