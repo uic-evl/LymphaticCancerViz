@@ -19,7 +19,9 @@ function Patients() {
       self.patients.push(patient);
   });
 
-  self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Edges", "Tanimoto Nodes", "Jaccard"]);
+  self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Nodes",
+    // "Tanimoto Edges",  "Jaccard"
+  ]);
   self.numberToDisplay = ko.observableArray([50, 100, 'All']);
 
   self.currentPatient = ko.observable(self.patients[0]);
@@ -116,25 +118,30 @@ function Patients() {
 (function () {
 
   queue()
-    .defer(d3.json, "data/json/tanimoto_edges.json")
     .defer(d3.json, "data/json/tanimoto_nodes.json")
     .defer(d3.json, "data/json/tanimoto_weighted.json")
-    .defer(d3.json, "data/json/jaccard.json")
-    .await(function (error, edges, nodes, weighted, jaccard) {
+    .defer(d3.csv, "data/csv/cluster_results_simple_0803.csv")
+    // .defer(d3.json, "data/json/tanimoto_edges.json")
+    // .defer(d3.json, "data/json/jaccard.json")
+      .await(function (error,  nodes, weighted, clusters//, edges, jaccard
+      ) {
       if (error) return console.warn(error);
 
-      App.edges = edges;
+      // App.edges = edges;
       App.nodes = nodes;
       App.weighted = weighted;
-      App.jaccard = jaccard;
+      // App.jaccard = jaccard;
 
       App.sites = [];
 
       /* Iterate through the data and pull out each patient's information */
-      App.edges.forEach(function (patient) {
+      App.nodes.forEach(function (patient) {
 
         if(patient.nodes.length <= 1)
           return;
+
+        // extract the clusters based on the patient's id
+        let patient_clusters = _.find(clusters, function(o){ return parseInt(o.pid) === patient.id });
 
         let site = {
           "patient": patient.id,
@@ -145,9 +152,10 @@ function Patients() {
           "gender": patient.gender,
           "score": [],
           "feedingTube_post": patient["Feeding_tube_6m"] ? patient["Feeding_tube_6m"] : "NA",
-          "feedingTube_pre": !!patient["Tube_removal"]? "N": patient["Feeding_tube_6m"],
+          "feedingTube_pre": !!patient["Tube_removal"] ? "N": patient["Feeding_tube_6m"],
           "aspiration_pre" : patient["Aspiration_rate_Pre-therapy"] ? patient["Aspiration_rate_Pre-therapy"] : "NA" ,
-          "aspiration_post" : patient["Aspiration_rate_Post-therapy"] ? patient["Aspiration_rate_Post-therapy"] : "NA"
+          "aspiration_post" : patient["Aspiration_rate_Post-therapy"] ? patient["Aspiration_rate_Post-therapy"] : "NA",
+          clusters: _.omit(patient_clusters, ["pid", ""])
         };
 
         App.sites.push(site);
