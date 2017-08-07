@@ -6,61 +6,52 @@ var App = App || {};
 function Patients() {
   let self = this;
 
-  /* Determine how many nodes will fit onto the screen in a single row */
-  self.maxNodes = parseInt(window.innerWidth / (App.graphSVGWidth + 2 * App.padding));
+  let dropdown = document.getElementById("clusterLabel");
 
-  // rankings of the patients
-  self.rankings = ko.observableArray();
-  self.optionsCaption = ko.observable('Select a Patient');
-  self.clusterCaption = ko.observable('Select a Cluster');
+  function setupObservables(){
+    /* Determine how many nodes will fit onto the screen in a single row */
+    self.maxNodes = parseInt(window.innerWidth / (App.graphSVGWidth + 2 * App.padding));
 
-  self.patients = ko.observableArray();
-  App.data.forEach(function (patient) {
-    if(patient.nodes.length > 1)
-      self.patients.push(patient);
-  });
+    // rankings of the patients
+    self.rankings = ko.observableArray();
+    self.optionsCaption = ko.observable('Select a Patient');
+    self.clusterCaption = ko.observable('Select a Cluster');
 
-  let cluster_groups = [];
-  _.keys(App.sites[0].clusters).forEach(function(name){
-    let cluster_names = [];
-    _.range(1, parseInt(name[name.length-1])+1).forEach(function(c){
-      cluster_names.push({name: "Cluster " + c, cluster: name});
-    });
-    cluster_groups.push({name:name, count:cluster_names, group: name.split("_")[0]})
-  });
-  self.cluster_groups = _.partition(cluster_groups, function(o) { return (o.name.split('_')[0] === "weighted") } );
-
-  // clusters
-  self.clusters = ko.observableArray(_.clone(self.cluster_groups[0]));
-
-  self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Nodes",
-    // "Tanimoto Edges",  "Jaccard"
-  ]);
-
-  self.selections = ko.observableArray(["By Patient", "By Cluster"]);
-
-  self.numberToDisplay = ko.observableArray([50, 100, 'All']);
-  self.currentPatient = ko.observable(self.patients[0]);
-  self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
-  self.currentDisplay = ko.observable(self.numberToDisplay[0]);
-  self.currentCluster = ko.observable();
-  self.currentType = ko.observable(self.selections[0]);
-
-  /*Subscribe the the change in clustering menu */
-  let dropdown = document.getElementById("clusterLabel"),
-    menu = document.getElementById("clusterMenu");
-
-  // subscribe to the change of the selection
-  self.currentPatient.subscribe(function (newValue) {
-    self.optionsCaption(undefined);
-
-    let patient = _.find(App.data, function (o) {
-      return o.id === newValue.id;
+    self.patients = ko.observableArray();
+    App.data.forEach(function (patient) {
+      if(patient.nodes.length > 1)
+        self.patients.push(patient);
     });
 
-    // clear the array
-    self.rankings.removeAll();
+    let cluster_groups = [];
+    _.keys(App.sites[0].clusters).forEach(function(name){
+      let cluster_names = [];
+      _.range(1, parseInt(name[name.length-1])+1).forEach(function(c){
+        cluster_names.push({name: "Cluster " + c, cluster: name});
+      });
+      cluster_groups.push({name:name, count:cluster_names, group: name.split("_")[0]})
+    });
+    self.cluster_groups = _.partition(cluster_groups, function(o) { return (o.name.split('_')[0] === "weighted") } );
 
+    // clusters
+    self.clusters = ko.observableArray(_.clone(self.cluster_groups[0]));
+
+    self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Nodes",
+      // "Tanimoto Edges",  "Jaccard"
+    ]);
+
+    self.selections = ko.observableArray(["By Patient", "By Cluster"]);
+
+    self.numberToDisplay = ko.observableArray([50, 100, 'All']);
+    self.currentPatient = ko.observable(self.patients[0]);
+    self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
+    self.currentDisplay = ko.observable(self.numberToDisplay[0]);
+    self.currentCluster = ko.observable();
+    self.currentType = ko.observable(self.selections[0]);
+  }
+
+  function filterPatients(patient) {
+    // filter the patients based on similarity
     patient.similarity.forEach(function (id, i) {
 
       /* I just want the first 50, etc */
@@ -78,7 +69,9 @@ function Patients() {
       site.score = patient.scores[i].toFixed(5);
       self.rankings.push(site);
     });
+  }
 
+  function placeSelectedPatientFirst(patient) {
     /* Ensure the patient is first */
     let pat = _.find(self.rankings(), {patient: patient.id});
     let index =self.rankings().indexOf(pat);
@@ -98,13 +91,26 @@ function Patients() {
         return b-a;
       }
     });
+  }
+
+  function changeCurrentPatient(newValue) {
+    self.optionsCaption(undefined);
+
+    let patient = _.find(App.data, function (o) {
+      return o.id === newValue.id;
+    });
+
+    // clear the array
+    self.rankings.removeAll();
+
+    filterPatients(patient);
+    placeSelectedPatientFirst(patient);
 
     /// / Render to the screen
     App.createVisualizations(self.rankings());
-  });
+  }
 
-  /*Subscribe the the change in similarity metric */
-  self.currentSorting.subscribe(function (newValue) {
+  function changeCurrentSorting(newValue) {
     if (newValue === "Tanimoto Edges") {
       App.data = App.edges;
     }
@@ -139,26 +145,9 @@ function Patients() {
     if(self.currentPatient()) {
       self.currentPatient(self.currentPatient());
     }
-  });
+  }
 
-  menu.addEventListener("click", function(e){
-    if (e.target.className === 'cluster') {
-
-      let value = e.target.value || e.target.firstChild.value;
-
-      dropdown.firstChild.textContent = value + ": " + e.target.textContent + ' ';
-        // set the cluster selector to the value
-      let cluster = {name: value, value: parseInt(e.target.textContent.split(" ")[1])};
-      self.currentCluster(cluster);
-
-      /* Touch the current observable to re-render the scene */
-      if(self.currentPatient()) {
-        self.currentPatient(self.currentPatient());
-      }
-    }
-  });
-
-  self.currentDisplay.subscribe(function (newValue) {
+  function changeNumberOfPatients(newValue) {
 
     if(newValue === "All"){
       self.currentDisplay(App.sites.length);
@@ -172,7 +161,45 @@ function Patients() {
       self.currentPatient(self.currentPatient());
     }
 
-  });
+  }
+
+  function setupMenu() {
+    /*Subscribe the the change in clustering menu */
+    let menu = document.getElementById("clusterMenu");
+
+
+    menu.addEventListener("click", function(e){
+      if (e.target.className === 'cluster') {
+
+        let value = e.target.value || e.target.firstChild.value;
+
+        dropdown.firstChild.textContent = value + ": " + e.target.textContent + ' ';
+        // set the cluster selector to the value
+        let cluster = {name: value, value: parseInt(e.target.textContent.split(" ")[1])};
+        self.currentCluster(cluster);
+
+        /* Touch the current observable to re-render the scene */
+        if(self.currentPatient()) {
+          self.currentPatient(self.currentPatient());
+        }
+      }
+    });
+
+  }
+
+  // initialize the observables
+  setupObservables();
+  // initialize the menu
+  setupMenu();
+
+  // subscribe to the change of the selection
+  self.currentPatient.subscribe(changeCurrentPatient);
+
+  /*Subscribe the the change in similarity metric */
+  self.currentSorting.subscribe(changeCurrentSorting);
+
+  // subscribe to the change of the how many patients to display
+  self.currentDisplay.subscribe(changeNumberOfPatients);
 
 }
 
