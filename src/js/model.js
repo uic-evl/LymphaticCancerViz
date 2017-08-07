@@ -36,8 +36,8 @@ function Patients() {
   self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Nodes",
     // "Tanimoto Edges",  "Jaccard"
   ]);
-  self.numberToDisplay = ko.observableArray([50, 100, 'All']);
 
+  self.numberToDisplay = ko.observableArray([50, 100, 'All']);
   self.currentPatient = ko.observable(self.patients[0]);
   self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
   self.currentDisplay = ko.observable(self.numberToDisplay[0]);
