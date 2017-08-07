@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="src/css/custom.css">
     <link rel="stylesheet" href="src/css/main.css">
+    <link rel="stylesheet" href="src/css/menu.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
@@ -21,24 +22,56 @@
 <script src="src/js/main.js"></script>
 <script src="src/js/model.js"></script>
 
-<select id='patientSelection' style='margin-top: 10px; margin-bottom:10px; margin-left: 20px;' data-bind="
+
+<!--<select id='cluster' style='margin-top: 10px; margin-bottom:10px; margin-left: 20px;'-->
+        <!--data-bind=" options: clusters,-->
+                      <!--value: currentCluster,-->
+                      <!--optionsCaption: clusterCaption">-->
+<!--</select>-->
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <select id='patientSelection' class="btn menu"
+                    data-bind="
                     options: patients,
                     optionsText: function(item) {
                        return 'Patient ' + item.id;
                    },
                     value: currentPatient,
                     optionsCaption: optionsCaption">
-</select>
+            </select>
 
-<select id='sortingAlgorithms' style='margin-top: 10px; margin-bottom:10px; margin-left: 20px;'
-        data-bind=" options: sortingAlgorithms,
+            <select id='sortingAlgorithms' class="btn menu"
+                    data-bind=" options: sortingAlgorithms,
                       value: currentSorting" >
-</select>
+            </select>
 
-<select id='numberOfPatients' style='margin-top: 10px; margin-bottom:10px; margin-left: 20px;'
-        data-bind=" options: numberToDisplay,
+            <select id='numberOfPatients' class="btn menu"
+                    data-bind=" options: numberToDisplay,
                       value: currentDisplay" >
-</select>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <div class="dropdown">
+                <a id="clusterLabel" role="button" data-toggle="dropdown" class="btn menu clusters"
+                   data-target="#" data-bind="visible: clusters().length > 0">ChiSquared Cluster
+                    <span class="caret"></span>
+                </a>
+                <ul id="clusterMenu" class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu"
+                    data-bind="foreach: clusters">
+                    <li class="dropdown-submenu">
+                        <a tabindex="-1" href="#"><span data-bind="text: name"></span></a>
+                        <ul class="dropdown-menu" data-bind="foreach: count">
+                            <li><a class="cluster" href="#"><span class="cluster" data-bind="text: name,  value: cluster"></span></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="container-fluid">
     <!--<div data-bind="css: { row: ($index()+1) % $parent.maxNodes == 0 }">-->

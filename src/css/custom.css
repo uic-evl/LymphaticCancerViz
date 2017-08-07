@@ -1367,7 +1367,7 @@ ul.msg_list li a .message {
 
 }
 .dropdown-menu>li>a {
-    color: #5A738E;
+    color: rgb(51,51,51);
 }
 .navbar-nav .open .dropdown-menu {
     position: absolute;
@@ -2250,7 +2250,7 @@ input.parsley-error, textarea.parsley-error, select.parsley-error {
     border-radius: 3px;
 }
 a.btn-success, a.btn-primary, a.btn-warning, a.btn-danger {
-    color: #fff;
+    color: rgb(51,51,51);
 }
 .btn-success {
     background: #26B99A;

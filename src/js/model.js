@@ -12,12 +12,26 @@ function Patients() {
   // rankings of the patients
   self.rankings = ko.observableArray();
   self.optionsCaption = ko.observable('Select a Patient');
+  self.clusterCaption = ko.observable('Select a Cluster');
 
   self.patients = ko.observableArray();
   App.data.forEach(function (patient) {
     if(patient.nodes.length > 1)
       self.patients.push(patient);
   });
+
+  let cluster_groups = [];
+  _.keys(App.sites[0].clusters).forEach(function(name){
+    let cluster_names = [];
+    _.range(1, parseInt(name[name.length-1])+1).forEach(function(c){
+      cluster_names.push({name: "Cluster " + c, cluster: name});
+    });
+    cluster_groups.push({name:name, count:cluster_names, group: name.split("_")[0]})
+  });
+  self.cluster_groups = _.partition(cluster_groups, function(o) { return (o.name.split('_')[0] === "weighted") } );
+
+  // clusters
+  self.clusters = ko.observableArray(_.clone(self.cluster_groups[0]));
 
   self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Nodes",
     // "Tanimoto Edges",  "Jaccard"
@@ -27,6 +41,7 @@ function Patients() {
   self.currentPatient = ko.observable(self.patients[0]);
   self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
   self.currentDisplay = ko.observable(self.numberToDisplay[0]);
+  self.currentCluster = ko.observable();
 
   // subscribe to the change of the selection
   self.currentPatient.subscribe(function (newValue) {
@@ -42,7 +57,7 @@ function Patients() {
     patient.similarity.forEach(function (id, i) {
 
       /* I just want the first 50 */
-      if ( parseInt(self.currentDisplay()) <= i) return;
+      if (self.rankings().length >= parseInt(self.currentDisplay())) return;
 
       let site = _.find(App.sites, {patient: id});
       if(!site) return;
@@ -52,6 +67,7 @@ function Patients() {
 
     /* Ensure the patient is first */
     let pat = _.find(self.rankings(), {patient: patient.id});
+
     let index =self.rankings().indexOf(pat);
     if(index > 0){
       self.rankings.remove(pat);
@@ -81,19 +97,55 @@ function Patients() {
     }
     else if (newValue === "Tanimoto Nodes") {
       App.data = App.nodes;
+      if(self.cluster_groups){
+        self.clusters.removeAll();
+        self.cluster_groups[1].forEach(function(c){
+          self.clusters.push(c);
+        });
+
+      }
     }
     else if (newValue === "Jaccard") {
       App.data = App.jaccard;
     }
     else {
       App.data = App.weighted;
+      if(self.cluster_groups){
+        self.clusters.removeAll();
+        self.cluster_groups[0].forEach(function(c){
+          self.clusters.push(c);
+        });
+
+      }
     }
 
     /* Touch the current observable to re-render the scene */
     if(self.currentPatient()) {
       self.currentPatient(self.currentPatient());
     }
+  });
 
+  /*Subscribe the the change in clustering menu */
+  let dropdown = document.getElementById("clusterLabel"),
+    menu = document.getElementById("clusterMenu");
+
+  menu.addEventListener("click", function(e){
+    if (e.target.className === 'cluster') {
+
+      let value = e.target.value || e.target.firstChild.value;
+
+      dropdown.firstChild.textContent = value + ": " + e.target.textContent + ' ';
+        // set the cluster selector to the value
+      let cluster = {name: value, value: parseInt(e.target.textContent.split(" ")[1])};
+      self.currentCluster(cluster);
+
+      console.log(cluster);
+
+      /* Touch the current observable to re-render the scene */
+      if(self.currentPatient()) {
+        self.currentPatient(self.currentPatient());
+      }
+    }
   });
 
   self.currentDisplay.subscribe(function (newValue) {
