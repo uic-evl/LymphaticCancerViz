@@ -43,6 +43,10 @@ function Patients() {
   self.currentDisplay = ko.observable(self.numberToDisplay[0]);
   self.currentCluster = ko.observable();
 
+  /*Subscribe the the change in clustering menu */
+  let dropdown = document.getElementById("clusterLabel"),
+    menu = document.getElementById("clusterMenu");
+
   // subscribe to the change of the selection
   self.currentPatient.subscribe(function (newValue) {
     self.optionsCaption(undefined);
@@ -56,18 +60,24 @@ function Patients() {
 
     patient.similarity.forEach(function (id, i) {
 
-      /* I just want the first 50 */
+      /* I just want the first 50, etc */
       if (self.rankings().length >= parseInt(self.currentDisplay())) return;
 
       let site = _.find(App.sites, {patient: id});
       if(!site) return;
+
+      /* Filter by cluster grouping */
+      if(self.currentCluster()){
+        let cluster = parseInt(site.clusters[self.currentCluster().name]);
+        if(self.currentCluster().value !== cluster) return;
+      }
+
       site.score = patient.scores[i].toFixed(5);
       self.rankings.push(site);
     });
 
     /* Ensure the patient is first */
     let pat = _.find(self.rankings(), {patient: patient.id});
-
     let index =self.rankings().indexOf(pat);
     if(index > 0){
       self.rankings.remove(pat);
@@ -115,19 +125,18 @@ function Patients() {
         self.cluster_groups[0].forEach(function(c){
           self.clusters.push(c);
         });
-
       }
     }
+
+    /* Reset the cluster drop down*/
+    self.currentCluster(undefined);
+    dropdown.firstChild.textContent = "ChiSquared Cluster";
 
     /* Touch the current observable to re-render the scene */
     if(self.currentPatient()) {
       self.currentPatient(self.currentPatient());
     }
   });
-
-  /*Subscribe the the change in clustering menu */
-  let dropdown = document.getElementById("clusterLabel"),
-    menu = document.getElementById("clusterMenu");
 
   menu.addEventListener("click", function(e){
     if (e.target.className === 'cluster') {
@@ -138,8 +147,6 @@ function Patients() {
         // set the cluster selector to the value
       let cluster = {name: value, value: parseInt(e.target.textContent.split(" ")[1])};
       self.currentCluster(cluster);
-
-      console.log(cluster);
 
       /* Touch the current observable to re-render the scene */
       if(self.currentPatient()) {
