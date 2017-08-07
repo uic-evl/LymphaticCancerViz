@@ -163,6 +163,12 @@ function Patients() {
 
   }
 
+  function changeFilteringMode(newValue) {
+
+
+
+  }
+
   function setupMenu() {
     /*Subscribe the the change in clustering menu */
     let menu = document.getElementById("clusterMenu");
@@ -200,6 +206,8 @@ function Patients() {
 
   // subscribe to the change of the how many patients to display
   self.currentDisplay.subscribe(changeNumberOfPatients);
+
+  self.currentType.subscribe(changeFilteringMode);
 
 }
 
