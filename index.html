@@ -31,7 +31,16 @@
 
 <div class="container-fluid" style="margin-bottom: 10px;">
     <div class="row">
+
+        <div class="col-md-1">
+            <select id='selectionType' class="btn menu"
+                    data-bind=" options: selections, value: currentType">
+            </select>
+        </div>
+
+        <!-- ko if: currentType() === "By Patient" -->
         <div class="col-md-3">
+
             <select id='patientSelection' class="btn menu"
                     data-bind="
                     options: patients,
@@ -52,6 +61,8 @@
                       value: currentDisplay" >
             </select>
         </div>
+        <!-- /ko -->
+
         <div class="col-md-2">
             <div class="dropdown">
                 <a id="clusterLabel" role="button" data-toggle="dropdown" class="btn menu clusters"
