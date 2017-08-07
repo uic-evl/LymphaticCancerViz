@@ -85,6 +85,9 @@
                 </div>
                 <div class="x_content">
                     <div data-bind="attr: {id: 'patient'+patient}" style="display: table; margin: auto;"></div>
+                    <!-- ko if:  $parent.currentCluster() -->
+                    <h2 class="stats">Cluster: <span class="bold" data-bind="text: clusters[$parent.currentCluster().name]"></span></h2>
+                    <!-- /ko -->
                     <h2 class="stats">Similarity Score: <span class="bold" data-bind="text: score"></span></h2>
                     <h2 class="stats">Aspiration (pre/post): <span class="bold" data-bind="text: aspiration_pre + ' / ' + aspiration_post"></span></h2>
                     <h2 class="stats">Feeding Tube (pre/post): <span class="bold" data-bind="text: feedingTube_pre + ' / ' + feedingTube_post"></span></h2></div>
