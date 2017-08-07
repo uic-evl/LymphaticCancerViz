@@ -37,11 +37,14 @@ function Patients() {
     // "Tanimoto Edges",  "Jaccard"
   ]);
 
+  self.selections = ko.observableArray(["By Patient", "By Cluster"]);
+
   self.numberToDisplay = ko.observableArray([50, 100, 'All']);
   self.currentPatient = ko.observable(self.patients[0]);
   self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
   self.currentDisplay = ko.observable(self.numberToDisplay[0]);
   self.currentCluster = ko.observable();
+  self.currentType = ko.observable(self.selections[0]);
 
   /*Subscribe the the change in clustering menu */
   let dropdown = document.getElementById("clusterLabel"),
