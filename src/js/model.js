@@ -165,8 +165,20 @@ function Patients() {
 
   function changeFilteringMode(newValue) {
 
+    if(newValue === "By Patient"){
 
+      self.currentPatient(self.patients[0]);
+      self.currentSorting (self.sortingAlgorithms[0]);
+      self.currentDisplay(self.numberToDisplay[0]);
+      self.currentCluster(undefined);
 
+    }
+    else if(newValue === "By Cluster"){
+      self.clusters.removeAll();
+      _.flatten(_.clone(self.cluster_groups)).forEach(function(c){
+        self.clusters.push(c);
+      });
+    }
   }
 
   function setupMenu() {
