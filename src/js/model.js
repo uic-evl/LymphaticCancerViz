@@ -9,6 +9,7 @@ function Patients() {
   let dropdown = document.getElementById("clusterLabel");
 
   function setupObservables(){
+
     /* Determine how many nodes will fit onto the screen in a single row */
     self.maxNodes = parseInt(window.innerWidth / (App.graphSVGWidth + 2 * App.padding));
 
@@ -19,8 +20,9 @@ function Patients() {
 
     self.patients = ko.observableArray();
     App.data.forEach(function (patient) {
-      if(patient.nodes.length > 1)
-        self.patients.push(patient);
+
+      // if(patient.nodes.length > 1)
+        self.patients.push(_.clone(patient));
     });
 
     let cluster_groups = [];
@@ -93,7 +95,10 @@ function Patients() {
   }
 
   function changeCurrentPatient(newValue) {
+    if(!newValue) return;
+
     self.optionsCaption(undefined);
+
 
     let patient = _.find(App.data, function (o) {
       return o.id === newValue.id;
@@ -159,30 +164,45 @@ function Patients() {
     if(self.currentPatient()) {
       self.currentPatient(self.currentPatient());
     }
-
   }
 
   function changeFilteringMode(newValue) {
 
     if(newValue === "By Patient"){
-      self.currentPatient(self.patients[0]);
-      self.currentSorting (self.sortingAlgorithms[0]);
-      self.currentDisplay(self.numberToDisplay[0]);
-      self.currentCluster(undefined);
+      self.optionsCaption = ko.observable('Select a Patient');
+
+      // clear the patient list
+      self.patients.removeAll();
+      self.rankings.removeAll();
+
+      self.currentPatient(undefined);
+      self.currentSorting(self.sortingAlgorithms[0]);
+
+      App.data.forEach(function (patient) {
+        self.patients.push(_.clone(patient));
+      });
+
     }
     else if(newValue === "By Cluster"){
+      self.optionsCaption = ko.observable('Select a Patient');
+
+      self.currentCluster(undefined);
+      self.currentPatient(undefined);
+      self.rankings.removeAll();
       self.clusters.removeAll();
+
       _.flatten(_.clone(self.cluster_groups)).forEach(function(c){
         self.clusters.push(c);
       });
     }
+
+    dropdown.firstChild.textContent = "ChiSquared Cluster";
+    self.currentCluster(undefined)
   }
 
   function setupMenu() {
     /*Subscribe the the change in clustering menu */
     let menu = document.getElementById("clusterMenu");
-
-
     menu.addEventListener("click", function(e){
       if (e.target.className === 'cluster') {
 
@@ -193,10 +213,40 @@ function Patients() {
         let cluster = {name: value, value: parseInt(e.target.textContent.split(" ")[1])};
         self.currentCluster(cluster);
 
+        if(self.currentType() === "By Cluster" && self.currentCluster())
+        {
+          // clear the patient list
+          self.patients.removeAll();
+          self.rankings.removeAll();
+
+          /* Change the similarity scores depending on the cluster type*/
+          if(value.split("_") === "weighted"){
+            App.data = App.weighted;
+          }
+          else {
+            App.data = App.nodes;
+          }
+
+          // add to the list only the patients in the current cluster
+          _.filter(App.sites, function(site) {
+            return parseInt(site.clusters[self.currentCluster().name]) === parseInt(self.currentCluster().value);
+          })
+          .forEach(function(p){
+            // find the patient in the data and add it to the list
+            let patient = _.find(App.data, function (o) {
+              return o.id === p.patient;
+            });
+
+            self.patients.push(_.clone(patient));
+          });
+          self.currentPatient(undefined);
+        }
+
         /* Touch the current observable to re-render the scene */
-        if(self.currentPatient()) {
+        else if(self.currentPatient()) {
           self.currentPatient(self.currentPatient());
         }
+
       }
     });
 
@@ -216,6 +266,7 @@ function Patients() {
   // subscribe to the change of the how many patients to display
   self.currentDisplay.subscribe(changeNumberOfPatients);
 
+  // subscribe to the primary filter type
   self.currentType.subscribe(changeFilteringMode);
 
 }
@@ -243,8 +294,8 @@ function Patients() {
       /* Iterate through the data and pull out each patient's information */
       App.nodes.forEach(function (patient) {
 
-        if(patient.nodes.length <= 1)
-          return;
+        // if(patient.nodes.length <= 1)
+        //   return;
 
         // extract the clusters based on the patient's id
         let patient_clusters = _.find(clusters, function(o){ return parseInt(o.pid) === patient.id });
