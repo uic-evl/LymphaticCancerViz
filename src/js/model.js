@@ -41,7 +41,6 @@ function Patients() {
     ]);
 
     self.selections = ko.observableArray(["By Patient", "By Cluster"]);
-
     self.numberToDisplay = ko.observableArray([50, 100, 'All']);
     self.currentPatient = ko.observable(self.patients[0]);
     self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
@@ -166,12 +165,10 @@ function Patients() {
   function changeFilteringMode(newValue) {
 
     if(newValue === "By Patient"){
-
       self.currentPatient(self.patients[0]);
       self.currentSorting (self.sortingAlgorithms[0]);
       self.currentDisplay(self.numberToDisplay[0]);
       self.currentCluster(undefined);
-
     }
     else if(newValue === "By Cluster"){
       self.clusters.removeAll();
