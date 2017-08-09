@@ -56,3 +56,7 @@
 #clusterLabel {
     margin-left: 0;
 }
+
+.highlighted a.cluster {
+    color: #1ABB9C;
+}

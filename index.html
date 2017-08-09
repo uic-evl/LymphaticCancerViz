@@ -78,7 +78,10 @@
                             <li data-bind="css: {
                                 disabled: $root.currentPatient()
                                        && $root.currentType() === 'By Patient'
-                                       && $root.currentPatient().clusters.indexOf(name +'_'+ cluster) < 0 } ">
+                                       && $root.currentPatient().clusters.indexOf(name +'_'+ cluster) < 0,
+                                highlighted: $root.currentPatient()
+                                       && $root.currentType() === 'By Patient'
+                                       && $root.currentPatient().clusters.indexOf(name +'_'+ cluster) > -1} ">
                                 <a class="cluster" href="#">
                                   <span class="cluster" data-bind="text: 'Cluster ' + cluster, value: name"></span>
                                 </a>
