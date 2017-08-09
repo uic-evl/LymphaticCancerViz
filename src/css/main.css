@@ -1,3 +1,7 @@
+body {
+    background-color: #f5f5f5;
+}
+
 h2.tumor {
     float: right;
     font-size: 12px !important;
@@ -17,14 +21,6 @@ h2.stats {
     text-align: right;
     color: red;
 }
-/*.male {*/
-    /*background: rgba(179,205,227,0.4);*/
-/*}*/
-
-/*.female {*/
-    /*background: rgba(251,154,153,0.4);*/
-/*}*/
-
 .menu {
     margin-top: 10px;
     margin-left: 20px;
