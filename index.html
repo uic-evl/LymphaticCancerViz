@@ -66,8 +66,8 @@
 
         <div class="col-md-2">
             <div class="dropdown">
-                <a id="clusterLabel" role="button" data-toggle="dropdown" class="btn menu clusters"
-                   data-target="#" data-bind="visible: currentType() === 'By Cluster' || currentPatient() ">ChiSquared Cluster
+                <a id="clusterLabel" data-toggle="dropdown" class="btn menu clusters"
+                   data-target="#" data-bind="visible: currentType() === 'By Cluster' || currentPatient() ">ChiSquared Clusters
                     <span class="caret"></span>
                 </a>
                 <ul id="clusterMenu" class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu"
@@ -75,7 +75,14 @@
                     <li class="dropdown-submenu">
                         <a tabindex="-1" href="#"><span data-bind="text: name"></span></a>
                         <ul class="dropdown-menu" data-bind="foreach: count">
-                            <li><a class="cluster" href="#"><span class="cluster" data-bind="text: name,  value: cluster"></span></a></li>
+                            <li data-bind="css: {
+                                disabled: $root.currentPatient()
+                                       && $root.currentType() === 'By Patient'
+                                       && $root.currentPatient().clusters.indexOf(name +'_'+ cluster) < 0 } ">
+                                <a class="cluster" href="#">
+                                  <span class="cluster" data-bind="text: 'Cluster ' + cluster, value: name"></span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>
@@ -84,7 +91,6 @@
 
         <!-- ko if: currentType() === "By Cluster" && currentCluster() -->
         <div class="col-md-3">
-
             <select id='patientSelection' class="btn menu"
                     data-bind="
                     options: patients,
@@ -95,16 +101,12 @@
                     optionsCaption: optionsCaption">
             </select>
 
-
             <select id='numberOfPatients' class="btn menu"
                     data-bind=" options: numberToDisplay,
                       value: currentDisplay" >
             </select>
-
         </div>
         <!-- /ko -->
-
-
     </div>
 </div>
 
@@ -121,9 +123,6 @@
                 </div>
                 <div class="x_content">
                     <div data-bind="attr: {id: 'patient'+patient}" style="display: table; margin: auto;"></div>
-                    <!-- ko if:  $parent.currentCluster() -->
-                    <h2 class="stats">Cluster: <span class="bold" data-bind="text: clusters[$parent.currentCluster().name]"></span></h2>
-                    <!-- /ko -->
                     <h2 class="stats">Similarity Score: <span class="bold" data-bind="text: score"></span></h2>
                     <h2 class="stats">Aspiration (pre/post): <span class="bold" data-bind="text: aspiration_pre + ' / ' + aspiration_post"></span></h2>
                     <h2 class="stats">Feeding Tube (pre/post): <span class="bold" data-bind="text: feedingTube_pre + ' / ' + feedingTube_post"></span></h2></div>

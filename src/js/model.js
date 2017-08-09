@@ -4,12 +4,10 @@ var App = App || {};
 
 /*** KO Class ***/
 function Patients() {
-  let self = this;
-
-  let dropdown = document.getElementById("clusterLabel");
+  let self = this,
+      dropdown = document.getElementById("clusterLabel");
 
   function setupObservables(){
-
     /* Determine how many nodes will fit onto the screen in a single row */
     self.maxNodes = parseInt(window.innerWidth / (App.graphSVGWidth + 2 * App.padding));
 
@@ -20,8 +18,6 @@ function Patients() {
 
     self.patients = ko.observableArray();
     App.data.forEach(function (patient) {
-
-      // if(patient.nodes.length > 1)
         self.patients.push(_.clone(patient));
     });
 
@@ -29,15 +25,14 @@ function Patients() {
     _.keys(App.sites[0].clusters).forEach(function(name){
       let cluster_names = [];
       _.range(1, parseInt(name[name.length-1])+1).forEach(function(c){
-        cluster_names.push({name: "Cluster " + c, cluster: name});
+        cluster_names.push({cluster: c, name: name});
       });
       cluster_groups.push({name:name, count:cluster_names, group: name.split("_")[0]})
     });
     self.cluster_groups = _.partition(cluster_groups, function(o) { return (o.name.split('_')[0] === "weighted") } );
 
     // clusters
-    self.clusters = ko.observableArray(_.clone(self.cluster_groups[0]));
-
+    self.clusters = ko.observableArray();
     self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Nodes",
       // "Tanimoto Edges",  "Jaccard"
     ]);
@@ -54,12 +49,10 @@ function Patients() {
   function filterPatients(patient) {
     // filter the patients based on similarity
     patient.similarity.forEach(function (id, i) {
+      let site = _.find(App.sites, {patient: id});
 
       /* I just want the first 50, etc */
-      if (self.rankings().length >= parseInt(self.currentDisplay())) return;
-
-      let site = _.find(App.sites, {patient: id});
-      if(!site) return;
+      if (self.rankings().length >= parseInt(self.currentDisplay()) || !site) return;
 
       /* Filter by cluster grouping */
       if(self.currentCluster()){
@@ -97,22 +90,27 @@ function Patients() {
   function changeCurrentPatient(newValue) {
     if(!newValue) return;
 
+    /* Clear the default caption if it exists */
     self.optionsCaption(undefined);
-
-    let patient = _.find(App.data, function (o) {
-      return o.id === newValue.id;
-    });
 
     if(self.currentType() === "By Patient"){
       dropdown.firstChild.textContent = "ChiSquared Cluster";
       self.currentCluster(undefined);
+
+      let site = _.find(App.sites, {patient: newValue.id}),
+          patient_clusters = [];
+      self.clusters().forEach(function(c){
+        patient_clusters.push(c.name + "_" + site.clusters[c.name]);
+      });
+      newValue.clusters = patient_clusters;
+
     }
 
     // clear the array
     self.rankings.removeAll();
 
-    filterPatients(patient);
-    placeSelectedPatientFirst(patient);
+    filterPatients(newValue);
+    placeSelectedPatientFirst(newValue);
 
     /// / Render to the screen
     App.createVisualizations(self.rankings());
@@ -209,12 +207,13 @@ function Patients() {
     let menu = document.getElementById("clusterMenu");
     menu.addEventListener("click", function(e){
       if (e.target.className === 'cluster') {
+        let cluster_class = e.target.value || e.target.firstElementChild.value,
+            cluster_value = _.trim(e.target.textContent);
 
-        let value = e.target.value || e.target.firstChild.value;
+        dropdown.firstChild.textContent = cluster_class + ": " + cluster_value + ' ';
 
-        dropdown.firstChild.textContent = value + ": " + e.target.textContent + ' ';
         // set the cluster selector to the value
-        let cluster = {name: value, value: parseInt(e.target.textContent.split(" ")[1])};
+        let cluster = {name: cluster_class, value: parseInt(cluster_value.split(" ")[1])};
         self.currentCluster(cluster);
 
         if(self.currentType() === "By Cluster" && self.currentCluster()) {
@@ -223,13 +222,12 @@ function Patients() {
           self.rankings.removeAll();
 
           /* Change the similarity scores depending on the cluster type*/
-          if(value.split("_") === "weighted"){
+          if(cluster_class.split("_")[0] === "weighted"){
             App.data = App.weighted;
           }
           else {
             App.data = App.nodes;
           }
-
           // add to the list only the patients in the current cluster
           _.filter(App.sites, function(site) {
             return parseInt(site.clusters[self.currentCluster().name]) === parseInt(self.currentCluster().value);
@@ -239,18 +237,19 @@ function Patients() {
             let patient = _.find(App.data, function (o) {
               return o.id === p.patient;
             });
-
             self.patients.push(_.clone(patient));
           });
-          self.currentPatient(undefined);
-        }
+          self.currentPatient(self.patients()[0]);
+      }
         /* Touch the current observable to re-render the scene */
         else if(self.currentPatient()) {
-          self.currentPatient(self.currentPatient());
+          self.rankings.removeAll();
+          filterPatients(self.currentPatient());
+          // Render to the screen
+          App.createVisualizations(self.rankings());
         }
       }
     });
-
   }
 
   // initialize the observables
