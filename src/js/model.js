@@ -44,7 +44,7 @@ function Patients() {
 
     self.selections = ko.observableArray(["By Patient", "By Cluster"]);
     self.numberToDisplay = ko.observableArray([50, 100, 'All']);
-    self.currentPatient = ko.observable(self.patients[0]);
+    self.currentPatient = ko.observable(undefined);
     self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
     self.currentDisplay = ko.observable(self.numberToDisplay[0]);
     self.currentCluster = ko.observable();
@@ -99,10 +99,14 @@ function Patients() {
 
     self.optionsCaption(undefined);
 
-
     let patient = _.find(App.data, function (o) {
       return o.id === newValue.id;
     });
+
+    if(self.currentType() === "By Patient"){
+      dropdown.firstChild.textContent = "ChiSquared Cluster";
+      self.currentCluster(undefined);
+    }
 
     // clear the array
     self.rankings.removeAll();
@@ -213,8 +217,7 @@ function Patients() {
         let cluster = {name: value, value: parseInt(e.target.textContent.split(" ")[1])};
         self.currentCluster(cluster);
 
-        if(self.currentType() === "By Cluster" && self.currentCluster())
-        {
+        if(self.currentType() === "By Cluster" && self.currentCluster()) {
           // clear the patient list
           self.patients.removeAll();
           self.rankings.removeAll();
@@ -241,12 +244,10 @@ function Patients() {
           });
           self.currentPatient(undefined);
         }
-
         /* Touch the current observable to re-render the scene */
         else if(self.currentPatient()) {
           self.currentPatient(self.currentPatient());
         }
-
       }
     });
 
