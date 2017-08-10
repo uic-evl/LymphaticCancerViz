@@ -40,12 +40,11 @@ function Patients() {
     }
     else {
       self.cluster_groups = [cluster_groups];
-      self.sortingAlgorithms = ko.observableArray([]);
+      self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted"]);
     }
 
     // clusters
     self.clusters = ko.observableArray();
-
 
     self.selections = ko.observableArray(["By Patient", "By Cluster"]);
     self.numberToDisplay = ko.observableArray([50, 100, 'All']);
@@ -111,7 +110,6 @@ function Patients() {
           patient_clusters = [];
 
       self.clusters().forEach(function(c){
-        console.log(c.name);
         patient_clusters.push(c.name + "_" + site.clusters[c.name]);
       });
 
