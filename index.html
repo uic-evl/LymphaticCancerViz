@@ -110,6 +110,10 @@
 
             <select id='numberOfPatients' class="btn menu"
                     data-bind=" options: numberToDisplay,
+                      optionsText: function(item) {
+                       if(_.isNumber(item)) return 'Top ' + item + ' Patients';
+                       else return item + ' Patients';
+                   },
                       value: currentDisplay" >
             </select>
         </div>
