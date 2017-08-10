@@ -24,18 +24,28 @@ function Patients() {
     let cluster_groups = [];
     _.keys(App.sites[0].clusters).forEach(function(name){
       let cluster_names = [];
-      _.range(1, parseInt(name[name.length-1])+1).forEach(function(c){
+      _.range(1, App.cluster_counts[name]+1).forEach(function(c){
         cluster_names.push({cluster: c, name: name});
       });
       cluster_groups.push({name:name, count:cluster_names, group: name.split("_")[0]})
     });
-    self.cluster_groups = _.partition(cluster_groups, function(o) { return (o.name.split('_')[0] === "weighted") } );
+
+    if( _.keys(App.cluster_counts).length > 3 ){
+      self.cluster_groups = _.partition(cluster_groups, function(o) {
+        return (o.name.split('_')[0] === "weighted")
+      } );
+      self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Nodes",
+        // "Tanimoto Edges",  "Jaccard"
+      ]);
+    }
+    else {
+      self.cluster_groups = [cluster_groups];
+      self.sortingAlgorithms = ko.observableArray([]);
+    }
 
     // clusters
     self.clusters = ko.observableArray();
-    self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Tanimoto Nodes",
-      // "Tanimoto Edges",  "Jaccard"
-    ]);
+
 
     self.selections = ko.observableArray(["By Patient", "By Cluster"]);
     self.numberToDisplay = ko.observableArray([50, 100, 'All']);
@@ -99,9 +109,12 @@ function Patients() {
 
       let site = _.find(App.sites, {patient: newValue.id}),
           patient_clusters = [];
+
       self.clusters().forEach(function(c){
+        console.log(c.name);
         patient_clusters.push(c.name + "_" + site.clusters[c.name]);
       });
+
       newValue.clusters = patient_clusters;
 
     }
@@ -277,7 +290,8 @@ function Patients() {
   queue()
     .defer(d3.json, "data/json/tanimoto_nodes.json")
     .defer(d3.json, "data/json/tanimoto_weighted.json")
-    .defer(d3.csv, "data/csv/cluster_results_simple_0803.csv")
+    .defer(d3.csv, "data/csv/cluster_results_weighted_0810.csv")
+    // .defer(d3.csv, "data/csv/cluster_results_simple_0803.csv")
     // .defer(d3.json, "data/json/tanimoto_edges.json")
     // .defer(d3.json, "data/json/jaccard.json")
       .await(function (error,  nodes, weighted, clusters//, edges, jaccard
@@ -291,7 +305,18 @@ function Patients() {
 
       App.sites = [];
 
-      /* Iterate through the data and pull out each patient's information */
+      /* Get the cluster keys from the data*/
+      let k = _.keys(clusters[0]);
+      App.cluster_counts = {};
+
+      /* Extract the max number of clusters */
+      k.forEach(function(o){
+        if(o === "pid" || o === "") return;
+        let max = _.maxBy(clusters, function(p){return parseInt(p[o]);});
+        App.cluster_counts[o] = parseInt(max[o]);
+      });
+
+        /* Iterate through the data and pull out each patient's information */
       App.nodes.forEach(function (patient) {
 
         // if(patient.nodes.length <= 1)
@@ -314,9 +339,7 @@ function Patients() {
           "aspiration_post" : patient["Aspiration_rate_Post-therapy"] ? patient["Aspiration_rate_Post-therapy"] : "NA",
           clusters: _.omit(patient_clusters, ["pid", ""])
         };
-
         App.sites.push(site);
-
       });
 
       App.data = App.weighted;
