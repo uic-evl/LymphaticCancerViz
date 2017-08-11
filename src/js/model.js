@@ -239,6 +239,9 @@ function Patients() {
           else {
             App.data = App.nodes;
           }
+
+          App.data = App.weighted;
+          
           // add to the list only the patients in the current cluster
           _.filter(App.sites, function(site) {
             return parseInt(site.clusters[self.currentCluster().name]) === parseInt(self.currentCluster().value);
