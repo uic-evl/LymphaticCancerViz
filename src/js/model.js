@@ -241,7 +241,7 @@ function Patients() {
           }
 
           App.data = App.weighted;
-          
+
           // add to the list only the patients in the current cluster
           _.filter(App.sites, function(site) {
             return parseInt(site.clusters[self.currentCluster().name]) === parseInt(self.currentCluster().value);
@@ -291,7 +291,8 @@ function Patients() {
   queue()
     .defer(d3.json, "data/json/tanimoto_nodes.json")
     .defer(d3.json, "data/json/tanimoto_weighted.json")
-    .defer(d3.csv, "data/csv/cluster_results_weighted_0810.csv")
+    .defer(d3.csv, "data/csv/cluster_results_weighted_complete_0811.csv")
+    // .defer(d3.csv, "data/csv/cluster_results_weighted_0810.csv")
     // .defer(d3.csv, "data/csv/cluster_results_simple_0803.csv")
     // .defer(d3.json, "data/json/tanimoto_edges.json")
     // .defer(d3.json, "data/json/jaccard.json")
