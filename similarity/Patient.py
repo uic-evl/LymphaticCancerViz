@@ -17,6 +17,7 @@ class Patient(object):
         self.lymph_nodes = lymph_nodes
 
     def set_graphs(self, left_graph, right_graph):
+                
         self.left_graph = left_graph
         self.right_graph = right_graph
 
@@ -99,6 +100,10 @@ class Patient(object):
         left_edges = self.left_graph.get_edges()
         right_edges = self.right_graph.get_edges()
 
+        #if self.id == 177:
+        #    print left_edges
+        #    print right_edges
+            
         vector = np.zeros(len(common_edges))
 
         for l in range(len(common_edges)):
