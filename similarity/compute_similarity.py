@@ -318,7 +318,7 @@ if __name__ == "__main__":
             patient_attr[id] = result[id]
     
     # calculate the similarity and output it to the files 
-    for output in ['edges', 'nodes', 'weighted', 'jaccard']:
+    for output in ['nodes', 'edges', 'weighted', 'jaccard']:
 
         print output
 

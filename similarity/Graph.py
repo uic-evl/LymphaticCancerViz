@@ -36,7 +36,7 @@ class Graph(object):
             self.positions.append(node.lower())
 
     def get_nodes(self):
-        return self.nodes
+        return sorted(self.nodes)
 
     def set_edge(self, edge_a, edge_b):
 
@@ -45,15 +45,20 @@ class Graph(object):
 
         if index in self.edges:
             self.edges[index] += 1
-
         elif reverse in self.edges:
             self.edges[reverse] +=1
-
         else:
             self.edges[index] = 1
 
     def get_edges(self):
-        return self.edges
+    
+        s = {}
+        
+        for key in sorted(self.edges.iterkeys()):
+            #print key
+            s[key] = self.edges[key]
+        
+        return s
 
     def get_node_positions(self):
         return self.positions
