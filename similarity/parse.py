@@ -13,9 +13,7 @@ for i in range(0, 291):
     else:
         header.append("Patient " + str(i))
 print ','.join(map(str, header))
-
-
-
+# print '~'
 with open(data, 'r') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     for row in reader:
@@ -26,9 +24,10 @@ with open(data, 'r') as csvfile:
         rank = []
         scores = []
         idx = int(row[0])
-        for i in range(1, 279):
+        
+        for i in range(1, 278):
             rank.append(row[i])
-        for j in range(279, 557):
+        for j in range(278, 555):
             scores.append(row[j])
         for l in rank:
             r = int(l)
