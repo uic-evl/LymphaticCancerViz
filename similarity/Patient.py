@@ -1,6 +1,6 @@
 import numpy as np
 from Graph import Graph
-
+import sys
 
 class Patient(object):
     def __init__(self, p_id):
@@ -100,17 +100,29 @@ class Patient(object):
         left_edges = self.left_graph.get_edges()
         right_edges = self.right_graph.get_edges()
 
-        #if self.id == 177:
-        #    print left_edges
-        #    print right_edges
-            
         vector = np.zeros(len(common_edges))
 
         for l in range(len(common_edges)):
             if common_edges[l] in left_edges:
-                vector[l] += 1
+                vector[l] += left_edges[common_edges[l]]
 
             if common_edges[l] in right_edges:
-                vector[l] += 1
+                vector[l] += right_edges[common_edges[l]]
+
+        if self.id == 1:
+            print self.id
+            print left_edges
+            print right_edges
+            print common_edges
+            print vector
+            print
+
+        if self.id == 136:
+            print self.id
+            print left_edges
+            print right_edges
+            print common_edges
+            print vector
+            sys.exit()
 
         return vector
