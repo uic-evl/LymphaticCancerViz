@@ -161,12 +161,30 @@ def compute_similarity():
             #     continue
 
             common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
+            common_nodes = sorted(list(set(patientA.get_all_nodes()) | set(patientB.get_all_nodes())))
+
+
+
+            # if patientA.get_id() == 1 and patientB.get_id() == 136:
+            #     print patientA.get_all_nodes()
+            #     print "common"
+            #     print common_nodes
+            #     sys.exit()
+            # else:
+            #     continue
 
             vector_a_edges = patientA.get_edges_vector(common_list)
             vector_b_edges = patientB.get_edges_vector(common_list)
 
-            vector_a_nodes = patientA.get_nodes_vector()
-            vector_b_nodes = patientB.get_nodes_vector()
+            vector_a_nodes = patientA.get_nodes_vector(common_nodes)
+            vector_b_nodes = patientB.get_nodes_vector(common_nodes)
+
+            # if patientA.get_id() == 1 and patientB.get_id() == 136:
+            #     print vector_a_nodes
+            #     print vector_b_nodes
+            #     sys.exit()
+            # else:
+            #     continue
 
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
@@ -318,18 +336,19 @@ if __name__ == "__main__":
             patient_attr[id] = result[id]
     
     # calculate the similarity and output it to the files 
-    for output in ['nodes', 'edges', 'weighted', 'jaccard']:
+    #for output in ['nodes', 'edges', 'weighted', 'jaccard']:
+    for output in ['weighted']:
 
         print output
 
         if output == "edges":
-            f = open('./data/json/tanimoto_edges.json', 'w')
+            f = open('../data/json/tanimoto_edges.json', 'w')
         elif output == "nodes":
-            f = open('./data/json/tanimoto_nodes.json', 'w')
+            f = open('../data/json/tanimoto_nodes.json', 'w')
         elif output == "weighted":
-            f = open('./data/json/tanimoto_weighted.json', 'w')
+            f = open('../data/json/tanimoto_weighted.json', 'w')
         elif output == "jaccard":
-            f = open('./data/json/jaccard.json', 'w')
+            f = open('../data/json/jaccard.json', 'w')
         f.write('[\n')
 
         # computer the similarity of the constructed graphs
