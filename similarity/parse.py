@@ -25,9 +25,9 @@ with open(data, 'r') as csvfile:
         scores = []
         idx = int(row[0])
         
-        for i in range(1, 278):
+        for i in range(1, 289):
             rank.append(row[i])
-        for j in range(278, 555):
+        for j in range(289, 578):
             scores.append(row[j])
         for l in rank:
             r = int(l)
