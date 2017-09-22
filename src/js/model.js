@@ -327,12 +327,21 @@ function Patients() {
 
         // extract the clusters based on the patient's id
         let patient_clusters = _.find(clusters, function(o){ return parseInt(o.pid) === patient.id });
+        let nodes = _.chain(patient.nodes).partition(function (p) {
+          return p[0] === 'L';
+        }).value();
+
+        let index = -1;
+        if(index = _.indexOf(nodes, "23") > -1){
+          nodes[index] = "2/3"
+        }
+        if(index = _.indexOf(nodes, "34") > -1){
+          nodes[index] = "3/4"
+        }
 
         let site = {
           "patient": patient.id,
-          "nodes": _.chain(patient.nodes).partition(function (p) {
-            return p[0] === 'L';
-          }).value(),
+          "nodes": nodes,
           "position": patient.position,
           "gender": patient.gender,
           "score": [],
