@@ -273,6 +273,8 @@ if __name__ == "__main__":
             # strip out the white space from eanode[1:], node[1:]ch string
             # I am also replacing rpln with a 7 to fit our previous model
             parsed_nodes = [x.strip(" ").replace(' RPLN', '7') for x in nodes]
+            # parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in parsed_nodes]
+            # parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
 
             # get the longest item (test purposes)
             longest_item = max(parsed_nodes, key=len)
@@ -299,6 +301,8 @@ if __name__ == "__main__":
 
             # until cleaned, I am only working with single coded lymph nodes
             if len(longest_item) > 3:
+                print patient_id
+                print parsed_nodes
                 continue
 
             # create the graph for the left and right lymph nodes
