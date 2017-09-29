@@ -14,6 +14,8 @@ output = ""
 # output file
 f = None
 
+def write_to_csv(current_patient, patient_order, scores):
+    f.write('')
 
 def write_to_file(current_patient, patient_order, scores):
     # write the output
@@ -163,8 +165,6 @@ def compute_similarity():
             common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
             common_nodes = sorted(list(set(patientA.get_all_nodes()) | set(patientB.get_all_nodes())))
 
-
-
             # if patientA.get_id() == 1 and patientB.get_id() == 136:
             #     print patientA.get_all_nodes()
             #     print "common"
@@ -189,16 +189,16 @@ def compute_similarity():
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
 
-            jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_edges(),
-                                                patientB.get_all_unique_edges())
+            #jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_edges(),
+            #                                    patientB.get_all_unique_edges())
 
             tanimoto_edges_scores.append(tanimoto_edges)
             tanimoto_nodes_scores.append(tanimoto_nodes)
-            jaccard_scores.append(jaccard)
+            #jaccard_scores.append(jaccard)
 
         tanimoto_edges_scores = [float(i) / max(tanimoto_edges_scores) for i in tanimoto_edges_scores]
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
-        jaccard_scores        = [float(i) / max(jaccard_scores) for i in jaccard_scores]
+        #jaccard_scores        = [float(i) / max(jaccard_scores) for i in jaccard_scores]
 
         tanimoto = [ tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in range(len(tanimoto_edges_scores)) ]
 
@@ -231,7 +231,8 @@ if __name__ == "__main__":
 
     data = sys.argv[1]
     connectivity = sys.argv[2]
-    
+    matrix = True
+
     patient_attr = {}
     result = {}
     all_patients = {}
@@ -343,9 +344,9 @@ if __name__ == "__main__":
     #for output in ['nodes', 'edges', 'weighted', 'jaccard']:
     for output in ['weighted']:
 
-        print output
-
-        if output == "edges":
+        if matrix == True:
+            f = open('../data/json/'+ output + '_' + 'matrix.csv', 'w')
+        elif output == "edges":
             f = open('../data/json/tanimoto_edges.json', 'w')
         elif output == "nodes":
             f = open('../data/json/tanimoto_nodes.json', 'w')
@@ -359,5 +360,7 @@ if __name__ == "__main__":
         compute_similarity()
 
         # write the ending of the json file
-        f.write(']')
+        if not matrix:
+            f.write(']')
+
         f.close()
