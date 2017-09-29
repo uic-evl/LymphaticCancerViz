@@ -10,12 +10,29 @@ lymph_nodes = []
 adjacency_matrix = []
 
 output = ""
+matrix = True
+ids = []
 
 # output file
 f = None
 
+
 def write_to_csv(current_patient, patient_order, scores):
-    f.write('')
+    ordered_scores = []
+    for id in sorted(ids):
+        if id == current_patient.get_id():
+            ordered_scores.append("-1.0")
+        else:
+            idx = patient_order.index(id)
+            ordered_scores.append(scores[idx])
+
+    order = ",".join(str(x) for x in ordered_scores)
+    f.write("Patient " + str(current_patient.get_id()) + "," )
+    f.write(order)
+    f.write('\r')
+
+    return
+
 
 def write_to_file(current_patient, patient_order, scores):
     # write the output
@@ -224,20 +241,22 @@ def compute_similarity():
             sorted_scores = sorted(jaccard_scores, reverse=True)
 
         # write the results to the file
-        write_to_file(patientA, sorted_by_score, sorted_scores)
+        if matrix:
+            write_to_csv(patientA, sorted_by_score, sorted_scores)
+        else:
+            write_to_file(patientA, sorted_by_score, sorted_scores)
 
 # Driver starts here
 if __name__ == "__main__":
 
     data = sys.argv[1]
     connectivity = sys.argv[2]
-    matrix = True
 
     patient_attr = {}
     result = {}
     all_patients = {}
     patients = {}
-    
+
     # read in the adjacency matrix
     read_matrix_data(connectivity)
 
@@ -263,6 +282,7 @@ if __name__ == "__main__":
             # get the patient number and create the patient object
             patient_id = int(id)
             patient = Patient(patient_id)
+            ids.append(patient_id)
 
             # add the possible lymph nodes to the patient
             patient.set_lymph_nodes(lymph_nodes)
@@ -344,8 +364,12 @@ if __name__ == "__main__":
     #for output in ['nodes', 'edges', 'weighted', 'jaccard']:
     for output in ['weighted']:
 
-        if matrix == True:
-            f = open('../data/json/'+ output + '_' + 'matrix.csv', 'w')
+        if matrix:
+            f = open('../data/' + output + '_' + 'matrix.csv', 'w')
+            header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
+            f.write(",")
+            f.write(header)
+            f.write('\r')
         elif output == "edges":
             f = open('../data/json/tanimoto_edges.json', 'w')
         elif output == "nodes":
@@ -354,7 +378,9 @@ if __name__ == "__main__":
             f = open('../data/json/tanimoto_weighted.json', 'w')
         elif output == "jaccard":
             f = open('../data/json/jaccard.json', 'w')
-        f.write('[\n')
+
+        if not matrix:
+            f.write('[\n')
 
         # computer the similarity of the constructed graphs
         compute_similarity()
