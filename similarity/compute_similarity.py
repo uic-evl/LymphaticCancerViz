@@ -10,7 +10,7 @@ lymph_nodes = []
 adjacency_matrix = []
 
 output = ""
-matrix = True
+matrix = False
 ids = []
 
 # output file
@@ -321,10 +321,10 @@ if __name__ == "__main__":
             patient.set_tumor_position(tumor_position)
 
             # until cleaned, I am only working with single coded lymph nodes
-            if len(longest_item) > 3:
-                print patient_id
-                print parsed_nodes
-                continue
+            #if len(longest_item) > 3:
+            #    print patient_id
+            #    print parsed_nodes
+            #    continue
 
             # create the graph for the left and right lymph nodes
             left = Graph(lymph_nodes, lymph_nodes)
