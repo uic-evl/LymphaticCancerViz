@@ -1,0 +1,9 @@
+<select id='patientSelection' class="btn menu"
+        data-bind="
+                    options: patients,
+                    optionsText: function(item) {
+                       return 'Patient ' + item.id;
+                   },
+                    value: currentPatient,
+                    optionsCaption: optionsCaption">
+</select>

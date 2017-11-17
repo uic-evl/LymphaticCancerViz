@@ -1,0 +1,15 @@
+<select id='patientSelection' class="btn menu"
+        data-bind="
+                    options: patients,
+                    optionsText: function(item) {
+                       return 'Patient ' + item.id;
+                   },
+                    value: currentPatient,
+                    optionsCaption: optionsCaption">
+</select>
+
+<select id='sortingAlgorithms' class="btn menu"
+        data-bind="visible: sortingAlgorithms().length > 0,  options: sortingAlgorithms,
+                      value: currentSorting" >
+</select>
+
