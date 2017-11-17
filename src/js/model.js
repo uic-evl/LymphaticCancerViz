@@ -221,27 +221,17 @@ function Patients() {
           return o.id === p.patient;
         });
         self.patients.push(_.clone(patient));
-      });self.currentPrediction
+      });
 
     self.currentPatient(self.patients()[0]);
-
-    // App.sites.forEach(function(s){
-    //   if(s.predictions[variable] >= min && s.predictions[variable] < max){
-    //     //console.log(s.predictions[variable]);
-    //     self.rankings.push(s);
-    //     console.log(s.predictions[variable]);
-    //   }
-    // });
-
-    // Render to the screen
-    //App.createVisualizations(self.rankings());
-    //console.log(self.rankings());
 
   }
 
   function changeProbabilityVariable(newValue){
     /* Clear the default caption if it exists */
     self.predictionCaption(undefined);
+    self.optionsCaption("Select a Variable");
+
     self.currentPredictionVariable(newValue);
     self.currentPrediction(undefined);
     self.predictions.removeAll();
@@ -300,15 +290,17 @@ function Patients() {
     }
     else if(newValue === "By Prediction"){
       self.optionsCaption = ko.observable('Select a Probability');
+      self.optionsCaption("Select a Variable");
 
       self.currentCluster(undefined);
       self.currentPatient(undefined);
-      self.currentPredictionVariable(undefined);
-      self.currentPrediction(undefined);
 
+      self.currentPrediction(undefined);
+      self.currentPredictionVariable(undefined);
+
+      self.predictions.removeAll();
       self.rankings.removeAll();
       self.clusters.removeAll();
-
     }
 
   }
