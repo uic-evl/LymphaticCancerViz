@@ -16,6 +16,7 @@ function Patients() {
     self.optionsCaption = ko.observable('Select a Patient');
     self.clusterCaption = ko.observable('Select a Cluster');
     self.predictionCaption = ko.observable('Select a Variable');
+    self.predictionProbCaption = ko.observable('Select a Probability');
 
     self.patients = ko.observableArray();
     App.data.forEach(function (patient) {
@@ -54,6 +55,18 @@ function Patients() {
       let group = "" + (prediction_groups[i-1]) + " <= p < " + p;
       self.prediction_groups.push(group);
     });
+
+    let enjoyment_groups = [];
+    for(let i = 0; i < 10; i++){
+      enjoyment_groups.push(parseFloat(i));
+    }
+    self.enjoyment_groups = [];
+    enjoyment_groups.forEach(function(p,i){
+      if(i === 0) return;
+      let group = "" + (enjoyment_groups[i-1]) + " <= p < " + p;
+      self.enjoyment_groups.push(group);
+    });
+
     self.predictionVariable = ko.observableArray(["Feeding Tube","Aspirating","Enjoyment"]);
 
     // clusters
@@ -132,11 +145,8 @@ function Patients() {
       self.clusters().forEach(function(c){
         patient_clusters.push(c.name + "_" + site.clusters[c.name]);
       });
-
       newValue.clusters = patient_clusters;
-
     }
-
     // clear the array
     self.rankings.removeAll();
 
@@ -200,8 +210,11 @@ function Patients() {
   }
 
   function changeProbabilityRange(newValue){
+    /* no value provided */
+    if(!newValue)return;
+
     /* Clear the default caption if it exists */
-    self.optionsCaption(undefined);
+    self.predictionProbCaption(undefined);
     // clear the patient list
     self.rankings.removeAll();
     self.patients.removeAll();
@@ -222,22 +235,26 @@ function Patients() {
         });
         self.patients.push(_.clone(patient));
       });
-
     self.currentPatient(self.patients()[0]);
-
   }
 
   function changeProbabilityVariable(newValue){
+    /* no value provided */
+    if(!newValue)return;
+
     /* Clear the default caption if it exists */
     self.predictionCaption(undefined);
-    self.optionsCaption("Select a Variable");
+    self.predictionProbCaption("Select a Probability");
 
     self.currentPredictionVariable(newValue);
     self.currentPrediction(undefined);
     self.predictions.removeAll();
+    self.rankings.removeAll();
+    self.patients.removeAll();
 
-    let variable = _.chain(newValue).toLower().replace(" ", "_").value();
-    self.prediction_groups.forEach(function(p){
+    let variable = _.chain(newValue).toLower().replace(" ", "_").value(),
+        groupings = (variable === 'enjoyment') ? self.enjoyment_groups : self.prediction_groups;
+    groupings.forEach(function(p){
       let split = p.split(" <= p < "),
         min = parseFloat(split[0]), max = parseFloat(split[1]);
 
@@ -255,7 +272,7 @@ function Patients() {
   function changeFilteringMode(newValue) {
 
     if(newValue === "By Patient"){
-      self.optionsCaption = ko.observable('Select a Patient');
+      self.optionsCaption('Select a Patient');
 
       // clear the patient list
       self.patients.removeAll();
@@ -273,7 +290,7 @@ function Patients() {
 
     }
     else if(newValue === "By Cluster"){
-      self.optionsCaption = ko.observable('Select a Patient');
+      self.optionsCaption('Select a Patient');
 
       self.currentCluster(undefined);
       self.currentPatient(undefined);
@@ -288,9 +305,10 @@ function Patients() {
         self.clusters.push(c);
       });
     }
+
     else if(newValue === "By Prediction"){
-      self.optionsCaption = ko.observable('Select a Probability');
-      self.optionsCaption("Select a Variable");
+      self.predictionCaption("Select a Variable");
+      self.predictionProbCaption("Select a Probability");
 
       self.currentCluster(undefined);
       self.currentPatient(undefined);
