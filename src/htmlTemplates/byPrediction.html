@@ -1,0 +1,25 @@
+<select id='predictionVariable' class="btn menu"
+        data-bind="
+                    options: predictionVariable,
+                    value: currentPredictionVariable,
+                    optionsCaption: predictionCaption">
+</select>
+
+<select id='predictionSelection' class="btn menu"
+        data-bind="
+                    visible: currentPredictionVariable(),
+                    options: predictions,
+                    value: currentPrediction,
+                    optionsCaption: optionsCaption">
+</select>
+
+<!--<select id='patientSelection' class="btn menu"-->
+        <!--data-bind="-->
+                    <!--visible: currentPatient(),-->
+                    <!--options: patients,-->
+                    <!--optionsText: function(item) {-->
+                       <!--return 'Patient ' + item.id;-->
+                   <!--},-->
+                    <!--value: currentPatient,-->
+                    <!--optionsCaption: optionsCaption">-->
+<!--</select>-->
