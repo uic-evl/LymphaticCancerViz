@@ -7,7 +7,7 @@ function Patients() {
   let self = this,
       dropdown = document.getElementById("clusterLabel");
 
-  function setupObservables(){
+  function setupObservables() {
     /* Determine how many nodes will fit onto the screen in a single row */
     self.maxNodes = parseInt(window.innerWidth / (App.graphSVGWidth + 2 * App.padding));
 
@@ -41,7 +41,7 @@ function Patients() {
     }
     else {
       self.cluster_groups = [cluster_groups];
-      self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted"]);
+      self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted", "Jaccard", "Tanimoto Nodes"]);
     }
 
     let prediction_groups = [];
@@ -150,8 +150,10 @@ function Patients() {
     // clear the array
     self.rankings.removeAll();
 
-    filterPatients(newValue);
-    placeSelectedPatientFirst(newValue);
+    let current = _.find(App.data, {id: newValue.id});
+
+    filterPatients(current);
+    placeSelectedPatientFirst(current);
 
     // Render to the screen
     App.createVisualizations(self.rankings());
@@ -163,13 +165,13 @@ function Patients() {
     }
     else if (newValue === "Tanimoto Nodes") {
       App.data = App.nodes;
-      if(self.cluster_groups){
-        self.clusters.removeAll();
-        self.cluster_groups[1].forEach(function(c){
-          self.clusters.push(c);
-        });
-
-      }
+      // if(self.cluster_groups){
+      //   self.clusters.removeAll();
+      //   self.cluster_groups[1].forEach(function(c){
+      //     self.clusters.push(c);
+      //   });
+      //
+      // }
     }
     else if (newValue === "Jaccard") {
       App.data = App.jaccard;
@@ -310,6 +312,8 @@ function Patients() {
       self.predictionCaption("Select a Variable");
       self.predictionProbCaption("Select a Probability");
 
+      App.data = App.weighted;
+
       self.currentCluster(undefined);
       self.currentPatient(undefined);
 
@@ -420,14 +424,14 @@ function Patients() {
     // .defer(d3.csv, "data/csv/cluster_results_weighted_0810.csv")
     // .defer(d3.csv, "data/csv/cluster_results_simple_0803.csv")
     // .defer(d3.json, "data/json/tanimoto_edges.json")
-    // .defer(d3.json, "data/json/jaccard.json")
-      .await(function (error,  nodes, weighted, clusters, predictions /*, edges, jaccard*/) {
+    .defer(d3.json, "data/json/jaccard.json")
+      .await(function (error,  nodes, weighted, clusters, predictions, jaccard /*, edges, jaccard*/) {
       if (error) return console.warn(error);
 
       // App.edges = edges;
       App.nodes = nodes;
       App.weighted = weighted;
-      // App.jaccard = jaccard;
+      App.jaccard = jaccard;
 
       App.sites = [];
 
