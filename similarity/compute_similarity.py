@@ -10,7 +10,7 @@ lymph_nodes = []
 adjacency_matrix = []
 
 output = ""
-matrix = False
+matrix = True
 ids = []
 
 # output file
@@ -206,16 +206,16 @@ def compute_similarity():
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
 
-            #jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_edges(),
-            #                                    patientB.get_all_unique_edges())
+            jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
+                                                patientB.get_all_unique_nodes())
 
             tanimoto_edges_scores.append(tanimoto_edges)
             tanimoto_nodes_scores.append(tanimoto_nodes)
-            #jaccard_scores.append(jaccard)
+            jaccard_scores.append(jaccard)
 
         tanimoto_edges_scores = [float(i) / max(tanimoto_edges_scores) for i in tanimoto_edges_scores]
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
-        #jaccard_scores        = [float(i) / max(jaccard_scores) for i in jaccard_scores]
+        jaccard_scores        = [float(i) / max(jaccard_scores) for i in jaccard_scores]
 
         tanimoto = [ tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in range(len(tanimoto_edges_scores)) ]
 
@@ -294,8 +294,8 @@ if __name__ == "__main__":
             # strip out the white space from eanode[1:], node[1:]ch string
             # I am also replacing rpln with a 7 to fit our previous model
             parsed_nodes = [x.strip(" ").replace(' RPLN', '7') for x in nodes]
-            # parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in parsed_nodes]
-            # parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
+            parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in parsed_nodes]
+            parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
 
             # get the longest item (test purposes)
             longest_item = max(parsed_nodes, key=len)
@@ -362,7 +362,7 @@ if __name__ == "__main__":
     
     # calculate the similarity and output it to the files 
     #for output in ['nodes', 'edges', 'weighted', 'jaccard']:
-    for output in ['weighted']:
+    for output in ['jaccard', 'nodes', 'weighted']:
 
         if matrix:
             f = open('../data/' + output + '_' + 'matrix.csv', 'w')
