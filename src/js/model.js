@@ -2,15 +2,15 @@
 
 var App = App || {};
 
+function patient_sort(key, left, right) {
+  return parseInt(left[key]) === parseInt(right[key]) ? 0 :
+    (parseInt(left[key]) < parseInt(right[key]) ? -1 : 1);
+}
+
 /*** KO Class ***/
 function Patients() {
   let self = this,
       dropdown = document.getElementById("clusterLabel");
-
-  function patient_sort(left, right) {
-    return parseInt(left.id) === parseInt(right.id) ? 0 :
-      (parseInt(left.id) < parseInt(right.id) ? -1 : 1);
-  }
 
   function setupClusterObservables() {
     self.clusters = ko.observableArray();
@@ -73,7 +73,7 @@ function Patients() {
     App.data.forEach(function (patient) {
       self.patients.push(_.clone(patient));
     });
-    self.patients(self.patients().sort(patient_sort));
+    // self.patients(self.patients().sort(patient_sort));
   }
 
 
@@ -261,7 +261,7 @@ function Patients() {
         });
         self.patients.push(_.clone(patient));
       });
-    self.patients(self.patients().sort(patient_sort));
+    //self.patients(self.patients().sort(patient_sort));
 
     self.currentPatient(self.patients()[0]);
   }
@@ -529,7 +529,8 @@ function Patients() {
         App.sites.push(site);
       });
 
-      App.data = App.weighted;
+      App.sites = App.sites.sort(patient_sort.bind(null, "patient"));
+      App.data = App.weighted.sort(patient_sort.bind(null, "id") );
 
       /* Load the dropdown templates */
       let d1 =  new $.Deferred(),

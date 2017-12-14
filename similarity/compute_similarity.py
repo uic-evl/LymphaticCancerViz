@@ -27,7 +27,7 @@ def write_to_csv(current_patient, patient_order, scores):
             ordered_scores.append(scores[idx])
 
     order = ",".join(str(x) for x in ordered_scores)
-    f.write("Patient " + str(current_patient.get_id()) + "," )
+    f.write("Patient " + str(current_patient.get_id()) + ",")
     f.write(order)
     f.write('\r')
 
@@ -44,12 +44,15 @@ def write_to_file(current_patient, patient_order, scores):
         f.write('"' + attr + '": "' + val + '", ')
 
     output = ",".join(str(e) for e in patient_order)
+    if(str(current_patient.get_id()) == "1"):
+        print output[:10]
     f.write('"similarity": [' + output + '], ')
 
     output = ",".join(str(round(e, 4)) for e in scores)
     f.write('"scores": [' + output + '], ')
 
-    out_nodes = current_patient.get_graph("Left").get_node_positions() + current_patient.get_graph("Right").get_node_positions()
+    out_nodes = current_patient.get_graph("Left").get_node_positions() + current_patient.get_graph(
+        "Right").get_node_positions()
     output = '","'.join(str(n).upper() for n in out_nodes)
     f.write('"nodes": ["' + output + '"] }')
 
@@ -61,7 +64,6 @@ def write_to_file(current_patient, patient_order, scores):
 
 
 def read_matrix_data(file):
-
     global lymph_nodes
     global adjacency_matrix
 
@@ -101,8 +103,8 @@ def get_min_max_nodes(patient_a, patient_b):
 
 
 def get_min_max_edges(patient_a, patient_b):
-    min_nodes = min( len(patient_a.get_all_edges()), len(patient_b.get_all_edges()) )
-    max_nodes = min( len(patient_a.get_all_edges()), len(patient_b.get_all_edges()) )
+    min_nodes = min(len(patient_a.get_all_edges()), len(patient_b.get_all_edges()))
+    max_nodes = min(len(patient_a.get_all_edges()), len(patient_b.get_all_edges()))
 
     return [min_nodes, max_nodes]
 
@@ -150,7 +152,6 @@ def compute_graph_similarity(graph_a, graph_b):
 
 
 def compute_similarity():
-
     global output
     scores = []
 
@@ -180,12 +181,26 @@ def compute_similarity():
             #     continue
 
             common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
-            common_nodes = sorted(list(set(patientA.get_all_combined_nodes()) | set(patientB.get_all_combined_nodes())))
+            common_combined_nodes = sorted(
+                list(set(patientA.get_all_combined_nodes()) | set(patientB.get_all_combined_nodes())))
+            common_nodes = sorted(list(set(patientA.get_all_nodes()) | set(patientB.get_all_nodes())))
+            common = sorted(list(set(common_nodes) | set(common_combined_nodes)))
 
-            # if patientA.get_id() == 1 and patientB.get_id() == 136:
+            # if patientA.get_id() == 1 and patientB.get_id() == 5:
+            #     print "all a"
             #     print patientA.get_all_nodes()
-            #     print "common"
+            #     print "all b"
+            #     print patientB.get_all_nodes()
+            #     print "combinedA"
+            #     print patientA.get_all_combined_nodes()
+            #     print "combinedB"
+            #     print patientB.get_all_combined_nodes()
+            #
+            #     print "common AB"
             #     print common_nodes
+            #     print "common all"
+            #     print common
+            #
             #     sys.exit()
             # else:
             #     continue
@@ -193,13 +208,9 @@ def compute_similarity():
             vector_a_edges = patientA.get_edges_vector(common_list)
             vector_b_edges = patientB.get_edges_vector(common_list)
 
-            vector_a_nodes = patientA.get_nodes_vector(common_nodes)
-            vector_b_nodes = patientB.get_nodes_vector(common_nodes)
+            vector_a_nodes = patientA.get_nodes_vector(common)
+            vector_b_nodes = patientB.get_nodes_vector(common)
 
-            # if patientA.get_id() == 1 and patientB.get_id() == 136:
-            #     print vector_a_nodes
-            #     print vector_b_nodes
-            #     sys.exit()
             # else:
             #     continue
 
@@ -208,20 +219,30 @@ def compute_similarity():
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
 
+            # if patientA.get_id() == 1 and patientB.get_id() == 5:
+            #     print common
+            #     print vector_a_nodes
+            #     print vector_b_nodes
+            #     print tanimoto_nodes
+            #     print tanimoto_edges
+            #     sys.exit()
+
             tanimoto_edges_scores.append(tanimoto_edges)
             tanimoto_nodes_scores.append(tanimoto_nodes)
             jaccard_scores.append(jaccard)
 
         max_edge_score = max(tanimoto_edges_scores)
+
         if max_edge_score == 0:
             tanimoto_edges_scores = [0 for i in tanimoto_edges_scores]
         else:
             tanimoto_edges_scores = [float(i) / max(tanimoto_edges_scores) for i in tanimoto_edges_scores]
 
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
-        jaccard_scores        = [float(i) / max(jaccard_scores) for i in jaccard_scores]
+        jaccard_scores = [float(i) / max(jaccard_scores) for i in jaccard_scores]
 
-        tanimoto = [ tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in range(len(tanimoto_edges_scores)) ]
+        tanimoto = [tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in
+                    range(len(tanimoto_edges_scores))]
 
         sorted_scores = []
         sorted_by_score = []
@@ -239,6 +260,13 @@ def compute_similarity():
             scores = tanimoto
             sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
             sorted_scores = sorted(tanimoto, reverse=True)
+
+            if patientA.get_id() == 1:
+                print scores[:10]
+                print sorted_by_score[:10]
+                print sorted_scores[:10]
+                sys.exit()
+
         elif output == "jaccard":
             scores = jaccard_scores
             sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
@@ -352,7 +380,7 @@ if __name__ == "__main__":
             del result[id][node_column_name]
             # del result[id][tumor_column_name]
             del result[id]['Gender']
-            #del result[id]["Comments"]
+            # del result[id]["Comments"]
 
             # create the graph for the left and right lymph nodes
             left = Graph(lymph_nodes, lymph_nodes)
@@ -382,14 +410,12 @@ if __name__ == "__main__":
                     if n[1:] == "23" or n[1:] == "234" or n[1:] == "34":
                         for c in n[1:]:
                             if c == "2":
-                                set_graph_node(current_graph, semantic+"2A", 0.5)
-                                set_graph_node(current_graph, semantic+"2B", 0.5)
+                                set_graph_node(current_graph, semantic + "2A", 1)
+                                set_graph_node(current_graph, semantic + "2B", 1)
                             else:
-                                set_graph_node(current_graph, semantic+c, 0.5)
+                                set_graph_node(current_graph, semantic + c, 1)
                     else:
                         set_graph_node(current_graph, n, 1.0)
-
-
 
             # set the patient graphs
             patient.set_graphs(left, right)
@@ -400,7 +426,7 @@ if __name__ == "__main__":
             patient_attr[id] = result[id]
 
     # calculate the similarity and output it to the files 
-    #for output in ['jaccard', 'nodes', 'weighted']:
+    # for output in ['jaccard', 'nodes', 'weighted']:
     for output in ['weighted']:
         if matrix:
             f = open('data/' + output + '_' + 'matrix.csv', 'w')
