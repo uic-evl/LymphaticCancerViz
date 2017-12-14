@@ -10,7 +10,7 @@ lymph_nodes = []
 adjacency_matrix = []
 
 output = ""
-matrix = True
+matrix = False
 ids = []
 
 # output file
@@ -94,8 +94,8 @@ def get_patient_graphs(current_patient):
 
 
 def get_min_max_nodes(patient_a, patient_b):
-    min_nodes = min( len(patient_a.get_all_nodes()), len(patient_b.get_all_nodes()) )
-    max_nodes = min( len(patient_a.get_all_nodes()), len(patient_b.get_all_nodes()) )
+    min_nodes = min(len(patient_a.get_all_combined_nodes()), len(patient_b.get_all_combined_nodes()))
+    max_nodes = min(len(patient_a.get_all_combined_nodes()), len(patient_b.get_all_combined_nodes()))
 
     return [min_nodes, max_nodes]
 
@@ -180,7 +180,7 @@ def compute_similarity():
             #     continue
 
             common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
-            common_nodes = sorted(list(set(patientA.get_all_nodes()) | set(patientB.get_all_nodes())))
+            common_nodes = sorted(list(set(patientA.get_all_combined_nodes()) | set(patientB.get_all_combined_nodes())))
 
             # if patientA.get_id() == 1 and patientB.get_id() == 136:
             #     print patientA.get_all_nodes()
@@ -214,6 +214,7 @@ def compute_similarity():
             jaccard_scores.append(jaccard)
 
         tanimoto_edges_scores = [float(i) / max(tanimoto_edges_scores) for i in tanimoto_edges_scores]
+        #print tanimoto_edges_scores
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
         jaccard_scores        = [float(i) / max(jaccard_scores) for i in jaccard_scores]
 
@@ -246,6 +247,16 @@ def compute_similarity():
         else:
             write_to_file(patientA, sorted_by_score, sorted_scores)
 
+
+def set_graph_node(infected, score):
+    # set the level
+    current_graph.set_node_value(infected[1:])
+    # add the full node name to keep track
+    current_graph.set_node_position(infected)
+    # the score is based on whether we had to split the node or not
+    current_graph.set_value_at(infected[1:], infected[1:], score)
+
+
 # Driver starts here
 if __name__ == "__main__":
 
@@ -256,6 +267,9 @@ if __name__ == "__main__":
     result = {}
     all_patients = {}
     patients = {}
+
+    node_column_name = 'Affected_Lymph_node_UPPER'
+    tumor_column_name = 'Tm_Laterality'
 
     # read in the adjacency matrix
     read_matrix_data(connectivity)
@@ -277,6 +291,11 @@ if __name__ == "__main__":
 
         # iterate over the rows of the csv file
         for id in result:
+
+            # no id given, we can't use
+            if len(id) == 0:
+                continue
+
             parsed = {}
 
             # get the patient number and create the patient object
@@ -289,36 +308,44 @@ if __name__ == "__main__":
             patient.set_adjacency_matrix(adjacency_matrix)
 
             # parse the nodes from the row
-            nodes = result[id]['Affected_lymph_nodes'].split(',')
+            nodes = result[id][node_column_name].split(',')
+
+            # No infected nodes available
+            if 'N/A' in nodes or len(nodes[0]) == 0:
+                continue
 
             # strip out the white space from eanode[1:], node[1:]ch string
-            # I am also replacing rpln with a 7 to fit our previous model
-            parsed_nodes = [x.strip(" ").replace(' RPLN', '7') for x in nodes]
+            parsed_nodes = [x.strip(" ").replace(' RPLN', 'RP') for x in nodes]
             parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in parsed_nodes]
             parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
+            parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in parsed_nodes]
 
             # get the longest item (test purposes)
             longest_item = max(parsed_nodes, key=len)
 
-            del result[id]['Affected_lymph_nodes']
-
             # get and set the patient gender
             gender = str(result[id]["Gender"]).lower()
             patient.set_gender(gender)
-            del result[id]['Gender']
 
             # get and set the tumor position
-            tumor_position = result[id]["Tumor_Laterality"].strip(" ")
-            #print tumor_position
-            if len(tumor_position) > 1 or len(tumor_position) == 0:
-                tumor_position = 'N/A'
-            elif tumor_position.lower() == 'l':
-                tumor_position = "Left"
-            elif tumor_position.lower() == 'r':
-                tumor_position = "Right"
+            # tumor_position = result[id][tumor_column_name].strip(" ")
 
-            del result[id]['Tumor_Laterality']
-            patient.set_tumor_position(tumor_position)
+            # if tumor_position.lower() == 'l':
+            #     tumor_position = "Left"
+            # elif tumor_position.lower() == 'r':
+            #     tumor_position = "Right"
+            # elif tumor_position.lower() == 'bilateral':
+            #     tumor_position = "BiLat."
+            # elif tumor_position.lower() == "Midline":
+            #     tumor_position = "Midline"
+            # else:
+            #     tumor_position
+            # patient.set_tumor_position(tumor_position)
+
+            del result[id][node_column_name]
+            # del result[id][tumor_column_name]
+            del result[id]['Gender']
+            #del result[id]["Comments"]
 
             # until cleaned, I am only working with single coded lymph nodes
             #if len(longest_item) > 3:
@@ -336,20 +363,32 @@ if __name__ == "__main__":
                 new_nodes = [node]
                 current_graph = left
 
+                if len(node) > 5:
+                    continue
+
                 if node[0] == 'R':
                     current_graph = right
 
                 # if the node is 5, then we add both a and b
-                if node[1:] == "5" or node[1:] == "1":
+                if len(node[1:]) == 1 and (node[1:] == "5" or node[1:] == "1" or node[1:] == "2"):
                     new_nodes = []
                     new_nodes = [node + 'A', node + 'B']
 
+                if node[1:].lower() == "3a":
+                    new_nodes = [node[0] + '3']
+
                 # add the nodes to the graph
                 for n in new_nodes:
-                    current_graph.set_node_value(n[1:])
-                    # the score is based on whether we had to split the node or not
-                    current_graph.set_value_at(n[1:], n[1:], 1.0)
-                    current_graph.set_node_position(n)
+                    semantic = n[0]
+                    if n[1:] == "23" or n[1:] == "234" or n[1:] == "34":
+                        for c in n[1:]:
+                            if c == "2":
+                                set_graph_node(semantic+"2A", 0.5)
+                                set_graph_node(semantic+"2B", 0.5)
+                            else:
+                                set_graph_node(semantic+c, 0.5)
+                    else:
+                        set_graph_node(n, 1.0)
 
             # set the patient graphs
             patient.set_graphs(left, right)
@@ -357,27 +396,25 @@ if __name__ == "__main__":
             patients.update({patient_id: patient})
 
             # keep the rest of the parsed attributes
-            del result[id]["Comments"]
             patient_attr[id] = result[id]
-    
-    # calculate the similarity and output it to the files 
-    #for output in ['nodes', 'edges', 'weighted', 'jaccard']:
-    for output in ['jaccard', 'nodes', 'weighted']:
 
+    # calculate the similarity and output it to the files 
+    #for output in ['jaccard', 'nodes', 'weighted']:
+    for output in ['weighted']:
         if matrix:
-            f = open('../data/' + output + '_' + 'matrix.csv', 'w')
+            f = open('data/' + output + '_' + 'matrix.csv', 'w')
             header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
             f.write(",")
             f.write(header)
             f.write('\r')
         elif output == "edges":
-            f = open('../data/json/tanimoto_edges.json', 'w')
+            f = open('data/json/tanimoto_edges.json', 'w')
         elif output == "nodes":
-            f = open('../data/json/tanimoto_nodes.json', 'w')
+            f = open('data/json/tanimoto_nodes.json', 'w')
         elif output == "weighted":
-            f = open('../data/json/tanimoto_weighted.json', 'w')
+            f = open('data/json/tanimoto_weighted.json', 'w')
         elif output == "jaccard":
-            f = open('../data/json/jaccard.json', 'w')
+            f = open('data/json/jaccard.json', 'w')
 
         if not matrix:
             f.write('[\n')
