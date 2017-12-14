@@ -109,8 +109,11 @@ class Patient(object):
 
         return nodes_right
 
-    def get_all_nodes(self):
+    def get_all_combined_nodes(self):
         return sorted(self.get_combined_left_nodes() + self.get_combined_right_nodes())
+
+    def get_all_nodes(self):
+        return sorted(self.right_graph.get_nodes() + self.left_graph.get_nodes())
 
     def get_all_edges(self):
         return list(self.right_graph.get_edges().keys() + self.left_graph.get_edges().keys())
