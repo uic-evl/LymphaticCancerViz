@@ -416,22 +416,25 @@ function Patients() {
   }
 
   queue()
-    .defer(d3.json, "data/json/tanimoto_nodes.json")
+    //.defer(d3.json, "data/json/tanimoto_nodes.json")
     .defer(d3.json, "data/json/tanimoto_weighted.json")
-    .defer(d3.csv, "data/csv/cluster_results_weighted_complete_0818.csv")
-    .defer(d3.csv, "data/csv/predict_outcome_lymph.csv")
+    //.defer(d3.csv, "data/csv/cluster_results_weighted_complete_0818.csv")
+    //.defer(d3.csv, "data/csv/predict_outcome_lymph.csv")
     // .defer(d3.csv, "data/csv/cluster_results_weighted_complete_0811.csv")
     // .defer(d3.csv, "data/csv/cluster_results_weighted_0810.csv")
     // .defer(d3.csv, "data/csv/cluster_results_simple_0803.csv")
     // .defer(d3.json, "data/json/tanimoto_edges.json")
-    .defer(d3.json, "data/json/jaccard.json")
-      .await(function (error,  nodes, weighted, clusters, predictions, jaccard /*, edges, jaccard*/) {
-      if (error) return console.warn(error);
+    //.defer(d3.json, "data/json/jaccard.json")
+      .await(function (error, /*nodes,*/ weighted/*, clusters, predictions, jaccard */) {
+      if (error){
+        console.log(weighted);
+        return console.warn(error);
+      }
 
       // App.edges = edges;
-      App.nodes = nodes;
+      // App.nodes = nodes;
       App.weighted = weighted;
-      App.jaccard = jaccard;
+      // App.jaccard = jaccard;
 
       App.sites = [];
 
@@ -478,16 +481,16 @@ function Patients() {
           "feedingTube_pre": !!patient["Tube_removal"] ? "N": patient["Feeding_tube_6m"],
           "aspiration_pre" : patient["Aspiration_rate_Pre-therapy"] ? patient["Aspiration_rate_Pre-therapy"] : "NA" ,
           "aspiration_post" : patient["Aspiration_rate_Post-therapy"] ? patient["Aspiration_rate_Post-therapy"] : "NA",
-          "clusters": _.omit(patient_clusters, ["pid", ""]),
-          "predictions":
-            {
-              "enjoyment": parseFloat(pred.pred_Enjoy),
-              "enjoyment_bin": bin_prediction(parseFloat(pred.pred_Enjoy)),
-              "feeding_tube": parseFloat(pred.prob_feeding_tube),
-              "feeding_tube_bin": bin_prediction(parseFloat(pred.prob_feeding_tube)),
-              "aspirating": parseFloat(pred.prob_aspiration),
-              "aspirating_bin": bin_prediction(parseFloat(pred.prob_aspiration)),
-            }
+          // "clusters": _.omit(patient_clusters, ["pid", ""]),
+          // "predictions":
+          //   {
+          //     "enjoyment": parseFloat(pred.pred_Enjoy),
+          //     "enjoyment_bin": bin_prediction(parseFloat(pred.pred_Enjoy)),
+          //     "feeding_tube": parseFloat(pred.prob_feeding_tube),
+          //     "feeding_tube_bin": bin_prediction(parseFloat(pred.prob_feeding_tube)),
+          //     "aspirating": parseFloat(pred.prob_aspiration),
+          //     "aspirating_bin": bin_prediction(parseFloat(pred.prob_aspiration)),
+          //   }
         };
         App.sites.push(site);
       });
@@ -504,8 +507,8 @@ function Patients() {
       });
 
       $("#byPatient").load("src/htmlTemplates/byPatient.html", ()=>{d1.resolve()});
-      $("#byCluster").load("src/htmlTemplates/byCluster.html", ()=>{d2.resolve()});
-      $("#byPrediction").load("src/htmlTemplates/byPrediction.html", ()=>{d3.resolve()});
+      // $("#byCluster").load("src/htmlTemplates/byCluster.html", ()=>{d2.resolve()});
+      // $("#byPrediction").load("src/htmlTemplates/byPrediction.html", ()=>{d3.resolve()});
     });
 
 })();

@@ -46,7 +46,7 @@ def write_to_file(current_patient, patient_order, scores):
     output = ",".join(str(e) for e in patient_order)
     f.write('"similarity": [' + output + '], ')
 
-    output = ",".join(str(e) for e in scores)
+    output = ",".join(str(round(e, 4)) for e in scores)
     f.write('"scores": [' + output + '], ')
 
     out_nodes = current_patient.get_graph("Left").get_node_positions() + current_patient.get_graph("Right").get_node_positions()
@@ -205,7 +205,6 @@ def compute_similarity():
 
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
-
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
 
@@ -213,8 +212,12 @@ def compute_similarity():
             tanimoto_nodes_scores.append(tanimoto_nodes)
             jaccard_scores.append(jaccard)
 
-        tanimoto_edges_scores = [float(i) / max(tanimoto_edges_scores) for i in tanimoto_edges_scores]
-        #print tanimoto_edges_scores
+        max_edge_score = max(tanimoto_edges_scores)
+        if max_edge_score == 0:
+            tanimoto_edges_scores = [0 for i in tanimoto_edges_scores]
+        else:
+            tanimoto_edges_scores = [float(i) / max(tanimoto_edges_scores) for i in tanimoto_edges_scores]
+
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
         jaccard_scores        = [float(i) / max(jaccard_scores) for i in jaccard_scores]
 
@@ -248,13 +251,13 @@ def compute_similarity():
             write_to_file(patientA, sorted_by_score, sorted_scores)
 
 
-def set_graph_node(infected, score):
+def set_graph_node(cg, infected, score):
     # set the level
-    current_graph.set_node_value(infected[1:])
+    cg.set_node_value(infected[1:])
     # add the full node name to keep track
-    current_graph.set_node_position(infected)
+    cg.set_node_position(infected)
     # the score is based on whether we had to split the node or not
-    current_graph.set_value_at(infected[1:], infected[1:], score)
+    cg.set_value_at(infected[1:], infected[1:], score)
 
 
 # Driver starts here
@@ -292,6 +295,9 @@ if __name__ == "__main__":
         # iterate over the rows of the csv file
         for id in result:
 
+            if str(id) == "5056":
+                continue
+
             # no id given, we can't use
             if len(id) == 0:
                 continue
@@ -315,7 +321,8 @@ if __name__ == "__main__":
                 continue
 
             # strip out the white space from eanode[1:], node[1:]ch string
-            parsed_nodes = [x.strip(" ").replace(' RPLN', 'RP') for x in nodes]
+            parsed_nodes = [x.strip(" ").replace('L RPLN', 'LRP') for x in nodes]
+            parsed_nodes = [x.strip(" ").replace('R RPLN', 'RRP') for x in parsed_nodes]
             parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in parsed_nodes]
             parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
             parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in parsed_nodes]
@@ -347,24 +354,17 @@ if __name__ == "__main__":
             del result[id]['Gender']
             #del result[id]["Comments"]
 
-            # until cleaned, I am only working with single coded lymph nodes
-            #if len(longest_item) > 3:
-            #    print patient_id
-            #    print parsed_nodes
-            #    continue
-
             # create the graph for the left and right lymph nodes
             left = Graph(lymph_nodes, lymph_nodes)
             right = Graph(lymph_nodes, lymph_nodes)
 
             # add the nodes to the graph
             for node in parsed_nodes:
+                if len(node) > 5:
+                    continue
 
                 new_nodes = [node]
                 current_graph = left
-
-                if len(node) > 5:
-                    continue
 
                 if node[0] == 'R':
                     current_graph = right
@@ -373,8 +373,7 @@ if __name__ == "__main__":
                 if len(node[1:]) == 1 and (node[1:] == "5" or node[1:] == "1" or node[1:] == "2"):
                     new_nodes = []
                     new_nodes = [node + 'A', node + 'B']
-
-                if node[1:].lower() == "3a":
+                elif node[1:].lower() == "3a":
                     new_nodes = [node[0] + '3']
 
                 # add the nodes to the graph
@@ -383,12 +382,14 @@ if __name__ == "__main__":
                     if n[1:] == "23" or n[1:] == "234" or n[1:] == "34":
                         for c in n[1:]:
                             if c == "2":
-                                set_graph_node(semantic+"2A", 0.5)
-                                set_graph_node(semantic+"2B", 0.5)
+                                set_graph_node(current_graph, semantic+"2A", 0.5)
+                                set_graph_node(current_graph, semantic+"2B", 0.5)
                             else:
-                                set_graph_node(semantic+c, 0.5)
+                                set_graph_node(current_graph, semantic+c, 0.5)
                     else:
-                        set_graph_node(n, 1.0)
+                        set_graph_node(current_graph, n, 1.0)
+
+
 
             # set the patient graphs
             patient.set_graphs(left, right)

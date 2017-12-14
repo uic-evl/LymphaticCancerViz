@@ -18,7 +18,7 @@ var App = App || {};
         y: 75
       },
       {
-        name: "2",
+        name: "2A",
         x: 65,
         y: 100
       },
@@ -52,6 +52,11 @@ var App = App || {};
         x: 60,
         y: 50
       },
+      {
+        name: "2B",
+        x: 65,
+        y: 100
+      }
       // {
       //   name: "2/3",
       //   x: 83,
@@ -131,18 +136,18 @@ var App = App || {};
     ],
     edgeList: [
       ["1A", "1B"],
-      ["1B", "2" ],
+      ["1B", "2A" ],
       // ["2", "2/3" ],
       // ["2/3", "3" ],
-      ["2" , "3" ],
+      ["2A" , "3" ],
       // ["3" , "3/4" ],
       // ["3/4" , "4" ],
       ["3" , "4" ],
       ["4" , "6" ],
       ["5A", "6" ],
       ["5A", "5B"],
-      ["5A", "2" ],
-      ["2" , "RP" ],
+      ["5A", "2A" ],
+      ["2A" , "RP" ],
       ["1B", "6" ],
       ["1A", "6" ]
 
@@ -159,7 +164,7 @@ var App = App || {};
 
   /* Define the end-to-end size of the graph */
   App.graphWidth = _.find(App.template.nodes, {"name": "6"}).x - _.find(App.template.nodes, {"name": "5A"}).x;
-  App.graphHeight = _.find(App.template.nodes, {"name": "4"}).y - _.find(App.template.nodes, {"name": "7"}).y;
+  App.graphHeight = _.find(App.template.nodes, {"name": "4"}).y - _.find(App.template.nodes, {"name": "RP"}).y;
 
   /* Utility functions */
   let utils = App.Utilities();
