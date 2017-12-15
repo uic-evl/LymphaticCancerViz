@@ -13,8 +13,8 @@ def compute_jaccard_coeff(items_a, items_b):
 def compute_tanimoto_coeff(vector_a, vector_b):
     a_dot_b = np.dot(vector_a, vector_b)
 
-    mag_a = np.linalg.norm(vector_a)
-    mag_b = np.linalg.norm(vector_b)
+    mag_a = np.linalg.norm(vector_a, 2)
+    mag_b = np.linalg.norm(vector_b, 2)
 
     # denominator is zero, no similarity
     if (mag_a * mag_a + mag_b * mag_b - a_dot_b) == 0:
