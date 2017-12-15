@@ -153,8 +153,11 @@ def compute_graph_similarity(graph_a, graph_b):
 
 
 def compute_similarity():
-    global output
+    global output, patients
     scores = []
+
+    # create a list of the other patients
+    other_patients = copy.deepcopy(patients)
 
     # small function to sort the patients by their scores
     def get_score(idx):
@@ -169,9 +172,6 @@ def compute_similarity():
         tanimoto_edges_scores = []
         tanimoto_nodes_scores = []
         jaccard_scores = []
-
-        # create a list of the other patients
-        other_patients = copy.deepcopy(patients)
 
         for keyB, patientB in other_patients.iteritems():
 
@@ -260,7 +260,7 @@ if __name__ == "__main__":
     patient_attr = {}
     result = {}
     all_patients = {}
-    patients = {}
+    # patients = {}
 
     node_column_name = 'Affected_Lymph_node_UPPER'
     tumor_column_name = 'Tm_Laterality'
@@ -353,8 +353,7 @@ if __name__ == "__main__":
                 tumor_position = "BiLat."
             elif tumor_position.lower() == "Midline":
                 tumor_position = "Midline"
-            else:
-                tumor_position
+
             patient.set_tumor_position(tumor_position)
 
             del result[int(id)][node_column_name]
@@ -415,9 +414,10 @@ if __name__ == "__main__":
             # keep the rest of the parsed attributes
             patient_attr[id] = result[int(id)]
 
-    # print ','.join(str(n).upper() for n in patients_w_dupes)
+    # calculate the similarity and output it to the files
 
-    # calculate the similarity and output it to the files 
+    od = OrderedDict(sorted(patients.items()))
+    patients = od
     for output in ['jaccard', 'nodes', 'weighted']:
     # for output in ['weighted']:
         if matrix:
