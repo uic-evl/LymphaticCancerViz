@@ -15,6 +15,10 @@ class Patient(object):
         self.lymph_nodes = []
         self.adjacency_matrix = []
         self.bilateral = []
+        self.output_nodes = []
+
+    def set_output_nodes(self, lymph_nodes):
+        self.output_nodes = lymph_nodes
 
     def set_lymph_nodes(self, lymph_nodes):
         self.lymph_nodes = lymph_nodes
@@ -47,7 +51,6 @@ class Patient(object):
                 if int(col) == 1 and node != neighbor:
                     self.right_graph.set_edge(node, neighbor,value)
 
-
     def set_adjacency_matrix(self, matrix):
         self.adjacency_matrix = matrix
 
@@ -65,6 +68,9 @@ class Patient(object):
             return self.right_graph
         elif position == "Left":
             return self.left_graph
+
+    def get_output_nodes(self):
+        return self.output_nodes
 
     def get_combined_left_nodes(self):
         left_nodes = self.left_graph.get_nodes()
