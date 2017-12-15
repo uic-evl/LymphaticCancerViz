@@ -11,7 +11,7 @@ lymph_nodes = []
 adjacency_matrix = []
 
 output = ""
-matrix = False
+matrix = True
 ids = []
 
 # output file
@@ -52,8 +52,9 @@ def write_to_file(current_patient, patient_order, scores):
     output_writer = ",".join(str(round(e, 4)) for e in scores)
     f.write('"scores": [' + output_writer + '], ')
 
-    out_nodes = current_patient.get_graph("Left").get_node_positions() + current_patient.get_graph(
-        "Right").get_node_positions()
+    patient_out_nodes = current_patient.get_output_nodes()
+    out_nodes = patient_out_nodes if len(patient_out_nodes) > 0 else \
+        current_patient.get_graph("Left").get_node_positions() + current_patient.get_graph("Right").get_node_positions()
     output_writer = '","'.join(str(n).upper() for n in out_nodes)
     f.write('"nodes": ["' + output_writer + '"] }')
 
@@ -190,15 +191,12 @@ def compute_similarity():
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
 
-            if patientA.get_id() == 288 and (patientB.get_id() == 276 or patientB.get_id() == 239):
-                print str(patientB.get_id())
-
-                print common_combined_nodes
-                print vector_a_nodes
-                print vector_b_nodes
-
-                print tanimoto_nodes
-                print tanimoto_edges
+            # if patientA.get_id() == 288 and patientB.get_id() == 2003:
+            #     print common_combined_nodes
+            #     print vector_a_nodes
+            #     print vector_b_nodes
+            #     print tanimoto_nodes
+            #     print tanimoto_edges
 
             tanimoto_edges_scores.append(tanimoto_edges)
             tanimoto_nodes_scores.append(tanimoto_nodes)
@@ -232,7 +230,6 @@ def compute_similarity():
             scores = tanimoto
             sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
             sorted_scores = sorted(tanimoto, reverse=True)
-
         elif output == "jaccard":
             scores = jaccard_scores
             sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
@@ -240,6 +237,7 @@ def compute_similarity():
 
         # write the results to the file
         if matrix:
+            # print patientA.get_id()
             write_to_csv(patientA, sorted_by_score, sorted_scores)
         else:
             write_to_file(patientA, sorted_by_score, sorted_scores)
@@ -288,12 +286,13 @@ if __name__ == "__main__":
 
         patients_w_dupes = []
         # iterate over the rows of the csv file
+        valid_ids = []
         for id in result:
 
             id = str(id)
 
-            if id not in ["3", "276", "274", "267", "255", "239", "288", "10171", "5026"]:
-                continue
+            # if id not in ["288", "2003"]:
+            #     continue
 
             # no id given, we can't use
             if len(id) == 0:
@@ -304,7 +303,6 @@ if __name__ == "__main__":
             # get the patient number and create the patient object
             patient_id = int(id)
             patient = Patient(patient_id)
-            ids.append(patient_id)
 
             # add the possible lymph nodes to the patient
             patient.set_lymph_nodes(lymph_nodes)
@@ -317,20 +315,25 @@ if __name__ == "__main__":
             if 'N/A' in nodes or len(nodes[0]) == 0:
                 continue
 
+            ids.append(patient_id)
+
             # strip out the white space from eanode[1:], node[1:]ch string
-            parsed_nodes = [x.strip(" ").replace('L RPLN', 'LRP') for x in nodes]
-            parsed_nodes = [x.strip(" ").replace('R RPLN', 'RRP') for x in parsed_nodes]
-            parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in parsed_nodes]
+            stripped_nodes = [x.strip(" ").replace('L RPLN', 'LRP') for x in nodes]
+            stripped_nodes = [x.strip(" ").replace('R RPLN', 'RRP') for x in stripped_nodes]
+
+            stripped_nodes = list(set(stripped_nodes))
+
+            parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in stripped_nodes]
             parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
             parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in parsed_nodes]
 
             # Remove accidental dupes from the data
-            remove_dupes = list(set(parsed_nodes))
+            # remove_dupes = list(set(parsed_nodes))
 
-            if len(remove_dupes) < len(parsed_nodes):
-                patients_w_dupes.append(str(id))
+            # if len(remove_dupes) < len(parsed_nodes):
+            #     patients_w_dupes.append(str(id))
 
-            parsed_nodes = remove_dupes
+            # parsed_nodes = remove_dupes
 
             # get the longest item (test purposes)
             longest_item = max(parsed_nodes, key=len)
@@ -364,6 +367,7 @@ if __name__ == "__main__":
             right = Graph(lymph_nodes, lymph_nodes)
 
             # add the nodes to the graph
+            tween = 0
             for node in parsed_nodes:
                 if len(node) > 5:
                     continue
@@ -382,11 +386,11 @@ if __name__ == "__main__":
                     new_nodes = [node[0] + '3']
 
                 # add the nodes to the graph
-                tween = 0
                 for n in new_nodes:
                     semantic = n[0]
                     if n[1:] == "23" or n[1:] == "234" or n[1:] == "34":
                         tween = 1
+                        patient.set_output_nodes(new_nodes)
                         for c in n[1:]:
                             if c == "2":
                                 set_graph_node(current_graph, semantic + "2A", 0.125)
@@ -394,7 +398,10 @@ if __name__ == "__main__":
                             else:
                                 set_graph_node(current_graph, semantic + c, 0.25)
                     else:
-                        set_graph_node(current_graph, n, 1.0)
+                        if n[1:].lower() == "rp":
+                            set_graph_node(current_graph, n, -3.0)
+                        else:
+                            set_graph_node(current_graph, n, 1.0)
 
             # set the patient graphs
             if tween == 0:
@@ -411,8 +418,8 @@ if __name__ == "__main__":
     # print ','.join(str(n).upper() for n in patients_w_dupes)
 
     # calculate the similarity and output it to the files 
-    # for output in ['jaccard', 'nodes', 'weighted']:
-    for output in ['weighted']:
+    for output in ['jaccard', 'nodes', 'weighted']:
+    # for output in ['weighted']:
         if matrix:
             f = open('data/' + output + '_' + 'matrix.csv', 'w')
             header = ",".join(str("Patient " + str(x)) for x in sorted(ids))

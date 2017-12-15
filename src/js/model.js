@@ -99,7 +99,7 @@ function Patients() {
 
     /* Menu drop-downs */
     self.predictionVariable = ko.observableArray(["Feeding Tube","Aspirating","Enjoyment"]);
-    self.selections = ko.observableArray(["By Prediction", "By Patient"/*, "By Cluster"*/]);
+    self.selections = ko.observableArray(["By Patient","By Prediction"/*, "By Cluster"*/]);
     self.numberToDisplay = ko.observableArray([50, 100, 'All']);
 
     /* Current menu selections */
