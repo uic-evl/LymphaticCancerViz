@@ -1,4 +1,5 @@
 import sys, csv, copy
+from collections import OrderedDict
 from Graph import Graph
 from Patient import Patient
 import Similarity as sim
@@ -39,22 +40,22 @@ def write_to_file(current_patient, patient_order, scores):
     f.write('{ "id": ' + str(current_patient.get_id()) + ', "gender": "' + current_patient.get_gender() + '", ')
     f.write('"position": "' + current_patient.get_tumor_position() + '", ')
 
-    for attr in patient_attr[str(current_patient.get_id())]:
-        val = patient_attr[str(current_patient.get_id())][attr]
-        f.write('"' + attr + '": "' + val + '", ')
+    for col_attr in patient_attr[str(current_patient.get_id())]:
+        val = patient_attr[str(current_patient.get_id())][col_attr]
+        f.write('"' + col_attr + '": "' + val + '", ')
 
-    output = ",".join(str(e) for e in patient_order)
-    if(str(current_patient.get_id()) == "1"):
-        print output[:10]
-    f.write('"similarity": [' + output + '], ')
+    output_writer = ",".join(str(e) for e in patient_order)
+    # if str(current_patient.get_id() == "1"):
+    #     print output_writer[:10]
+    f.write('"similarity": [' + output_writer + '], ')
 
-    output = ",".join(str(round(e, 4)) for e in scores)
-    f.write('"scores": [' + output + '], ')
+    output_writer = ",".join(str(round(e, 4)) for e in scores)
+    f.write('"scores": [' + output_writer + '], ')
 
     out_nodes = current_patient.get_graph("Left").get_node_positions() + current_patient.get_graph(
         "Right").get_node_positions()
-    output = '","'.join(str(n).upper() for n in out_nodes)
-    f.write('"nodes": ["' + output + '"] }')
+    output_writer = '","'.join(str(n).upper() for n in out_nodes)
+    f.write('"nodes": ["' + output_writer + '"] }')
 
     # check for end of data
     if current_patient.get_id() == patients.keys()[-1]:
@@ -133,7 +134,6 @@ def compute_neighbors_similarity(graph_a, graph_b):
             # will not always be one if a graph has a bilateral node
             weight = compare_neighbor_weight(graph_a, graph_b, a_node)
             neighbors.set_value_at(a_node, a_node, weight)
-
     return neighbors
 
 
@@ -156,10 +156,10 @@ def compute_similarity():
     scores = []
 
     # small function to sort the patients by their scores
-    def getScore(idx):
-        i = patients.keys().index(idx)
+    def get_score(idx):
+        ii = other_patients.keys().index(idx)
         # we want the first element to stay the same
-        return scores[i]
+        return scores[ii]
 
     # iterate over the graphs and compute the similarity
     for keyA, patientA in patients.iteritems():
@@ -174,65 +174,37 @@ def compute_similarity():
 
         for keyB, patientB in other_patients.iteritems():
 
-            # patient is most similar to his/her self
-            # if keyB == keyA:
-            #     scores.append(0.0)
-            #     patient_idx = idx
-            #     continue
-
             common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
+
             common_combined_nodes = sorted(
                 list(set(patientA.get_all_combined_nodes()) | set(patientB.get_all_combined_nodes())))
-            common_nodes = sorted(list(set(patientA.get_all_nodes()) | set(patientB.get_all_nodes())))
-            common = sorted(list(set(common_nodes) | set(common_combined_nodes)))
-
-            # if patientA.get_id() == 1 and patientB.get_id() == 5:
-            #     print "all a"
-            #     print patientA.get_all_nodes()
-            #     print "all b"
-            #     print patientB.get_all_nodes()
-            #     print "combinedA"
-            #     print patientA.get_all_combined_nodes()
-            #     print "combinedB"
-            #     print patientB.get_all_combined_nodes()
-            #
-            #     print "common AB"
-            #     print common_nodes
-            #     print "common all"
-            #     print common
-            #
-            #     sys.exit()
-            # else:
-            #     continue
 
             vector_a_edges = patientA.get_edges_vector(common_list)
             vector_b_edges = patientB.get_edges_vector(common_list)
 
-            vector_a_nodes = patientA.get_nodes_vector(common)
-            vector_b_nodes = patientB.get_nodes_vector(common)
+            vector_a_nodes = patientA.get_nodes_vector(common_combined_nodes)
+            vector_b_nodes = patientB.get_nodes_vector(common_combined_nodes)
 
-            # else:
-            #     continue
-
-            tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
+            tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
 
-            # if patientA.get_id() == 1 and patientB.get_id() == 5:
-            #     print common
-            #     print vector_a_nodes
-            #     print vector_b_nodes
-            #     print tanimoto_nodes
-            #     print tanimoto_edges
-            #     sys.exit()
+            if patientA.get_id() == 288 and (patientB.get_id() == 276 or patientB.get_id() == 239):
+                print str(patientB.get_id())
+
+                print common_combined_nodes
+                print vector_a_nodes
+                print vector_b_nodes
+
+                print tanimoto_nodes
+                print tanimoto_edges
 
             tanimoto_edges_scores.append(tanimoto_edges)
             tanimoto_nodes_scores.append(tanimoto_nodes)
             jaccard_scores.append(jaccard)
 
         max_edge_score = max(tanimoto_edges_scores)
-
         if max_edge_score == 0:
             tanimoto_edges_scores = [0 for i in tanimoto_edges_scores]
         else:
@@ -250,26 +222,20 @@ def compute_similarity():
         # noinspection PyInterpreter
         if output == "edges":
             scores = tanimoto_edges_scores
-            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+            sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
             sorted_scores = sorted(tanimoto_edges_scores, reverse=True)
         elif output == "nodes":
             scores = tanimoto_nodes_scores
-            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+            sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
             sorted_scores = sorted(tanimoto_nodes_scores, reverse=True)
         elif output == "weighted":
             scores = tanimoto
-            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+            sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
             sorted_scores = sorted(tanimoto, reverse=True)
-
-            if patientA.get_id() == 1:
-                print scores[:10]
-                print sorted_by_score[:10]
-                print sorted_scores[:10]
-                sys.exit()
 
         elif output == "jaccard":
             scores = jaccard_scores
-            sorted_by_score = sorted(other_patients, key=getScore, reverse=True)
+            sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
             sorted_scores = sorted(jaccard_scores, reverse=True)
 
         # write the results to the file
@@ -286,7 +252,6 @@ def set_graph_node(cg, infected, score):
     cg.set_node_position(infected)
     # the score is based on whether we had to split the node or not
     cg.set_value_at(infected[1:], infected[1:], score)
-
 
 # Driver starts here
 if __name__ == "__main__":
@@ -318,12 +283,16 @@ if __name__ == "__main__":
                 if id[-1] == '_':
                     id = id[:-1]
                 parsed[id] = row[attr]
-            result[key] = parsed
+            if key.isdigit():
+                result[int(key)] = parsed
 
+        patients_w_dupes = []
         # iterate over the rows of the csv file
         for id in result:
 
-            if str(id) == "5056":
+            id = str(id)
+
+            if id not in ["3", "276", "274", "267", "255", "239", "288", "10171", "5026"]:
                 continue
 
             # no id given, we can't use
@@ -342,7 +311,7 @@ if __name__ == "__main__":
             patient.set_adjacency_matrix(adjacency_matrix)
 
             # parse the nodes from the row
-            nodes = result[id][node_column_name].split(',')
+            nodes = result[int(id)][node_column_name].split(',')
 
             # No infected nodes available
             if 'N/A' in nodes or len(nodes[0]) == 0:
@@ -355,31 +324,39 @@ if __name__ == "__main__":
             parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
             parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in parsed_nodes]
 
+            # Remove accidental dupes from the data
+            remove_dupes = list(set(parsed_nodes))
+
+            if len(remove_dupes) < len(parsed_nodes):
+                patients_w_dupes.append(str(id))
+
+            parsed_nodes = remove_dupes
+
             # get the longest item (test purposes)
             longest_item = max(parsed_nodes, key=len)
 
             # get and set the patient gender
-            gender = str(result[id]["Gender"]).lower()
+            gender = str(result[int(id)]["Gender"]).lower()
             patient.set_gender(gender)
 
             # get and set the tumor position
-            # tumor_position = result[id][tumor_column_name].strip(" ")
+            tumor_position = result[int(id)][tumor_column_name].strip(" ")
 
-            # if tumor_position.lower() == 'l':
-            #     tumor_position = "Left"
-            # elif tumor_position.lower() == 'r':
-            #     tumor_position = "Right"
-            # elif tumor_position.lower() == 'bilateral':
-            #     tumor_position = "BiLat."
-            # elif tumor_position.lower() == "Midline":
-            #     tumor_position = "Midline"
-            # else:
-            #     tumor_position
-            # patient.set_tumor_position(tumor_position)
+            if tumor_position.lower() == 'l':
+                tumor_position = "Left"
+            elif tumor_position.lower() == 'r':
+                tumor_position = "Right"
+            elif tumor_position.lower() == 'bilateral':
+                tumor_position = "BiLat."
+            elif tumor_position.lower() == "Midline":
+                tumor_position = "Midline"
+            else:
+                tumor_position
+            patient.set_tumor_position(tumor_position)
 
-            del result[id][node_column_name]
+            del result[int(id)][node_column_name]
             # del result[id][tumor_column_name]
-            del result[id]['Gender']
+            del result[int(id)]['Gender']
             # del result[id]["Comments"]
 
             # create the graph for the left and right lymph nodes
@@ -405,25 +382,33 @@ if __name__ == "__main__":
                     new_nodes = [node[0] + '3']
 
                 # add the nodes to the graph
+                tween = 0
                 for n in new_nodes:
                     semantic = n[0]
                     if n[1:] == "23" or n[1:] == "234" or n[1:] == "34":
+                        tween = 1
                         for c in n[1:]:
                             if c == "2":
-                                set_graph_node(current_graph, semantic + "2A", 1)
-                                set_graph_node(current_graph, semantic + "2B", 1)
+                                set_graph_node(current_graph, semantic + "2A", 0.125)
+                                set_graph_node(current_graph, semantic + "2B", 0.125)
                             else:
-                                set_graph_node(current_graph, semantic + c, 1)
+                                set_graph_node(current_graph, semantic + c, 0.25)
                     else:
                         set_graph_node(current_graph, n, 1.0)
 
             # set the patient graphs
-            patient.set_graphs(left, right)
+            if tween == 0:
+                patient.set_graphs(left, right, 1.0)
+            else:
+                patient.set_graphs(left, right, 0.125)
+
             # add the graphs to the dictionary
             patients.update({patient_id: patient})
 
             # keep the rest of the parsed attributes
-            patient_attr[id] = result[id]
+            patient_attr[id] = result[int(id)]
+
+    # print ','.join(str(n).upper() for n in patients_w_dupes)
 
     # calculate the similarity and output it to the files 
     # for output in ['jaccard', 'nodes', 'weighted']:

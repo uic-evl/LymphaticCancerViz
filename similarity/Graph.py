@@ -38,17 +38,17 @@ class Graph(object):
     def get_nodes(self):
         return sorted(self.nodes)
 
-    def set_edge(self, edge_a, edge_b):
+    def set_edge(self, edge_a, edge_b, value):
 
         index   = str(edge_a) + '_' + str(edge_b)
         reverse = str(edge_b) + '_' + str(edge_a)
 
         if index in self.edges:
-            self.edges[index] += 1
+            self.edges[index] += value
         elif reverse in self.edges:
-            self.edges[reverse] +=1
+            self.edges[reverse] += value
         else:
-            self.edges[index] = 1
+            self.edges[index] = value
 
     def get_edges(self):
     
