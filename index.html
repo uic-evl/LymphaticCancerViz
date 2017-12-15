@@ -13,49 +13,44 @@
     <script src="lib/js/jquery-2.2.4.min.js"></script>
     <script src="lib/js/bootstrap.min.js"></script>
     <script src="lib/js/queue.v1.min.js"></script>
-
-    <script src="src/js/utilities.js"></script>
-    <script src="src/js/main.js"></script>
-    <script src="src/js/model.js"></script>
-
 </head>
 
 <body>
 
-<div class="container-fluid" style="margin-bottom: 10px;">
-    <div class="row">
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                <select id='selectionType' class="btn menu"
+                        data-bind=" options: selections, value: currentType">
+                </select>
+            </div>
 
-        <div class="col-md-2">
-            <select id='selectionType' class="btn menu"
-                    data-bind=" options: selections, value: currentType">
-            </select>
-        </div>
+            <!-- ko if: currentType() === "By Patient" -->
+            <div id="byPatient" class="col-md-5"></div>
+            <!-- /ko -->
 
-        <!-- ko if: currentType() === "By Patient" -->
-        <div id="byPatient" class="col-md-5"></div>
-        <!-- /ko -->
+            <!-- ko if: currentType() === "By Cluster" && currentCluster() -->
+            <div id="byCluster" class="col-md-5"></div>
+            <!-- /ko -->
 
-        <!-- ko if: currentType() === "By Cluster" && currentCluster() -->
-        <div id="byCluster" class="col-md-5"></div>
-        <!-- /ko -->
+            <!-- ko if: currentType() === "By Prediction" -->
+            <div id="byPrediction" class="col-md-5"></div>
+            <!-- /ko -->
 
-        <!-- ko if: currentType() === "By Prediction" -->
-        <div id="byPrediction" class="col-md-5"></div>
-        <!-- /ko -->
-
-        <select id='numberOfPatients' class="btn menu"
-                data-bind=" options: numberToDisplay,
+            <select id='numberOfPatients' class="btn menu"
+                    data-bind=" options: numberToDisplay,
                      optionsText: function(item) {
                        if(_.isNumber(item)) return 'Top ' + item + ' Patients';
                        else return item + ' Patients';
                    },
                       value: currentDisplay" >
-        </select>
-
+            </select>
+        </div>
     </div>
-</div>
+</nav>
 
-<div class="container-fluid">
+<div class="container" style="margin-top: 55px">
     <!--<div data-bind="css: { row: ($index()+1) % $parent.maxNodes == 0 }">-->
     <div class="row" data-bind="foreach: rankings">
         <div class="patient_container" data-bind=" css: { 'col-md-2': $parent.maxNodes > 5, 'col-md-3': $parent.maxNodes < 6  } ">
@@ -74,6 +69,12 @@
         </div>
     </div>
 </div>
+
+<div id="virtualGraph" style="visibility: hidden"></div>
+
+<script src="src/js/utilities.js"></script>
+<script src="src/js/main.js"></script>
+<script src="src/js/model.js"></script>
 
 </body>
 
