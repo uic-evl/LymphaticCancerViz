@@ -12,6 +12,13 @@ function Patients() {
   let self = this,
       dropdown = document.getElementById("clusterLabel");
 
+  App.changePatient = function(patient) {
+    /* Get the selected patient */
+    let selected_patient = _.find(self.patients(), {id:patient.patient});
+    /* Change the current patient to the selected one */
+    self.currentPatient(selected_patient);
+  };
+
   function setupClusterObservables() {
     self.clusters = ko.observableArray();
     self.currentCluster = ko.observable();
@@ -64,7 +71,6 @@ function Patients() {
       self.patients.push(_.clone(patient));
     });
   }
-
 
   function setupObservables() {
     /* Determine how many nodes will fit onto the screen in a single row */

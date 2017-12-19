@@ -27,10 +27,10 @@
             </div>
 
             <!-- ko if: currentType() === "By Patient" -->
-            <div id="byPatient" class="col-md-5"></div>
+            <div id="byPatient" class="col-md-4"></div>
             <!-- /ko -->
 
-            <div id="byCluster" class="col-md-5"></div>
+            <div id="byCluster" class="col-md-2"></div>
 
             <!-- ko if: currentType() === "By Prediction" -->
             <div id="byPrediction" class="col-md-5"></div>
@@ -54,7 +54,7 @@
         <div class="patient_container" data-bind=" css: { 'col-md-2': $parent.maxNodes > 5, 'col-md-3': $parent.maxNodes < 6  } ">
             <div class="x_panel tile">
                 <div class="x_title" data-bind="css: { male: gender=='male', female: gender=='female'}">
-                    <h2 class="patient" data-bind="text: 'Patient '+patient"></h2>
+                    <h2 class="patient"><a href="#"  data-bind="text: 'Patient '+patient, click:App.changePatient"></a></h2>
                     <h2 class='tumor' data-bind="text: 'Tumor: '+position"></h2>
                     <div class="clearfix"></div>
                 </div>
