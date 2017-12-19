@@ -11,7 +11,7 @@ lymph_nodes = []
 adjacency_matrix = []
 
 output = ""
-matrix = True
+matrix = False
 ids = []
 
 # output file
@@ -217,7 +217,6 @@ def compute_similarity():
         sorted_scores = []
         sorted_by_score = []
         # sort the patients by their scores
-        # noinspection PyInterpreter
         if output == "edges":
             scores = tanimoto_edges_scores
             sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
@@ -351,7 +350,7 @@ if __name__ == "__main__":
                 tumor_position = "Right"
             elif tumor_position.lower() == 'bilateral':
                 tumor_position = "BiLat."
-            elif tumor_position.lower() == "Midline":
+            elif tumor_position.lower() == "midline":
                 tumor_position = "Midline"
 
             patient.set_tumor_position(tumor_position)
@@ -389,7 +388,6 @@ if __name__ == "__main__":
                     semantic = n[0]
                     if n[1:] == "23" or n[1:] == "234" or n[1:] == "34":
                         tween = 1
-                        patient.set_output_nodes(new_nodes)
                         for c in n[1:]:
                             if c == "2":
                                 set_graph_node(current_graph, semantic + "2A", 0.125)
@@ -406,6 +404,7 @@ if __name__ == "__main__":
             if tween == 0:
                 patient.set_graphs(left, right, 1.0)
             else:
+                patient.set_output_nodes(parsed_nodes)
                 patient.set_graphs(left, right, 0.125)
 
             # add the graphs to the dictionary
@@ -418,8 +417,8 @@ if __name__ == "__main__":
 
     od = OrderedDict(sorted(patients.items()))
     patients = od
-    for output in ['jaccard', 'nodes', 'weighted']:
-    # for output in ['weighted']:
+    # for output in ['jaccard', 'nodes', 'weighted']:
+    for output in ['weighted']:
         if matrix:
             f = open('data/' + output + '_' + 'matrix.csv', 'w')
             header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
