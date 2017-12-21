@@ -51,13 +51,9 @@ class Graph(object):
             self.edges[index] = value
 
     def get_edges(self):
-    
         s = {}
-        
         for key in sorted(self.edges.iterkeys()):
-            #print key
             s[key] = self.edges[key]
-        
         return s
 
     def get_node_positions(self):

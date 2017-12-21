@@ -1,4 +1,6 @@
-import sys, csv, copy
+import sys, csv, copy, json
+import unicodedata, datetime
+from pprint import pprint
 from collections import OrderedDict
 from Graph import Graph
 from Patient import Patient
@@ -9,33 +11,37 @@ patients = {}
 patient_attr = {}
 lymph_nodes = []
 adjacency_matrix = []
+g_sorted_scores = {}
 
 output = ""
-matrix = False
 ids = []
+max_nodes = 0
 
 # output file
 f = None
-
+m = None
+now = datetime.datetime.now()
 
 def write_to_csv(current_patient, patient_order, scores):
     ordered_scores = []
-    for id in sorted(ids):
-        if id == current_patient.get_id():
+    for mid in sorted(ids):
+        if mid == current_patient.get_id():
             ordered_scores.append("-1.0")
         else:
-            idx = patient_order.index(id)
-            ordered_scores.append(scores[idx])
+            midx = patient_order.index(mid)
+            ordered_scores.append(scores[midx])
+
+    g_sorted_scores[current_patient.get_id()] = ordered_scores
 
     order = ",".join(str(x) for x in ordered_scores)
-    f.write("Patient " + str(current_patient.get_id()) + ",")
-    f.write(order)
-    f.write('\r')
+    m.write("Patient " + str(current_patient.get_id()) + ",")
+    m.write(order)
+    m.write('\r')
 
     return
 
 
-def write_to_file(current_patient, patient_order, scores):
+def write_to_json(current_patient, patient_order, scores):
     # write the output
     f.write('{ "id": ' + str(current_patient.get_id()) + ', "gender": "' + current_patient.get_gender() + '", ')
     f.write('"position": "' + current_patient.get_tumor_position() + '", ')
@@ -45,8 +51,6 @@ def write_to_file(current_patient, patient_order, scores):
         f.write('"' + col_attr + '": "' + val + '", ')
 
     output_writer = ",".join(str(e) for e in patient_order)
-    # if str(current_patient.get_id() == "1"):
-    #     print output_writer[:10]
     f.write('"similarity": [' + output_writer + '], ')
 
     output_writer = ",".join(str(round(e, 4)) for e in scores)
@@ -55,7 +59,7 @@ def write_to_file(current_patient, patient_order, scores):
     patient_out_nodes = current_patient.get_output_nodes()
     out_nodes = patient_out_nodes if len(patient_out_nodes) > 0 else \
         current_patient.get_graph("Left").get_node_positions() + current_patient.get_graph("Right").get_node_positions()
-    output_writer = '","'.join(str(n).upper() for n in out_nodes)
+    output_writer = '","'.join(str(no).upper() for no in out_nodes)
     f.write('"nodes": ["' + output_writer + '"] }')
 
     # check for end of data
@@ -63,6 +67,14 @@ def write_to_file(current_patient, patient_order, scores):
         f.write("\n")
     else:
         f.write(",\n")
+
+
+def init_matrix(m_header):
+    global m
+    m = open('data/matrices/' + output + '_' + 'matrix_test.csv', 'w')
+    m.write(",")
+    m.write(m_header)
+    m.write('\r')
 
 
 def read_matrix_data(file):
@@ -160,10 +172,10 @@ def compute_similarity():
     other_patients = copy.deepcopy(patients)
 
     # small function to sort the patients by their scores
-    def get_score(idx):
-        ii = other_patients.keys().index(idx)
+    def get_score(midx):
+        jj = other_patients.keys().index(midx)
         # we want the first element to stay the same
-        return scores[ii]
+        return scores[jj]
 
     # iterate over the graphs and compute the similarity
     for keyA, patientA in patients.iteritems():
@@ -190,13 +202,6 @@ def compute_similarity():
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
-
-            # if patientA.get_id() == 288 and patientB.get_id() == 2003:
-            #     print common_combined_nodes
-            #     print vector_a_nodes
-            #     print vector_b_nodes
-            #     print tanimoto_nodes
-            #     print tanimoto_edges
 
             tanimoto_edges_scores.append(tanimoto_edges)
             tanimoto_nodes_scores.append(tanimoto_nodes)
@@ -234,12 +239,9 @@ def compute_similarity():
             sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
             sorted_scores = sorted(jaccard_scores, reverse=True)
 
-        # write the results to the file
-        if matrix:
-            # print patientA.get_id()
-            write_to_csv(patientA, sorted_by_score, sorted_scores)
-        else:
-            write_to_file(patientA, sorted_by_score, sorted_scores)
+        # write the results to the csv and json files
+        write_to_csv(patientA, sorted_by_score, sorted_scores)
+        write_to_json(patientA, sorted_by_score, sorted_scores)
 
 
 def set_graph_node(cg, infected, score):
@@ -259,7 +261,6 @@ if __name__ == "__main__":
     patient_attr = {}
     result = {}
     all_patients = {}
-    # patients = {}
 
     node_column_name = 'Affected_Lymph_node_UPPER'
     tumor_column_name = 'Tm_Laterality'
@@ -289,9 +290,6 @@ if __name__ == "__main__":
         for id in result:
 
             id = str(id)
-
-            # if id not in ["288", "2003"]:
-            #     continue
 
             # no id given, we can't use
             if len(id) == 0:
@@ -400,6 +398,12 @@ if __name__ == "__main__":
                         else:
                             set_graph_node(current_graph, n, 1.0)
 
+            right_nodes = right.get_nodes()
+            left_nodes = left.get_nodes()
+
+            # set the max number of nodes
+            max_nodes = max(max_nodes, len(right_nodes) + len(left_nodes))
+
             # set the patient graphs
             if tween == 0:
                 patient.set_graphs(left, right, 1.0)
@@ -417,31 +421,87 @@ if __name__ == "__main__":
 
     od = OrderedDict(sorted(patients.items()))
     patients = od
+    file_name = ''
     # for output in ['jaccard', 'nodes', 'weighted']:
+    header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
     for output in ['weighted']:
-        if matrix:
-            f = open('data/' + output + '_' + 'matrix.csv', 'w')
-            header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-            f.write(",")
-            f.write(header)
-            f.write('\r')
-        elif output == "edges":
-            f = open('data/json/tanimoto_edges.json', 'w')
+        if output == "edges":
+            init_matrix(header)
+            file_name = 'data/json/tanimoto_edges.json'
+            f = open(file_name, 'w')
         elif output == "nodes":
-            f = open('data/json/tanimoto_nodes.json', 'w')
+            init_matrix(header)
+            file_name = 'data/json/tanimoto_nodes.json'
+            f = open(file_name, 'w')
         elif output == "weighted":
-            f = open('data/json/tanimoto_weighted.json', 'w')
+            init_matrix(header)
+            file_name = 'data/json/tanimoto_weighted.json'
+            f = open(file_name, 'w')
         elif output == "jaccard":
-            f = open('data/json/jaccard.json', 'w')
+            init_matrix(header)
+            file_name = 'data/json/jaccard.json'
+            f = open(file_name, 'w')
 
-        if not matrix:
-            f.write('[\n')
+        f.write('[\n')
 
         # computer the similarity of the constructed graphs
         compute_similarity()
 
         # write the ending of the json file
-        if not matrix:
-            f.write(']')
+        f.write(']')
 
         f.close()
+        m.close()
+
+        # read in the json file
+        json_data = json.load(open(file_name, 'r'), object_pairs_hook=OrderedDict)
+        # create a csv vile
+        idx = file_name.rfind('/')
+        name = file_name[idx:-5] + '_Data_and_Scores_' + str(now.month) + '_' + str(now.year) + '.csv'
+        name = name[1].upper() + name[2:]
+        csv_name = './' + name
+        csv_file = open(csv_name, 'w')
+
+        # our writing object
+        csv_writer = csv.writer(csv_file, lineterminator='\n')
+        # iterate over the json attributes and write them out
+        count = 0
+        for atr in json_data:
+            values = atr.values()
+            json_header = atr.keys()
+            values_all = []
+            values_scores = []
+            if count == 0:
+                header_titles = []
+                col = 0
+                # parse the arrays out of the json
+                for h in json_header:
+                    if type(values[col]) is list and h == "nodes":
+                        for ii in range(0, max_nodes):
+                            header_titles.append(h + '/' + str(ii))
+                    elif type(values[col]) is not list:
+                        header_titles.append(h)
+                    col += 1
+                # write the header
+                header_list = header.split(",")
+                csv_writer.writerow(header_titles + header_list)
+                count += 1
+            # parse the values
+            col = 0
+            for val in values:
+                if type(val) is list and json_header[col] == "nodes":
+                    for ii in range(0, max_nodes):
+                        if ii < len(val):
+                            values_all.append(val[ii])
+                        else:
+                            values_all.append('')
+                elif type(val) is not list:
+                    values_all.append(val)
+                col += 1
+
+            values_scores = g_sorted_scores[values[0]]
+
+            # write the values
+            csv_writer.writerow(values_all + values_scores)
+
+        csv_file.close()
