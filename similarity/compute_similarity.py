@@ -7,8 +7,10 @@ from Patient import Patient
 import Similarity as sim
 
 # A list of all the patients that are read in
-patients_list = {}
+patients_pointer = {}
 rp_patients = {}
+non_rp_patients = {}
+
 patient_attr = {}
 lymph_nodes = []
 adjacency_matrix = []
@@ -16,6 +18,9 @@ g_sorted_scores = {}
 
 output = ""
 ids = []
+rp_ids = []
+non_rp_ids = []
+
 max_nodes = 0
 
 # output file
@@ -65,7 +70,7 @@ def write_to_json(current_patient, patient_order, scores):
     f.write('"nodes": ["' + output_writer + '"] }')
 
     # check for end of data
-    if current_patient.get_id() == patients_list.keys()[-1]:
+    if current_patient.get_id() == patients_pointer.keys()[-1]:
         f.write("\n")
     else:
         f.write(",\n")
@@ -206,12 +211,17 @@ def compute_graph_similarity(graph_a, graph_b):
     return float(summed_weights)
 
 
-def compute_similarity():
-    global output, patients_list
+def compute_similarity(patient_list):
+    global output, patients_pointer
+
+    # calculate the similarity and output it to the files
+    od = OrderedDict(sorted(patient_list.items()))
+    patients_pointer = od
+
     scores = []
 
     # create a list of the other patients
-    other_patients = copy.deepcopy(patients_list)
+    other_patients = copy.deepcopy(patients_pointer)
 
     # small function to sort the patients by their scores
     def get_score(midx):
@@ -220,7 +230,7 @@ def compute_similarity():
         return scores[jj]
 
     # iterate over the graphs and compute the similarity
-    for keyA, patientA in patients_list.iteritems():
+    for keyA, patientA in patients_pointer.iteritems():
 
         # store the scores of the test
         tanimoto_edges_scores = []
@@ -379,12 +389,10 @@ def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
 
 # Driver starts here
 if __name__ == "__main__":
-
     data = sys.argv[1]
     connectivity = sys.argv[2]
 
     patient_attr = {}
-    all_patients = {}
     result = {}
 
     patients_w_dupes = []
@@ -426,8 +434,6 @@ if __name__ == "__main__":
         if 'N/A' in nodes or len(nodes[0]) == 0:
             continue
 
-        ids.append(patient_id)
-
         # parse the nodes
         parsed_nodes = parse_patient_nodes(nodes)
         # get the longest item (test purposes)
@@ -451,6 +457,7 @@ if __name__ == "__main__":
         # set the max number of nodes
         right_nodes = right.get_nodes()
         left_nodes = left.get_nodes()
+
         max_nodes = max(max_nodes, len(right_nodes) + len(left_nodes))
 
         # set the patient graphs
@@ -460,19 +467,22 @@ if __name__ == "__main__":
             patient.set_output_nodes(parsed_nodes)
             patient.set_graphs(left, right, 0.125)
 
-        # add the graphs to the dictionary
-        patients_list.update({patient_id: patient})
+        # add the graphs to the non-rp dictionary
+        if "rp" not in (right_nodes + left_nodes):
+            non_rp_patients.update({patient_id: patient})
+            non_rp_ids.append(patient_id)
+        else:
+            rp_patients.update({patient_id: patient})
+            rp_ids.append(patient_id)
 
         # keep the rest of the parsed attributes
         patient_attr[id] = result[int(id)]
 
-    # calculate the similarity and output it to the files
-    od = OrderedDict(sorted(patients_list.items()))
-    patients_list = od
     file_name = ''
-    # for output in ['jaccard', 'nodes', 'weighted']:
+
+    ids = non_rp_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['weighted']:
+    for output in ['weighted', 'nodes', 'jaccard']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_edges.json'
@@ -493,7 +503,7 @@ if __name__ == "__main__":
         f.write('[\n')
 
         # computer the similarity of the constructed graphs
-        compute_similarity()
+        compute_similarity(non_rp_patients)
 
         # write the ending of the json file
         f.write(']')
