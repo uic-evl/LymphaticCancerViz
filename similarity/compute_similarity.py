@@ -16,6 +16,11 @@ lymph_nodes = []
 adjacency_matrix = []
 g_sorted_scores = {}
 
+tanimoto_edges_output = {}
+tanimoto_nodes_output = {}
+tanimoto_weighted_output = {}
+jaccard_output = {}
+
 output = ""
 ids = []
 rp_ids = []
@@ -133,6 +138,14 @@ def write_to_scores(file_name, header):
     csv_file.close()
 
 
+def write_patient_data(scores_all):
+    global patients_pointer
+    for keyA, patientA in patients_pointer.iteritems():
+        scores = scores_all[keyA]
+        write_to_csv(patientA, scores[0], scores[1])
+        write_to_json(patientA, scores[0], scores[1])
+
+
 def init_matrix_file(m_header):
     global m
     m = open('data/matrices/' + output + '_' + 'matrix.csv', 'w')
@@ -227,8 +240,9 @@ def sort_by_scores(scores, other_patients):
     sorted_scores = sorted(scores, reverse=True)
     return [sorted_by_score, sorted_scores]
 
+
 def compute_similarity(patient_list):
-    global output, patients_pointer
+    global patients_pointer, tanimoto_edges_output, tanimoto_nodes_output, tanimoto_weighted_output, jaccard_output
 
     # calculate the similarity and output it to the files
     od = OrderedDict(sorted(patient_list.items()))
@@ -287,18 +301,10 @@ def compute_similarity(patient_list):
         tanimoto = [tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in
                     range(len(tanimoto_edges_scores))]
 
-        if output == "edges":
-            scores_out = sort_by_scores(tanimoto_edges_scores, other_patients)
-        elif output == "nodes":
-            scores_out = sort_by_scores(tanimoto_nodes_scores, other_patients)
-        elif output == "weighted":
-            scores_out = sort_by_scores(tanimoto, other_patients)
-        elif output == "jaccard":
-            scores_out = sort_by_scores(jaccard_scores, other_patients)
-
-        # write the results to the csv and json files
-        write_to_csv(patientA, scores_out[0], scores_out[1])
-        write_to_json(patientA, scores_out[0], scores_out[1])
+        tanimoto_edges_output[keyA] = sort_by_scores(tanimoto_edges_scores, other_patients)
+        tanimoto_nodes_output[keyA] = sort_by_scores(tanimoto_nodes_scores, other_patients)
+        tanimoto_weighted_output[keyA] = sort_by_scores(tanimoto, other_patients)
+        jaccard_output[keyA] = sort_by_scores(jaccard_scores, other_patients)
 
 
 def set_graph_node(cg, infected, score):
@@ -416,6 +422,7 @@ if __name__ == "__main__":
         # parse the rows
         result = parse_input_data(reader)
 
+    # Parse the input data
     for id in result:
         id = str(id)
         # no id given, we can't use
@@ -483,7 +490,11 @@ if __name__ == "__main__":
         # keep the rest of the parsed attributes
         patient_attr[id] = result[int(id)]
 
+    # Computer the similarity
+    compute_similarity(non_rp_patients)
+
     file_name = ''
+    scores_out = []
 
     ids = non_rp_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
@@ -492,23 +503,27 @@ if __name__ == "__main__":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_edges.json'
             f = open(file_name, 'w')
+            scores_out = tanimoto_edges_output
         elif output == "nodes":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_nodes.json'
             f = open(file_name, 'w')
+            scores_out = tanimoto_nodes_output
         elif output == "weighted":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_weighted.json'
             f = open(file_name, 'w')
+            scores_out = tanimoto_weighted_output
         elif output == "jaccard":
             init_matrix_file(header)
             file_name = 'data/json/jaccard.json'
             f = open(file_name, 'w')
+            scores_out = jaccard_output
 
         f.write('[\n')
 
-        # computer the similarity of the constructed graphs
-        compute_similarity(non_rp_patients)
+        # write the results to the csv and json files
+        write_patient_data(scores_out)
 
         # write the ending of the json file
         f.write(']')
