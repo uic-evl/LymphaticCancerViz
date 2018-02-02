@@ -29,6 +29,7 @@ m = None
 now = datetime.datetime.now()
 
 
+# Write the patient metadata anc scores to a CSV file
 def write_to_csv(current_patient, patient_order, scores):
     ordered_scores = []
     for mid in sorted(ids):
@@ -48,6 +49,7 @@ def write_to_csv(current_patient, patient_order, scores):
     return
 
 
+# Write out the patient metadata and scores to the JSON file for the web interface
 def write_to_json(current_patient, patient_order, scores):
     # write the output
     f.write('{ "id": ' + str(current_patient.get_id()) + ', "gender": "' + current_patient.get_gender() + '", ')
@@ -76,6 +78,7 @@ def write_to_json(current_patient, patient_order, scores):
         f.write(",\n")
 
 
+# Write out the similarity matrix to a csv file
 def write_to_scores(file_name, header):
     # read in the json file
     json_data = json.load(open(file_name, 'r'), object_pairs_hook=OrderedDict)
@@ -185,7 +188,7 @@ def compute_neighbors_similarity(graph_a, graph_b):
     aNodes = graph_a.get_nodes()
     bNodes = graph_b.get_nodes()
 
-    # create a new graph that is the size of A x B
+    # create a new graph that is the size of |A| x |B|
     neighbors = Graph(aNodes, bNodes)
 
     for a_node in aNodes:
@@ -211,6 +214,19 @@ def compute_graph_similarity(graph_a, graph_b):
     return float(summed_weights)
 
 
+def sort_by_scores(scores, other_patients):
+
+    # small function to sort the patients by their scores
+    def get_score(m_idx):
+        jj = other_patients.keys().index(m_idx)
+        # we want the first element to stay the same
+        return scores[jj]
+
+    # sort the patients by their scores
+    sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
+    sorted_scores = sorted(scores, reverse=True)
+    return [sorted_by_score, sorted_scores]
+
 def compute_similarity(patient_list):
     global output, patients_pointer
 
@@ -218,18 +234,10 @@ def compute_similarity(patient_list):
     od = OrderedDict(sorted(patient_list.items()))
     patients_pointer = od
 
-    scores = []
-
     # create a list of the other patients
     other_patients = copy.deepcopy(patients_pointer)
 
-    # small function to sort the patients by their scores
-    def get_score(midx):
-        jj = other_patients.keys().index(midx)
-        # we want the first element to stay the same
-        return scores[jj]
-
-    # iterate over the graphs and compute the similarity
+    # iterate over the patients and compute the similarity
     for keyA, patientA in patients_pointer.iteritems():
 
         # store the scores of the test
@@ -237,63 +245,60 @@ def compute_similarity(patient_list):
         tanimoto_nodes_scores = []
         jaccard_scores = []
 
+        # iterate over all of the other patients
         for keyB, patientB in other_patients.iteritems():
 
+            # Find all of the common edges between patient A and patient B
             common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
 
+            # Find all of the common node/node pairs between patient A and patient B
             common_combined_nodes = sorted(
                 list(set(patientA.get_all_combined_nodes()) | set(patientB.get_all_combined_nodes())))
 
+            # Create the edge vector for each patient
             vector_a_edges = patientA.get_edges_vector(common_list)
             vector_b_edges = patientB.get_edges_vector(common_list)
 
+            #  Create the node vector for each patient
             vector_a_nodes = patientA.get_nodes_vector(common_combined_nodes)
             vector_b_nodes = patientB.get_nodes_vector(common_combined_nodes)
 
+            # Compute the scores
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
 
+            # Save the scores to their respective arrays
             tanimoto_edges_scores.append(tanimoto_edges)
             tanimoto_nodes_scores.append(tanimoto_nodes)
             jaccard_scores.append(jaccard)
 
+        # Find the maximum score (necessary because there may be no edges )
         max_edge_score = max(tanimoto_edges_scores)
         if max_edge_score == 0:
             tanimoto_edges_scores = [0 for i in tanimoto_edges_scores]
         else:
             tanimoto_edges_scores = [float(i) / max(tanimoto_edges_scores) for i in tanimoto_edges_scores]
 
+        # Normalize all of the scores (tanimoto nodes, jaccard, and weighted tanimoto)
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
         jaccard_scores = [float(i) / max(jaccard_scores) for i in jaccard_scores]
-
         tanimoto = [tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in
                     range(len(tanimoto_edges_scores))]
 
-        sorted_scores = []
-        sorted_by_score = []
-        # sort the patients by their scores
         if output == "edges":
-            scores = tanimoto_edges_scores
-            sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
-            sorted_scores = sorted(tanimoto_edges_scores, reverse=True)
+            scores_out = sort_by_scores(tanimoto_edges_scores, other_patients)
         elif output == "nodes":
-            scores = tanimoto_nodes_scores
-            sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
-            sorted_scores = sorted(tanimoto_nodes_scores, reverse=True)
+            scores_out = sort_by_scores(tanimoto_nodes_scores, other_patients)
         elif output == "weighted":
-            scores = tanimoto
-            sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
-            sorted_scores = sorted(tanimoto, reverse=True)
+            scores_out = sort_by_scores(tanimoto, other_patients)
         elif output == "jaccard":
-            scores = jaccard_scores
-            sorted_by_score = sorted(other_patients, key=get_score, reverse=True)
-            sorted_scores = sorted(jaccard_scores, reverse=True)
+            scores_out = sort_by_scores(jaccard_scores, other_patients)
 
         # write the results to the csv and json files
-        write_to_csv(patientA, sorted_by_score, sorted_scores)
-        write_to_json(patientA, sorted_by_score, sorted_scores)
+        write_to_csv(patientA, scores_out[0], scores_out[1])
+        write_to_json(patientA, scores_out[0], scores_out[1])
 
 
 def set_graph_node(cg, infected, score):
