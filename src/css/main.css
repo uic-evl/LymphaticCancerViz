@@ -2,6 +2,26 @@ body {
     background-color: #f5f5f5;
 }
 
+.hull {
+    stroke-width: 40px;
+    stroke-linejoin: round;
+    opacity: 0.4;
+}
+
+.between_nodes {
+    opacity: 0.2;
+}
+
+.hull_left {
+    fill: #1b9e77;
+    stroke: #1b9e77;
+}
+
+.hull_right {
+    fill: #7570b3;
+    stroke: #7570b3;
+}
+
 h2.tumor {
     float: right;
     font-size: 12px !important;

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Convex Hull</title>
+<style>
+
+    rect {
+        fill: none;
+        pointer-events: all;
+    }
+
+    .hull {
+        fill: white;
+        stroke: steelblue;
+        stroke-width: 32px;
+        stroke-linejoin: round;
+    }
+
+    circle {
+        fill: white;
+        stroke: black;
+        stroke-width: 1.5px;
+    }
+
+</style>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+<script>
+
+  var width = 960,
+    height = 500;
+
+  var randomX = d3.random.normal(width / 2, 60),
+    randomY = d3.random.normal(height / 2, 60),
+    vertices = d3.range(3).map(function() { return [randomX(), randomY()]; });
+
+  var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .on("mousemove", function() { vertices[0] = d3.mouse(this); redraw(); })
+    .on("click", function() { vertices.push(d3.mouse(this)); redraw(); });
+
+  svg.append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+  var hull = svg.append("path")
+    .attr("class", "hull");
+
+  var circle = svg.selectAll("circle");
+
+  redraw();
+
+  function redraw() {
+
+    let verts = vertices.map(function(v){  return [v[0]+30, v[1]+30]  });
+
+    hull.datum(d3.geom.hull(verts)).attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+    circle = circle.data(vertices);
+    circle.enter().append("circle")
+      .attr("r", 15);
+//      .attr("cx", function(d,i){ console.log(d); return d[0]})
+//      .attr("cy", function(d,i){ console.log(d); return d[1]});
+    circle.attr("transform", function(d) {
+      return "translate(" + d + ")";
+    });
+  }
+
+</script>

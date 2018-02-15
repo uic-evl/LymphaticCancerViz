@@ -101,7 +101,7 @@ function Patients() {
     self.currentPatient = ko.observable(undefined);
     self.currentSorting = ko.observable(self.sortingAlgorithms[0]);
     self.currentDisplay = ko.observable(self.numberToDisplay[0]);
-    self.currentType = ko.observable(self.selections[0]);
+    self.currentType    = ko.observable(self.selections[0]);
   }
 
   function filterPatients(patient) {
@@ -444,9 +444,35 @@ function Patients() {
     return nodes
   }
 
-  function extract_nodes(patient_nodes){
-    return _.chain(patient_nodes).partition(function (p) {
-      return p[0] === 'L';
+  function extract_nodes(patient, between){
+    return _.chain(patient.nodes)
+      .reduce(function(result, value) {
+        /* Check for two digits */
+        if( _.parseInt(value.substring(1)) > 9){
+          /* Node 2 is split into A and B */
+          if(value[1] === "2"){
+            result.push(value[0] + value[1] + 'A');
+            result.push(value[0] + value[1] + 'B');
+          }
+          else{
+            result.push(value[0] + value[1]);
+          }
+          result.push(value[0] + value[2]);
+          between.push(value);
+        }
+        else {
+          if(value[1] === "2"){
+            result.push(value[0] + value[1] + 'A');
+            result.push(value[0] + value[1] + 'B');
+          }
+          else {
+            result.push(value);
+          }
+        }
+        return result;
+      }, [])
+      .partition(function (p) {
+        return p[0] === 'L';
     }).value();
   }
 
@@ -483,7 +509,8 @@ function Patients() {
         // extract the clusters based on the patient's id
         let patient_clusters = parse_clusters(patient.id, [clusters_ak6, clusters_ac7], "center", ["Average, k=6","Complege, k=7"] ),
             patient_predictions = parse_predictions(patient,predictions),
-            nodes = extract_nodes(patient.nodes);
+            between = [],
+            nodes = extract_nodes(patient, between);
 
         let site = {
           "patient": patient.id,
@@ -491,6 +518,7 @@ function Patients() {
           "position": patient.position,
           "gender": patient.gender,
           "score": [],
+          "between_nodes": between,
           "feedingTube_post": patient["Feeding_tube_6m"] ? patient["Feeding_tube_6m"] : "NA",
           "feedingTube_pre": !!patient["Tube_removal"] ? "N": patient["Feeding_tube_6m"],
           "aspiration_pre" : patient["Aspiration_rate_Pre-therapy"] ? patient["Aspiration_rate_Pre-therapy"] : "NA" ,

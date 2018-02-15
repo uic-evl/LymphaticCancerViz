@@ -470,6 +470,7 @@ if __name__ == "__main__":
         right_nodes = right.get_nodes()
         left_nodes = left.get_nodes()
 
+        # recompute the max nodes
         max_nodes = max(max_nodes, len(right_nodes) + len(left_nodes))
 
         # set the patient graphs
