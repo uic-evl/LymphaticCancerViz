@@ -6,6 +6,80 @@ var App = App || {};
 
   /* The current graph template */
   App.template = {};
+
+  App.template.nodes_new = [
+    {
+      name: "1A",
+      x: 230,
+      y: 125,
+      index: 0
+    },
+    {
+      name: "1B",
+      x: 157,
+      y: 80,
+      index: 1
+    },
+    {
+      name: "2A",
+      x: 112,
+      y: 112,
+      index: 2
+    },
+    {
+      name: "2B",
+      x: 82,
+      y: 80,
+      index: 3
+    },
+    {
+      name: "3",
+      x: 132,
+      y: 140,
+      index: 4
+    },
+    {
+      name: "4",
+      x: 132,
+      y: 232,
+      index: 5
+    },
+    {
+      name: "5A",
+      x: 41,
+      y: 140,
+      index: 6
+    },
+    {
+      name: "5B",
+      x: 41,
+      y: 232,
+      index: 7
+    },
+    {
+      name: "6",
+      x: 230,
+      y: 186,
+      index: 8
+    },
+    {
+      name: "RP",
+      x: 17,
+      y: 20,
+      index: 9
+    },
+
+    // {
+    //   name: "2/3",
+    //   x: 83,
+    //   y: 125
+    // },
+    // {
+    //   name: "3/4",
+    //   x: 100,
+    //   y: 187
+    // }
+  ];
   App.template.nodes = [
     {
       name: "1A",
@@ -66,43 +140,37 @@ var App = App || {};
       x: 15,
       y: 50,
       index: 9
-    },
-
-    // {
-    //   name: "2/3",
-    //   x: 83,
-    //   y: 125
-    // },
-    // {
-    //   name: "3/4",
-    //   x: 100,
-    //   y: 187
-    // }
-  ];
+    }];
   App.template.links = [
     {
       source: _.find(App.template.nodes, {"name": "1A"}).index,
       target: _.find(App.template.nodes, {"name": "1B"}).index,
+      name: "1A-1B"
     },
     {
       source: _.find(App.template.nodes, {"name": "1A"}).index,
       target: _.find(App.template.nodes, {"name": "6"}).index,
+      name: "1A-6"
     },
     {
       source: _.find(App.template.nodes, {"name": "1B"}).index,
       target: _.find(App.template.nodes, {"name": "2A"}).index,
+      name: "1B-2A"
     },
     {
       source: _.find(App.template.nodes, {"name": "1B"}).index,
       target: _.find(App.template.nodes, {"name": "3"}).index,
+      name: "1B-3"
     },
     {
       source: _.find(App.template.nodes, {"name": "2A"}).index,
       target: _.find(App.template.nodes, {"name": "2B"}).index,
+      name: "2A-2B"
     },
     {
       source: _.find(App.template.nodes, {"name": "2A"}).index,
       target: _.find(App.template.nodes, {"name": "3"}).index,
+      name: "2A-3"
     },
     // {
     //   source: _.find(App.template.nodes, {"name": "2A"}).index,
@@ -111,10 +179,12 @@ var App = App || {};
     {
       source: _.find(App.template.nodes, {"name": "2B"}).index,
       target: _.find(App.template.nodes, {"name": "5A"}).index,
+      name: "2B-5A"
     },
     {
       source: _.find(App.template.nodes, {"name": "3"}).index,
       target: _.find(App.template.nodes, {"name": "4"}).index,
+      name: "3-4"
     },
     // {
     //   source: _.find(App.template.nodes, {"name": "3"}).index,
@@ -123,22 +193,27 @@ var App = App || {};
     {
       source: _.find(App.template.nodes, {"name": "3"}).index,
       target: _.find(App.template.nodes, {"name": "5A"}).index,
+      name: "3-5A"
     },
     {
       source: _.find(App.template.nodes, {"name": "3"}).index,
       target: _.find(App.template.nodes, {"name": "6"}).index,
+      name: "3-6"
     },
     {
       source: _.find(App.template.nodes, {"name": "4"}).index,
       target: _.find(App.template.nodes, {"name": "5B"}).index,
+      name: "4-5B"
     },
     {
       source: _.find(App.template.nodes, {"name": "4"}).index,
       target: _.find(App.template.nodes, {"name": "6"}).index,
+      name: "4-6"
     },
     {
       source: _.find(App.template.nodes, {"name": "5A"}).index,
       target: _.find(App.template.nodes, {"name": "5B"}).index,
+      name: "5A-5B"
     }
   ];
   App.template.edgeList = [
@@ -156,6 +231,12 @@ var App = App || {};
     ["5A" , "5B" ],
   ];
 
+
+  // for(let i = 0; i < App.template.nodes.length; i++){
+  //   App.template.nodes[i].x = 250 - App.template.nodes[i].x;
+  // }
+
+
   /* Initialize the styling variables*/
   App.graphSVGWidth = 250;
   App.graphSVGHeight = 250;
@@ -165,7 +246,7 @@ var App = App || {};
   App.nodeRadius = 15;
 
   /* Define the end-to-end size of the graph */
-  App.graphWidth = _.find(App.template.nodes, {"name": "6"}).x - _.find(App.template.nodes, {"name": "5A"}).x;
+  App.graphWidth = _.find(App.template.nodes, {"name": "6"}).x - _.find(App.template.nodes, {"name": "RP"}).x;
   App.graphHeight = _.find(App.template.nodes, {"name": "4"}).y - _.find(App.template.nodes, {"name": "RP"}).y;
 
   let template_svg = d3.select("#virtualGraph")
@@ -179,27 +260,25 @@ var App = App || {};
 
   let groupPath = function (d) {
     // add fake points to the hull if there are < 3
+    // Inspiration: http://jsfiddle.net/y4amnsbn/
     let fakePoints = [];
     if (d.values.length < 3) {
-      fakePoints = [[d.values[0].x + 0.001, d.values[0].y - 0.001],
+      fakePoints = [
+        [d.values[0].x + 0.001, d.values[0].y - 0.001],
         [d.values[0].x - 0.001, d.values[0].y + 0.001],
-        [d.values[0].x - 0.001, d.values[0].y + 0.001]];
+        [d.values[0].x - 0.001, d.values[0].y + 0.001]
+      ];
     }
 
     // construct the convex hull
     return "M" +
-        d3.geom.hull(d.values.map(function (i) {
-              return [i.x, i.y];
-            }
-        ).concat(fakePoints)).join("L") + "Z";
+        d3.geom.hull(
+          d.values.map(function (i) {return [i.x, i.y]; }).concat(fakePoints)
+        ).join("L") + "Z";
   };
 
   let groupFill = function (d) {
-    // console.log(d);
-    if (d.orientation === "left")
-      return '#1b9e77';
-    else
-      return "#7570b3";
+    return (d.orientation === "left");
   };
 
   function createBubbles(svg, nodes, tumors) {
@@ -233,7 +312,6 @@ var App = App || {};
 
         /* Add the nodes to the list */
         groups.push({orientation: (i===0) ? "left" : "right", nodes: group_nodes});
-
       });
 
     });
@@ -243,14 +321,13 @@ var App = App || {};
         .data(groups)
         .attr("d", groupPath)
         .enter().insert("path", "circle")
-        .style("fill", groupFill)
-        .style("stroke", groupFill)
-        .style("stroke-width", 40)
-        .style("stroke-linejoin", "round")
-        .style("opacity", .4)
+        .classed("hull", true)
+        .classed("hull_left", (d)=>{return groupFill(d)})
+        .classed("hull_right", (d)=>{return !groupFill(d)})
         .attr("d", function (d) {
-          if (d.nodes.length > 0)
+          if (d.nodes.length > 0) {
             return groupPath(d.nodes[0]);
+          }
         });
   }
 
