@@ -281,9 +281,31 @@ var App = App || {};
     return (d.orientation === "left");
   };
 
-  function createBubbles(svg, nodes, tumors) {
+  function createBubbles(svg, nodes, patient) {
     /* Store the two groups of nodes for the convex hull -- left and right */
-    let groups = [];
+    let groups = [], tumors = _.clone(patient.nodes), between_nodes = [];
+
+    /* Check for in-between nodes */
+    patient.between_nodes.forEach(function(btw){
+
+      let nodes_split = [ btw.slice(1, -1), btw.slice(-1)],
+          semantic_idx = (btw[0] === "L") ? 0 : 1;
+
+      for(let i = 0; i < nodes_split.length; i++){
+        if(nodes_split[i] === "2") {
+          tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+"2A", btw[0]+"2B"]);
+          between_nodes = [btw[0]+"2A", btw[0]+"2B"];
+        }
+        else {
+          //tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+nodes_split[i]]);
+          between_nodes.push(btw[0]+nodes_split[i]);
+        }
+      }
+
+    });
+
+    /* Add the between nodes to the tumor groups */
+    tumors.push(between_nodes);
 
     tumors.forEach(function (t,i) {
 
@@ -311,7 +333,16 @@ var App = App || {};
         });
 
         /* Add the nodes to the list */
-        groups.push({orientation: (i===0) ? "left" : "right", nodes: group_nodes});
+        groups.push({
+          orientation: function() {
+
+            if(i === 0) return "left";
+            else if(i === 1) return "right";
+
+            if(t.length > 0) return (t[0][0]==="R") ? "right" : "left";
+
+          }(),
+          nodes: group_nodes});
       });
 
     });
@@ -322,6 +353,7 @@ var App = App || {};
         .attr("d", groupPath)
         .enter().insert("path", "circle")
         .classed("hull", true)
+        .classed("between_nodes", (d,i)=>{return (i > 1)})
         .classed("hull_left", (d)=>{return groupFill(d)})
         .classed("hull_right", (d)=>{return !groupFill(d)})
         .attr("d", function (d) {
@@ -423,7 +455,7 @@ var App = App || {};
           $network = $('#patient' + patient.patient).append(clone),
           g = $network.find('g')[0];
       /*Create the bubbles around the infected nodes */
-      createBubbles(d3.select(g), App.template.nodes, patient.nodes);
+      createBubbles(d3.select(g), App.template.nodes, patient);
     });
   }
 

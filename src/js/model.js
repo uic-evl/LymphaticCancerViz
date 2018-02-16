@@ -461,7 +461,7 @@ function Patients() {
           between.push(value);
         }
         else {
-          if(value[1] === "2"){
+          if(value.length === 2 && value[1] === "2"){
             result.push(value[0] + value[1] + 'A');
             result.push(value[0] + value[1] + 'B');
           }
