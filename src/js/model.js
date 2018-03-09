@@ -487,14 +487,14 @@ function Patients() {
 
   queue()
     .defer(d3.json, "data/json/tanimoto_weighted.json")
-    // .defer(d3.csv, "data/csv/clusters/12_2017/clusters_average_k3.csv")
+    .defer(d3.csv, "data/csv/clusters/12_2017/clusters_average_k3.csv")
     .defer(d3.csv, "data/csv/clusters/12_2017/clusters_average_k6.csv")
-    // .defer(d3.csv, "data/csv/clusters/12_2017/clusters_complete_k3.csv")
+    .defer(d3.csv, "data/csv/clusters/12_2017/clusters_complete_k3.csv")
     .defer(d3.csv, "data/csv/clusters/12_2017/clusters_complete_k7.csv")
     .defer(d3.csv, "data/csv/predictions/predict_outcome_lymph.csv")
     // .defer(d3.json, "data/json/tanimoto_edges.json")
     //.defer(d3.json, "data/json/jaccard.json")
-      .await(function (error, weighted, /*clusters_ak3,*/ clusters_ak6, /*clusters_ac3,*/ clusters_ac7, predictions) {
+      .await(function (error, weighted, clusters_ak3, clusters_ak6, clusters_ac3, clusters_ac7, predictions) {
       if (error){
         return console.warn(error);
       }
@@ -507,7 +507,8 @@ function Patients() {
       App.weighted.forEach(function (patient) {
 
         // extract the clusters based on the patient's id
-        let patient_clusters = parse_clusters(patient.id, [clusters_ak6, clusters_ac7], "center", ["Average, k=6","Complege, k=7"] ),
+        let patient_clusters = parse_clusters(patient.id, [clusters_ak3, clusters_ak6, clusters_ac3, clusters_ac7],
+              "center", ["Average, k=3", "Average, k=6","Complete, k=3", "Complete, k=7"] ),
             patient_predictions = parse_predictions(patient,predictions),
             between = [],
             nodes = extract_nodes(patient, between);
