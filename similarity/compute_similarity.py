@@ -491,13 +491,17 @@ if __name__ == "__main__":
         # keep the rest of the parsed attributes
         patient_attr[id] = result[int(id)]
 
+
+    all_patients = rp_patients.copy()
+    all_patients.update(non_rp_patients)
+
     # Computer the similarity
-    compute_similarity(non_rp_patients)
+    compute_similarity(all_patients)
 
     file_name = ''
     scores_out = []
 
-    ids = non_rp_patients
+    ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
     for output in ['weighted', 'nodes', 'jaccard']:
         if output == "edges":
