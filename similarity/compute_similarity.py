@@ -374,7 +374,6 @@ def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
 
         # if the node is 5, then we add both a and b
         if len(node[1:]) == 1 and (node[1:] == "5" or node[1:] == "1" or node[1:] == "2"):
-            new_nodes = []
             new_nodes = [node + 'A', node + 'B']
         elif node[1:].lower() == "3a":
             new_nodes = [node[0] + '3']
@@ -503,7 +502,7 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['weighted', 'nodes', 'jaccard']:
+    for output in ['weighted']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_edges.json'
