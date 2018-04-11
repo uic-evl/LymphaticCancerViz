@@ -393,6 +393,26 @@ function Patients() {
             });
             self.patients.push(_.clone(patient));
           });
+
+          let outcomes = [_.countBy(self.patients(), "Feeding_tube_6m"), _.countBy(self.patients(), "Aspiration_rate_Pre-therapy"),
+              _.countBy(self.patients(), "Aspiration_rate_Post-therapy"), _.countBy(self.patients(), "Aspiration_rate"),
+                  _.countBy(self.patients(), "Neck_boost"), _.countBy(self.patients(), "Neck_Disssection_after_IMRT")],
+              output_c = [], output_p = [], totals = [105,19,103,104,417,124];
+
+          outcomes.forEach(function(o,i){
+            let s = String(o["Y"]||0);
+            s+= " / ";
+            s+= (o["Y"])?(o["Y"]/self.patients().length*100).toFixed(2):0;
+            s+= " / ";
+            s+= (o["Y"])?(o["Y"]/totals[i]*100).toFixed(2):0;
+            output_c.push(s);
+            // output_p.push((o["Y"])?o["Y"]/self.patients().length*100:0);
+          });
+
+          // console.log(self.patients().length);
+          console.log(output_c.join(", "));
+          // console.log(output_p.join(", "));
+
           self.currentPatient(self.patients()[0]);
       }
       /* Touch the current observable to re-render the scene */
@@ -487,14 +507,16 @@ function Patients() {
 
   queue()
     .defer(d3.json, "data/json/tanimoto_weighted.json")
-    .defer(d3.csv, "data/csv/clusters/12_2017/clusters_average_k3.csv")
-    .defer(d3.csv, "data/csv/clusters/12_2017/clusters_average_k6.csv")
-    .defer(d3.csv, "data/csv/clusters/12_2017/clusters_complete_k3.csv")
-    .defer(d3.csv, "data/csv/clusters/12_2017/clusters_complete_k7.csv")
+    .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=2.csv")
+    .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=3.csv")
+    .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=5.csv")
+    .defer(d3.csv, "data/csv/clusters/03_2018/cluster_complete_3_2018_k=2.csv")
+    .defer(d3.csv, "data/csv/clusters/03_2018/cluster_complete_3_2018_k=3.csv")
+    .defer(d3.csv, "data/csv/clusters/03_2018/cluster_complete_3_2018_k=4.csv")
     .defer(d3.csv, "data/csv/predictions/predict_outcome_lymph.csv")
     // .defer(d3.json, "data/json/tanimoto_edges.json")
     //.defer(d3.json, "data/json/jaccard.json")
-      .await(function (error, weighted, clusters_ak3, clusters_ak6, clusters_ac3, clusters_ac7, predictions) {
+      .await(function (error, weighted, clusters_ak2, clusters_ak3, clusters_ak5, clusters_ac2, clusters_ac3,clusters_a4, predictions) {
       if (error){
         return console.warn(error);
       }
@@ -507,8 +529,8 @@ function Patients() {
       App.weighted.forEach(function (patient) {
 
         // extract the clusters based on the patient's id
-        let patient_clusters = parse_clusters(patient.id, [clusters_ak3, clusters_ak6, clusters_ac3, clusters_ac7],
-              "center", ["Average, k=3", "Average, k=6","Complete, k=3", "Complete, k=7"] ),
+        let patient_clusters = parse_clusters(patient.id, [clusters_ak2, clusters_ak3, clusters_ak5, clusters_ac2, clusters_ac3,clusters_a4],
+              "group", ["Average, k=2", "Average, k=3", "Average, k=5", "Complete, k=2", "Complete, k=3","Complete, k=4" ] ),
             patient_predictions = parse_predictions(patient,predictions),
             between = [],
             nodes = extract_nodes(patient, between);
