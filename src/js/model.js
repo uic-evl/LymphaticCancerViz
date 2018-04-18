@@ -546,6 +546,7 @@ function Patients() {
           "feedingTube_pre": !!patient["Tube_removal"] ? "N": patient["Feeding_tube_6m"],
           "aspiration_pre" : patient["Aspiration_rate_Pre-therapy"] ? patient["Aspiration_rate_Pre-therapy"] : "NA" ,
           "aspiration_post" : patient["Aspiration_rate_Post-therapy"] ? patient["Aspiration_rate_Post-therapy"] : "NA",
+          "neck_boost" : patient["Neck_boost"] ? patient["Neck_boost"] : "NA",
           "clusters": patient_clusters,
           "predictions":
             {
