@@ -61,8 +61,10 @@
                 <div class="x_content">
                     <div data-bind="attr: {id: 'patient'+patient}" style="display: table; margin: auto;"></div>
                     <h2 class="stats">Similarity Score: <span class="bold" data-bind="text: score"></span></h2>
-                    <h2 class="stats">Aspiration (pre/post): <span class="bold" data-bind="text: aspiration_pre + ' / ' + aspiration_post"></span></h2>
-                    <h2 class="stats">Feeding Tube (pre/post): <span class="bold" data-bind="text: feedingTube_pre + ' / ' + feedingTube_post"></span></h2></div>
+                    <h2 class="stats">Feeding Tube @ 6m: <span class="bold" data-bind="text: feedingTube_post"></span></h2>
+                    <h2 class="stats">Aspiration: <span class="bold" data-bind="text: aspiration_post "></span></h2>
+                    <h2 class="stats">Neck Boost: <span class="bold" data-bind="text: neck_boost "></span></h2>
+                </div>
             </div>
         </div>
     </div>
