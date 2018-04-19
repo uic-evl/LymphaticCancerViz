@@ -231,11 +231,9 @@ var App = App || {};
     ["5A" , "5B" ],
   ];
 
-
   // for(let i = 0; i < App.template.nodes.length; i++){
   //   App.template.nodes[i].x = 250 - App.template.nodes[i].x;
   // }
-
 
   /* Initialize the styling variables*/
   App.graphSVGWidth = 250;
