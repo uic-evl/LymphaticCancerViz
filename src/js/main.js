@@ -303,9 +303,29 @@ var App = App || {};
     });
 
     /* Add the between nodes to the tumor groups */
-    tumors.push(between_nodes);
+    if(between_nodes.length > 0) {
+      let found = false;
+      tumors.forEach(function(t,i){
+          if(_.intersection(t, between_nodes).length === between_nodes.length) {
+            tumors[i] = {nodes:between_nodes, between: true};
+            found = true;
+          }
+      });
+      if(!found){
+          tumors.push({nodes:between_nodes, between: true});
+      }
+    }
 
     tumors.forEach(function (t,i) {
+
+      let between = false;
+      if(!_.isArray(t)){
+        t = t.nodes;
+        between = true;
+      }
+
+      /* Check for empty sets */
+      if(t.length === 0) return;
 
       /* Parse the data from the partitions */
       let group = _.chain(t).map(function (p) {
@@ -340,7 +360,9 @@ var App = App || {};
             if(t.length > 0) return (t[0][0]==="R") ? "right" : "left";
 
           }(),
-          nodes: group_nodes});
+          nodes: group_nodes,
+          between_nodes: between
+        });
       });
 
     });
@@ -351,7 +373,7 @@ var App = App || {};
         .attr("d", groupPath)
         .enter().insert("path", "circle")
         .classed("hull", true)
-        .classed("between_nodes", (d,i)=>{return (i > 1)})
+        .classed("between_nodes", (d,i)=>{return d.between_nodes})
         .classed("hull_left", (d)=>{return groupFill(d)})
         .classed("hull_right", (d)=>{return !groupFill(d)})
         .attr("d", function (d) {

@@ -97,7 +97,7 @@ function Patients() {
 
         /* Menu drop-downs */
         self.predictionVariable = ko.observableArray(["Feeding Tube","Aspirating","Enjoyment"]);
-        self.selections = ko.observableArray(["By Patient","By Cluster", "By Prediction"]);
+        self.selections = ko.observableArray(["By Patient","By Cluster"]);//, "By Prediction"]);
         self.sideEffect = ko.observableArray(['Feeding Tube', 'Aspiration', "Neck Boost"]);
         self.numberToDisplay = ko.observableArray([50, 100, 'All']);
 
@@ -505,7 +505,7 @@ function Patients() {
     }
 
     function extract_nodes(patient, between){
-        return _.chain(patient.nodes)
+        let nodes =  _.chain(patient.nodes)
             .reduce(function(result, value) {
                 /* Check for two digits */
                 if( _.parseInt(value.substring(1)) > 9){
@@ -534,6 +534,8 @@ function Patients() {
             .partition(function (p) {
                 return p[0] === 'L';
             }).value();
+        return nodes;
+
     }
 
     function parse_clusters(patient, clusters, key, labels){
@@ -575,6 +577,11 @@ function Patients() {
                     between = [],
                     nodes = extract_nodes(patient, between);
 
+
+                nodes[0] = _.uniqBy(nodes[0], function(e){return e});
+                nodes[1] = _.uniqBy(nodes[1], function(e){return e});
+
+
                 let site = {
                     "patient": patient.id,
                     "nodes": nodes,
@@ -609,13 +616,13 @@ function Patients() {
                 d2 =  new $.Deferred(),
                 d3 =  new $.Deferred();
 
-            $.when(d1,d2,d3).done(function(){
+            $.when(d1,d2/*,d3*/).done(function(){
                 ko.applyBindings(new Patients());
             });
 
             $("#byPatient").load("src/htmlTemplates/byPatient.html", ()=>{d1.resolve()});
             $("#byCluster").load("src/htmlTemplates/byCluster.html", ()=>{d2.resolve()});
-            $("#byPrediction").load("src/htmlTemplates/byPrediction.html", ()=>{d3.resolve()});
+            // $("#byPrediction").load("src/htmlTemplates/byPrediction.html", ()=>{d3.resolve()});
         });
 
 })();
