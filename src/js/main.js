@@ -250,138 +250,13 @@ var App = App || {};
   let template_svg = d3.select("#virtualGraph")
       .append("svg")
       .attr("width", App.graphSVGWidth)
-      .attr("height", App.graphSVGHeight);
-  createNetwork(template_svg, App.template);
+      .attr("height", App.graphSVGHeight),
 
-  /* Utility functions */
-  let utils = App.Utilities();
+  template_pattern = d3.select("#virtualPattern svg")
+        .attr("width", App.graphSVGWidth)
+        .attr("height", App.graphSVGHeight);
 
-  let groupPath = function (d) {
-    // add fake points to the hull if there are < 3
-    // Inspiration: http://jsfiddle.net/y4amnsbn/
-    let fakePoints = [];
-    if (d.values.length < 3) {
-      fakePoints = [
-        [d.values[0].x + 0.001, d.values[0].y - 0.001],
-        [d.values[0].x - 0.001, d.values[0].y + 0.001],
-        [d.values[0].x - 0.001, d.values[0].y + 0.001]
-      ];
-    }
-
-    // construct the convex hull
-    return "M" +
-        d3.geom.hull(
-          d.values.map(function (i) {return [i.x, i.y]; }).concat(fakePoints)
-        ).join("L") + "Z";
-  };
-
-  let groupFill = function (d) {
-    return (d.orientation === "left");
-  };
-
-  function createBubbles(svg, nodes, patient) {
-    /* Store the two groups of nodes for the convex hull -- left and right */
-    let groups = [], tumors = _.clone(patient.nodes), between_nodes = [];
-
-    /* Check for in-between nodes */
-    patient.between_nodes.forEach(function(btw){
-
-      let nodes_split = [ btw.slice(1, -1), btw.slice(-1)],
-          semantic_idx = (btw[0] === "L") ? 0 : 1;
-
-      for(let i = 0; i < nodes_split.length; i++){
-        if(nodes_split[i] === "2") {
-          tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+"2A", btw[0]+"2B"]);
-          between_nodes = [btw[0]+"2A", btw[0]+"2B"];
-        }
-        else {
-          //tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+nodes_split[i]]);
-          between_nodes.push(btw[0]+nodes_split[i]);
-        }
-      }
-
-    });
-
-    /* Add the between nodes to the tumor groups */
-    if(between_nodes.length > 0) {
-      let found = false;
-      tumors.forEach(function(t,i){
-          if(_.intersection(t, between_nodes).length === between_nodes.length) {
-            tumors[i] = {nodes:between_nodes, between: true};
-            found = true;
-          }
-      });
-      if(!found){
-          tumors.push({nodes:between_nodes, between: true});
-      }
-    }
-
-    tumors.forEach(function (t,i) {
-
-      let between = false;
-      if(!_.isArray(t)){
-        t = t.nodes;
-        between = true;
-      }
-
-      /* Check for empty sets */
-      if(t.length === 0) return;
-
-      /* Parse the data from the partitions */
-      let group = _.chain(t).map(function (p) {
-        return p.substring(1)
-      }).value();
-
-      let connected_components = [group];
-      /* Check the connectedness of the nodes */
-      if(group.length > 1){
-        connected_components = utils.connectedComponents(group, App.template.edgeList);
-      }
-
-      /* Iterate over the node groupings */
-      connected_components.forEach(function (component_nodes) {
-
-        /* Collect the nodes to be used in the convex hull*/
-        let group_nodes = d3.nest().key(function (d) {
-          return (_.indexOf(component_nodes, d.name) >= 0) ? d & 3 : 1;
-        }).entries(nodes);
-
-        group_nodes = _.filter(group_nodes, function (o) {
-          return o.key === "0";
-        });
-
-        /* Add the nodes to the list */
-        groups.push({
-          orientation: function() {
-
-            if(i === 0) return "left";
-            else if(i === 1) return "right";
-
-            if(t.length > 0) return (t[0][0]==="R") ? "right" : "left";
-
-          }(),
-          nodes: group_nodes,
-          between_nodes: between
-        });
-      });
-
-    });
-
-    /** Adds the convex hulls **/
-    svg.selectAll("path")
-        .data(groups)
-        .attr("d", groupPath)
-        .enter().insert("path", "circle")
-        .classed("hull", true)
-        .classed("between_nodes", (d,i)=>{return d.between_nodes})
-        .classed("hull_left", (d)=>{return groupFill(d)})
-        .classed("hull_right", (d)=>{return !groupFill(d)})
-        .attr("d", function (d) {
-          if (d.nodes.length > 0) {
-            return groupPath(d.nodes[0]);
-          }
-        });
-  }
+  createNetwork(template_pattern, App.template);
 
   function addNodes(svg, lymphNodes) {
     let nodes = svg.selectAll("circle.node")
@@ -448,6 +323,69 @@ var App = App || {};
         .attr("stroke", "black");
   }
 
+    let groupPath = function (d) {
+        // add fake points to the hull if there are < 3
+        // Inspiration: http://jsfiddle.net/y4amnsbn/
+        let fakePoints = [];
+        if (d.values.length < 3) {
+            fakePoints = [
+                [d.values[0].x + 0.001, d.values[0].y - 0.001],
+                [d.values[0].x - 0.001, d.values[0].y + 0.001],
+                [d.values[0].x - 0.001, d.values[0].y + 0.001]
+            ];
+        }
+
+        // construct the convex hull
+        return "M" +
+            d3.geom.hull(
+                d.values.map(function (i) {return [i.x, i.y]; }).concat(fakePoints)
+            ).join("L") + "Z";
+    };
+
+    let groupFill = function (d) {
+        return (d.orientation === "left");
+    };
+
+    function createBubbles(svg, pattern, groups) {
+
+      let group_split = _.partition(groups,["between_nodes", true]);
+
+        group_split.forEach(function(group,j){
+          if(!group.length) return;
+
+          /* Between node group */
+          if(j === 0){
+              /* Adds the convex hulls */
+              pattern.selectAll("path")
+                  .data(group)
+                  .enter().insert("path", "circle")
+                  .classed("hull", true)
+                  .classed("between_nodes", (d)=>{return d.between_nodes})
+                  .classed("hull_left", (d)=>{return groupFill(d)})
+                  .classed("hull_right", (d)=>{return !groupFill(d)})
+                  .attr("d", function (d) {
+                      if (d.nodes.length > 0) {
+                          return groupPath(d.nodes[0]);
+                      }
+                  });
+          }
+
+          /* Adds the convex hulls */
+          svg.selectAll("path")
+              .data(group)
+              .enter().insert("path", "circle")
+              .classed("hull", true)
+              .classed("between_nodes", (d)=>{return d.between_nodes})
+              .classed("hull_left", (d)=>{return groupFill(d)})
+              .classed("hull_right", (d)=>{return !groupFill(d)})
+              .attr("d", function (d) {
+                  if (d.nodes.length > 0) {
+                      return groupPath(d.nodes[0]);
+                  }
+              });
+      });
+    }
+
   function createNetwork(svg, data) {
     /*Add a group to house each graph and center it in the container */
     let transformX = (App.graphSVGWidth - App.graphWidth) / 2.0 +
@@ -457,8 +395,14 @@ var App = App || {};
             (App.nodeRadius - _.find(App.template.nodes, {"name": "5B"}).x) * 2.0;
 
     let g = svg.append("g")
-        .attr("transform", "translate(" + transformX + ",-"
-            + transformY + ")");
+        .attr("transform", "translate(" + transformX + ",-" + transformY + ")")
+        .attr("id", "bubbleSet");
+
+
+    svg.select("#between-pattern")
+        .append("g")
+        .attr("transform", "translate(" + transformX + ",-" + transformY + ")")
+        .attr("id", "patternSet");
 
     /* Add the links to the network*/
     addLinks(g, data);
@@ -471,11 +415,14 @@ var App = App || {};
 
   App.createVisualizations = function (ranking) {
     ranking.forEach(function (patient) {
-      let clone = template_svg.node().cloneNode(true),
+
+      let clone = template_pattern.node().cloneNode(true),
           $network = $('#patient' + patient.patient).append(clone),
-          g = $network.find('g')[0];
-      /*Create the bubbles around the infected nodes */
-      createBubbles(d3.select(g), App.template.nodes, patient);
+          g = $network.find('#bubbleSet')[0],
+          p = $network.find('#patternSet')[0];
+
+        /*Create the bubbles around the infected nodes */
+        createBubbles(d3.select(g), d3.select(p), patient.groups);
     });
   }
 
