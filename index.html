@@ -20,6 +20,7 @@
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
         <div class="row">
+
             <div class="col-md-2">
                 <select id='selectionType' class="btn menu"
                         data-bind=" options: selections, value: currentType">
@@ -27,17 +28,18 @@
             </div>
 
             <!-- ko if: currentType() === "By Patient" -->
-            <div id="byPatient" class="col-md-4"></div>
+            <div id="byPatient" class="col-md-2"></div>
             <!-- /ko -->
 
-            <div id="byCluster" class="col-md-2"></div>
-
+            <div id="byCluster" data-bind="css: {'col-md-3': currentType()=='By Cluster', 'col-md-2': currentType()=='By Patient'}">
+                <span data-bind="text: currentType"></span>
+            </div>
 
             <!-- ko if: currentType() === "By Prediction" -->
-            <div id="byPrediction" class="col-md-5"></div>
+            <div id="byPrediction"></div>
             <!-- /ko -->
 
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <div class="dropdown">
                     <a id="SELabel" data-toggle="dropdown" class="btn menu sideEffects"
                        data-target="#">Side-Effect<!-- || currentPatient() ">Cluster-->
@@ -54,7 +56,7 @@
                                 </li>
                                 <li>
                                     <a class="sideEffect" href="#"><span class="sideEffect"
-                                       data-bind="value: $data"
+                                                                         data-bind="value: $data"
                                     >N</span></a>
                                 </li>
                             </ul>
@@ -63,14 +65,17 @@
                 </div>
             </div>
 
-            <select id='numberOfPatients' class="btn menu"
-                    data-bind=" options: numberToDisplay,
-                     optionsText: function(item) {
-                       if(_.isNumber(item)) return 'Top ' + item + ' Patients';
-                       else return item + ' Patients';
-                   },
-                      value: currentDisplay" >
-            </select>
+
+            <div class="col-md-2">
+                <select id='numberOfPatients' class="btn menu"
+                        data-bind=" options: numberToDisplay,
+                         optionsText: function(item) {
+                           if(_.isNumber(item)) return 'Top ' + item + ' Patients';
+                           else return item + ' Patients';
+                       },
+                          value: currentDisplay" >
+                </select>
+            </div>
 
         </div>
     </div>
