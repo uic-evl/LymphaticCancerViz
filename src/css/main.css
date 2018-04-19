@@ -14,13 +14,7 @@ body {
 
 .between_nodes {
     opacity: 0.2;
-    background: repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 10px,
-            #ccc 10px,
-            #ccc 20px
-    )
+    stroke: #d95f02;
 }
 
 .hull_left {
