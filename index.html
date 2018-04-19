@@ -32,9 +32,36 @@
 
             <div id="byCluster" class="col-md-2"></div>
 
+
             <!-- ko if: currentType() === "By Prediction" -->
             <div id="byPrediction" class="col-md-5"></div>
             <!-- /ko -->
+
+            <div class="col-md-1">
+                <div class="dropdown">
+                    <a id="SELabel" data-toggle="dropdown" class="btn menu sideEffects"
+                       data-target="#">Side-Effect<!-- || currentPatient() ">Cluster-->
+                        <span class="caret"></span>
+                    </a>
+                    <ul id="SEMenu" class="dropdown-menu multi-level" role="menu"
+                        aria-labelledby="dropdownMenu" data-bind="foreach: sideEffect">
+                        <li class="dropdown-submenu">
+                            <a tabindex="-1" href="#"><span data-bind="text: $data"></span></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="sideEffect" href="#"><span class="sideEffect"
+                                                                         data-bind="value: $data">Y</span></a>
+                                </li>
+                                <li>
+                                    <a class="sideEffect" href="#"><span class="sideEffect"
+                                       data-bind="value: $data"
+                                    >N</span></a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
             <select id='numberOfPatients' class="btn menu"
                     data-bind=" options: numberToDisplay,
@@ -44,6 +71,7 @@
                    },
                       value: currentDisplay" >
             </select>
+
         </div>
     </div>
 </nav>

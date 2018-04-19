@@ -47,16 +47,16 @@
     border-radius: 6px 0 6px 6px;
 }
 
-#clusterMenu {
+#clusterMenu, #SEMenu {
     margin-top: 0;
     margin-left: 20px;
     min-width: inherit;
 }
 
-#clusterLabel {
+#clusterLabel, #SELabel {
     margin-left: 0;
 }
 
-.highlighted a.cluster {
+.highlighted a.cluster, .highlighted a.sideEffect {
     color: #1ABB9C;
 }
