@@ -346,7 +346,7 @@ var App = App || {};
         return (d.orientation === "left");
     };
 
-    function createBubbles(svg, pattern, groups) {
+    function createBubbles(svg, groups,id) {
 
       let group_split = _.partition(groups,["between_nodes", true]);
 
@@ -354,21 +354,38 @@ var App = App || {};
           if(!group.length) return;
 
           /* Between node group */
-          if(j === 0){
-              /* Adds the convex hulls */
-              pattern.selectAll("path")
-                  .data(group)
-                  .enter().insert("path", "circle")
-                  .classed("hull", true)
-                  .classed("between_nodes", (d)=>{return d.between_nodes})
-                  .classed("hull_left", (d)=>{return groupFill(d)})
-                  .classed("hull_right", (d)=>{return !groupFill(d)})
-                  .attr("d", function (d) {
-                      if (d.nodes.length > 0) {
-                          return groupPath(d.nodes[0]);
-                      }
-                  });
-          }
+          // if(j === 0){
+          //
+          //     let pattern = d3.select("#defs")
+          //       .append("mask")
+          //         .attr("id", "between-pattern_"+id)
+          //         .attr("maskUnits","userSpaceOnUse")
+          //         .attr("x",0)
+          //         .attr("y",0)
+          //         .attr("width","100%")
+          //         .attr("height","100%")
+          //       .append("g")
+          //         .attr("transform", "translate(" + App.transformX + ",-" + App.transformY + ")")
+          //         .attr("id", "bubbleSet");
+          //
+          //     /* Adds the convex hulls */
+          //     pattern.selectAll("path")
+          //         .data(group)
+          //         .enter().insert("path", "circle")
+          //         .classed("hull", true)
+          //         .classed("between_nodes", (d)=>{return d.between_nodes})
+          //         .classed("hull_left", (d)=>{return groupFill(d)})
+          //         .classed("hull_right", (d)=>{return !groupFill(d)})
+          //         .attr("d", function (d) {
+          //             if (d.nodes.length > 0) {
+          //                 return groupPath(d.nodes[0]);
+          //             }
+          //         });
+          //
+          //     d3.select(svg.node().parentNode)
+          //         .select("#overlay")
+          //         .attr("mask", "url(#between-pattern_"+id+")");
+          // }
 
           /* Adds the convex hulls */
           svg.selectAll("path")
@@ -388,21 +405,14 @@ var App = App || {};
 
   function createNetwork(svg, data) {
     /*Add a group to house each graph and center it in the container */
-    let transformX = (App.graphSVGWidth - App.graphWidth) / 2.0 +
-        (App.nodeRadius - _.find(App.template.nodes, {"name": "5A"}).x) * 2.0,
-
-        transformY = (App.graphSVGHeight - App.graphHeight) / 2.0 +
+    App.transformX = (App.graphSVGWidth - App.graphWidth) / 2.0 +
+        (App.nodeRadius - _.find(App.template.nodes, {"name": "5A"}).x) * 2.0;
+    App.transformY = (App.graphSVGHeight - App.graphHeight) / 2.0 +
             (App.nodeRadius - _.find(App.template.nodes, {"name": "5B"}).x) * 2.0;
 
     let g = svg.append("g")
-        .attr("transform", "translate(" + transformX + ",-" + transformY + ")")
+        .attr("transform", "translate(" + App.transformX + ",-" + App.transformY + ")")
         .attr("id", "bubbleSet");
-
-
-    svg.select("#between-pattern")
-        .append("g")
-        .attr("transform", "translate(" + transformX + ",-" + transformY + ")")
-        .attr("id", "patternSet");
 
     /* Add the links to the network*/
     addLinks(g, data);
@@ -417,12 +427,14 @@ var App = App || {};
     ranking.forEach(function (patient) {
 
       let clone = template_pattern.node().cloneNode(true),
-          $network = $('#patient' + patient.patient).append(clone),
-          g = $network.find('#bubbleSet')[0],
-          p = $network.find('#patternSet')[0];
+          $network = $('#patient' + patient.patient)
+              .append(clone)
+              .attr("id", "svg_"+patient.patient),
+          g = $network.find('#bubbleSet')[0];
+          // p = $network.find('#patternSet')[0];
 
         /*Create the bubbles around the infected nodes */
-        createBubbles(d3.select(g), d3.select(p), patient.groups);
+        createBubbles(d3.select(g), patient.groups, patient.patient);
     });
   }
 
