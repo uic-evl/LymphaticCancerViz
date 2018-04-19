@@ -505,7 +505,7 @@ function Patients() {
     }
 
     function extract_nodes(patient, between){
-        let nodes =  _.chain(patient.nodes)
+        return _.chain(patient.nodes)
             .reduce(function(result, value) {
                 /* Check for two digits */
                 if( _.parseInt(value.substring(1)) > 9){
@@ -534,8 +534,6 @@ function Patients() {
             .partition(function (p) {
                 return p[0] === 'L';
             }).value();
-        return nodes;
-
     }
 
     function parse_clusters(patient, clusters, key, labels){
@@ -545,6 +543,96 @@ function Patients() {
             centers[labels[i]] = parseInt(_.find(cluster, {"patientId": String(patient)})[key]);
         });
         return centers;
+    }
+
+    function extract_bubble_groups(patient) {
+        /* Store the two groups of nodes for the convex hull -- left and right */
+        let groups = [], tumors = _.clone(patient.nodes), between_nodes = [],
+            nodes = App.template.nodes;
+
+        /* Check for in-between nodes */
+        patient.between_nodes.forEach(function(btw){
+
+            let nodes_split = [ btw.slice(1, -1), btw.slice(-1)],
+                semantic_idx = (btw[0] === "L") ? 0 : 1;
+
+            for(let i = 0; i < nodes_split.length; i++){
+                if(nodes_split[i] === "2") {
+                    tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+"2A", btw[0]+"2B"]);
+                    between_nodes = [btw[0]+"2A", btw[0]+"2B"];
+                }
+                else {
+                    //tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+nodes_split[i]]);
+                    between_nodes.push(btw[0]+nodes_split[i]);
+                }
+            }
+        });
+
+        /* Add the between nodes to the tumor groups */
+        if(between_nodes.length > 0) {
+            let found = false;
+            tumors.forEach(function(t,i){
+                if(_.intersection(t, between_nodes).length === between_nodes.length) {
+                    tumors[i] = {nodes:between_nodes, between: true};
+                    found = true;
+                }
+            });
+            if(!found){
+                tumors.push({nodes:between_nodes, between: true});
+            }
+        }
+
+        tumors.forEach(function (t,i) {
+
+            let between = false;
+            if(!_.isArray(t)){
+                t = t.nodes;
+                between = true;
+            }
+
+            /* Check for empty sets */
+            if(t.length === 0) return;
+
+            /* Parse the data from the partitions */
+            let group = _.chain(t).map(function (p) {
+                return p.substring(1)
+            }).value();
+
+            let connected_components = [group];
+            /* Check the connectedness of the nodes */
+            if(group.length > 1){
+                connected_components = App.utils.connectedComponents(group, App.template.edgeList);
+            }
+
+            /* Iterate over the node groupings */
+            connected_components.forEach(function (component_nodes) {
+
+                /* Collect the nodes to be used in the convex hull*/
+                let group_nodes = d3.nest().key(function (d) {
+                    return (_.indexOf(component_nodes, d.name) >= 0) ? d & 3 : 1;
+                }).entries(nodes);
+
+                group_nodes = _.filter(group_nodes, function (o) {
+                    return o.key === "0";
+                });
+
+                /* Add the nodes to the list */
+                groups.push({
+                    orientation: function() {
+
+                        if(i === 0) return "left";
+                        else if(i === 1) return "right";
+
+                        if(t.length > 0) return (t[0][0]==="R") ? "right" : "left";
+
+                    }(),
+                    nodes: group_nodes,
+                    between_nodes: between
+                });
+            });
+        });
+
+        return groups;
     }
 
     queue()
@@ -564,8 +652,10 @@ function Patients() {
             }
 
             App.weighted = weighted;
-
             App.sites = [];
+
+            /* Utility functions */
+            App.utils = App.Utilities();
 
             /* Iterate through the data and pull out each patient's information */
             App.weighted.forEach(function (patient) {
@@ -605,6 +695,8 @@ function Patients() {
                             "aspirating_bin": bin_prediction(parseFloat(patient_predictions.prob_aspiration)),
                         }
                 };
+                /* Create the bubble sets for every patient */
+                site.groups  = extract_bubble_groups(site);
                 App.sites.push(site);
             });
 
