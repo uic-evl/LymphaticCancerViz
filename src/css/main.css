@@ -5,7 +5,7 @@ body {
 .hull {
     stroke-width: 40px;
     stroke-linejoin: round;
-    opacity: 0.4;
+    opacity: 0.6;
 }
 
 /*.between_nodes {*/
