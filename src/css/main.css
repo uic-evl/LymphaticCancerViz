@@ -62,3 +62,7 @@ h2.stats {
 .cluster, .dropdown-menu {
     min-width: unset;
 }
+
+.hidden {
+    visibility: hidden;
+}
