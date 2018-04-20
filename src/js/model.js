@@ -510,15 +510,6 @@ function Patients() {
             .reduce(function(result, value) {
                 /* Check for two digits */
                 if( _.parseInt(value.substring(1)) > 9){
-                    /* Node 2 is split into A and B */
-                    // if(value[1] === "2"){
-                    //     result.push(value[0] + value[1] + 'A');
-                    //     result.push(value[0] + value[1] + 'B');
-                    // }
-                    // else{
-                    //     result.push(value[0] + value[1]);
-                    // }
-                    // result.push(value[0] + value[2]);
                     between.push(value);
                 }
                 else {
@@ -650,9 +641,7 @@ function Patients() {
         // .defer(d3.json, "data/json/tanimoto_edges.json")
         //.defer(d3.json, "data/json/jaccard.json")
         .await(function (error, weighted, clusters_ak2, clusters_ak3, clusters_ak5, clusters_ac2, clusters_ac3,clusters_a4, predictions) {
-            if (error){
-                return console.warn(error);
-            }
+            if (error){ return console.warn(error); }
 
             App.weighted = weighted;
             App.sites = [];
@@ -670,10 +659,8 @@ function Patients() {
                     between = [],
                     nodes = extract_nodes(patient, between);
 
-
                 nodes[0] = _.uniqBy(nodes[0], function(e){return e});
                 nodes[1] = _.uniqBy(nodes[1], function(e){return e});
-
 
                 let site = {
                     "patient": patient.id,
@@ -715,6 +702,9 @@ function Patients() {
                 ko.applyBindings(new Patients());
                 $("#appBody").removeClass("hidden");
                 $("#menuBody").removeClass("hidden");
+                setTimeout(App.initializeLegend, 500)
+
+
             });
 
             $("#byPatient").load("src/htmlTemplates/byPatient.html", ()=>{d1.resolve()});
