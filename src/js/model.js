@@ -183,7 +183,6 @@ function Patients() {
 
         filterPatients(current);
         placeSelectedPatientFirst(current);
-        console.log(current);
 
         // Render to the screen
         App.createVisualizations(self.rankings());
@@ -714,6 +713,8 @@ function Patients() {
 
             $.when(d1,d2/*,d3*/).done(function(){
                 ko.applyBindings(new Patients());
+                $("#appBody").removeClass("hidden");
+                $("#menuBody").removeClass("hidden");
             });
 
             $("#byPatient").load("src/htmlTemplates/byPatient.html", ()=>{d1.resolve()});

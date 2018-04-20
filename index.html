@@ -19,8 +19,7 @@
 
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
-        <div class="row">
-
+        <div id="menuBody" class="row hidden">
             <div class="col-md-2">
                 <select id='selectionType' class="btn menu"
                         data-bind=" options: selections, value: currentType">
@@ -82,7 +81,7 @@
 
 <div class="container-fluid" style="margin-top: 55px">
     <!--<div data-bind="css: { row: ($index()+1) % $parent.maxNodes == 0 }">-->
-    <div class="row" data-bind="foreach: rankings">
+    <div id="appBody" class="row hidden" data-bind="foreach: rankings">
         <div class="patient_container" data-bind=" css: { 'col-md-2': $parent.maxNodes > 5, 'col-md-3': $parent.maxNodes < 6  } ">
             <div class="x_panel tile">
                 <div class="x_title" data-bind="css: {male: gender=='male', female: gender=='female'}">
@@ -128,36 +127,6 @@
         </div>
     </div>
 </div>
-
-<div id="virtualGraph" style="visibility: hidden"></div>
-
-<!--<div id="virtualPattern" style="visibility: hidden">-->
-    <!--<svg>-->
-        <!--<defs id="defs">-->
-            <!--<pattern id="diagonal-stripe-1" patternUnits="userSpaceOnUse" width="10" height="10">-->
-                <!--<image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPSd3aGl0ZScvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsMTAgbDEwLC0xMAogICAgICAgICAgIE05LDExIGwyLC0yJyBzdHJva2U9J2JsYWNrJyBzdHJva2Utd2lkdGg9JzEnLz4KPC9zdmc+Cg=="-->
-                       <!--x="0" y="0" width="10" height="10"> </image>-->
-            <!--</pattern>-->
-
-            <!--&lt;!&ndash;<mask id="between-pattern"&ndash;&gt;-->
-                  <!--&lt;!&ndash;maskUnits="userSpaceOnUse" x="0" y="0" height="100%" width="100%">&ndash;&gt;-->
-            <!--&lt;!&ndash;</mask>&ndash;&gt;-->
-
-            <!--<mask class="pattern-mask" x="0" y="0" width="1" height="1" >-->
-                <!--<rect x="0" y="0" height="100%" width="100%"-->
-                      <!--fill="url(#diagonal-stripe-1)"-->
-                      <!--stroke="url(#diagonal-stripe-1)">-->
-                <!--</rect>-->
-            <!--</mask>-->
-        <!--</defs>-->
-
-        <!--&lt;!&ndash;<g id="overlay" data-bind="attr:{mask: url('between-pattern_'+patient}">&ndash;&gt;-->
-            <!--&lt;!&ndash;<rect x="0" y="0" height="100%" width="100%"  mask="url(#pattern-mask)"></rect>&ndash;&gt;-->
-        <!--&lt;!&ndash;</g>&ndash;&gt;-->
-
-        <!--&lt;!&ndash;<path class="hull hull_right" d="M100,225L100,150L80,112L50,90L25,150L25,225Z"></path>&ndash;&gt;-->
-    <!--</svg>-->
-<!--</div>-->
 
 <script src="src/js/utilities.js"></script>
 <script src="src/js/main.js"></script>
