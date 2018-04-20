@@ -348,10 +348,10 @@ var App = App || {};
 
     function createBubbles(svg, groups,id) {
 
-      let group_split = _.partition(groups,["between_nodes", true]);
+      // let group_split = _.partition(groups,["between_nodes", true]);
 
-        group_split.forEach(function(group,j){
-          if(!group.length) return;
+        // groups.forEach(function(group,j){
+          // if(!group.length) return;
 
           /* Between node group */
           // if(j === 0){
@@ -389,10 +389,11 @@ var App = App || {};
 
           /* Adds the convex hulls */
           svg.selectAll("path")
-              .data(group)
+              .data(groups)
               .enter().insert("path", "circle")
               .classed("hull", true)
-              .classed("between_nodes", (d)=>{return d.between_nodes})
+              .classed("between_nodes", (d)=>{
+                return d.between_nodes})
               .classed("hull_left", (d)=>{return groupFill(d)})
               .classed("hull_right", (d)=>{return !groupFill(d)})
               .attr("d", function (d) {
@@ -400,7 +401,7 @@ var App = App || {};
                       return groupPath(d.nodes[0]);
                   }
               });
-      });
+      // });
     }
 
   function createNetwork(svg, data) {
