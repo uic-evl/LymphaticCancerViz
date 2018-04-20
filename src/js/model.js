@@ -377,6 +377,8 @@ function Patients() {
         // clear the patient list
         self.patients.removeAll();
         self.rankings.removeAll();
+        SEdropdown.firstChild.textContent = "Side-Effect";
+        self.sideEffect_class = null;
 
         /* Change the similarity scores depending on the cluster type*/
         if(cluster_class.split("_")[0] === "weighted"){
