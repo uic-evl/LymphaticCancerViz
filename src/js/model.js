@@ -372,19 +372,14 @@ function Patients() {
         self.currentType.subscribe(changeFilteringMode);
     }
 
-    function filterByCluster(cluster_class) {
+    function filterByCluster(seClass) {
         // clear the patient list
         self.patients.removeAll();
         self.rankings.removeAll();
-        SEdropdown.firstChild.textContent = "Side-Effect";
-        self.sideEffect_class = null;
 
-        /* Change the similarity scores depending on the cluster type*/
-        if(cluster_class.split("_")[0] === "weighted"){
-            App.data = App.weighted;
-        }
-        else {
-            App.data = App.nodes;
+        if(!seClass) {
+            SEdropdown.firstChild.textContent = "Side-Effect";
+            self.sideEffect_class = null;
         }
 
         App.data = App.weighted;
@@ -420,7 +415,7 @@ function Patients() {
                 self.currentCluster(cluster);
 
                 if(self.currentType() === "By Cluster" && self.currentCluster()) {
-                    filterByCluster(self.cluster_class);
+                    filterByCluster();
                     self.currentPatient(self.patients()[0]);
                 }
                 /* Touch the current observable to re-render the scene */
@@ -440,6 +435,9 @@ function Patients() {
 
                 SEdropdown.firstChild.textContent = self.sideEffect_class + ": " + self.sideEffect_value + ' ';
 
+                if(self.currentType() === "By Cluster" && self.currentCluster()) {
+                    filterByCluster(self.sideEffect_class);
+                }
                 // // add to the list only the patients in the current cluster
                 let new_pats = [];
                 _.filter(App.sites, function(site) {
@@ -506,7 +504,7 @@ function Patients() {
     }
 
     function extract_nodes(patient, between){
-        let nodes =  _.chain(patient.nodes)
+        return _.chain(patient.nodes)
             .reduce(function(result, value) {
                 /* Check for two digits */
                 if( _.parseInt(value.substring(1)) > 9){
@@ -527,7 +525,6 @@ function Patients() {
                 return p[0] === 'L';
             }).value();
 
-        return nodes;
     }
 
     function parse_clusters(patient, clusters, key, labels){
@@ -556,7 +553,6 @@ function Patients() {
                     between_nodes = [btw[0]+"2A", btw[0]+"2B"];
                 }
                 else {
-                    //tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+nodes_split[i]]);
                     between_nodes.push(btw[0]+nodes_split[i]);
                 }
             }
@@ -577,7 +573,6 @@ function Patients() {
         }
 
         tumors.forEach(function (t,i) {
-
             let between = false;
             if(!_.isArray(t)){
                 t = t.nodes;
@@ -659,8 +654,8 @@ function Patients() {
                     between = [],
                     nodes = extract_nodes(patient, between);
 
-                nodes[0] = _.uniqBy(nodes[0], function(e){return e});
-                nodes[1] = _.uniqBy(nodes[1], function(e){return e});
+                // nodes[0] = _.uniqBy(nodes[0], function(e){return e});
+                // nodes[1] = _.uniqBy(nodes[1], function(e){return e});
 
                 let site = {
                     "patient": patient.id,
