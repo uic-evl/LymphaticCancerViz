@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="src/css/main.css">
     <link rel="stylesheet" href="src/css/menu.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+    <script src="lib/js/d3.min.js"></script>
     <script src="lib/js/lodash.min.js"></script>
     <script src="lib/js/knockout.js"></script>
 
@@ -91,7 +91,34 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                    <div data-bind="attr: {id: 'patient'+patient}" style="display: table; margin: auto;"></div>
+                    <div data-bind="attr: {id: 'patient'+patient}" style="display: table; margin: auto;">
+                        <svg>
+                            <defs id="defs">
+                                <pattern id="diagonal-stripe-1" patternUnits="userSpaceOnUse" width="10" height="10">
+                                    <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPSd3aGl0ZScvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsMTAgbDEwLC0xMAogICAgICAgICAgIE05LDExIGwyLC0yJyBzdHJva2U9J2JsYWNrJyBzdHJva2Utd2lkdGg9JzEnLz4KPC9zdmc+Cg=="
+                                           x="0" y="0" width="10" height="10"> </image>
+                                </pattern>
+
+                                <mask data-bind="attr: {id: 'between_pattern_'+patient}" maskUnits="userSpaceOnUse"
+                                      x="0" y="0" height="100%" width="100%">
+                                </mask>
+
+                                <mask id="pattern-mask" x="0" y="0" width="1" height="1" >
+                                    <rect x="0" y="0" height="100%" width="100%"
+                                          fill="url(#diagonal-stripe-1)"
+                                          stroke="url(#diagonal-stripe-1)">
+                                    </rect>
+                                </mask>
+                            </defs>
+
+                            <g data-bind="attr:{mask: 'url(#between_pattern_'+patient+')'}">
+                                <rect x="0" y="0" height="100%" width="100%"  mask="url(#pattern-mask)"></rect>
+                            </g>
+
+                            <!--<path class="hull hull_right" d="M100,225L100,150L80,112L50,90L25,150L25,225Z"></path>-->
+                        </svg>
+
+                    </div>
                     <h2 class="stats">Similarity Score: <span class="bold" data-bind="text: score"></span></h2>
                     <h2 class="stats">Feeding Tube @ 6m: <span class="bold" data-bind="text: feedingTube_post"></span></h2>
                     <h2 class="stats">Aspiration: <span class="bold" data-bind="text: aspiration_post "></span></h2>
@@ -104,33 +131,33 @@
 
 <div id="virtualGraph" style="visibility: hidden"></div>
 
-<div id="virtualPattern" style="visibility: hidden">
-    <svg>
-        <defs id="defs">
-            <pattern id="diagonal-stripe-1" patternUnits="userSpaceOnUse" width="10" height="10">
-                <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPSd3aGl0ZScvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsMTAgbDEwLC0xMAogICAgICAgICAgIE05LDExIGwyLC0yJyBzdHJva2U9J2JsYWNrJyBzdHJva2Utd2lkdGg9JzEnLz4KPC9zdmc+Cg=="
-                       x="0" y="0" width="10" height="10"> </image>
-            </pattern>
+<!--<div id="virtualPattern" style="visibility: hidden">-->
+    <!--<svg>-->
+        <!--<defs id="defs">-->
+            <!--<pattern id="diagonal-stripe-1" patternUnits="userSpaceOnUse" width="10" height="10">-->
+                <!--<image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPSd3aGl0ZScvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsMTAgbDEwLC0xMAogICAgICAgICAgIE05LDExIGwyLC0yJyBzdHJva2U9J2JsYWNrJyBzdHJva2Utd2lkdGg9JzEnLz4KPC9zdmc+Cg=="-->
+                       <!--x="0" y="0" width="10" height="10"> </image>-->
+            <!--</pattern>-->
 
-            <!--<mask id="between-pattern"-->
-                  <!--maskUnits="userSpaceOnUse" x="0" y="0" height="100%" width="100%">-->
+            <!--&lt;!&ndash;<mask id="between-pattern"&ndash;&gt;-->
+                  <!--&lt;!&ndash;maskUnits="userSpaceOnUse" x="0" y="0" height="100%" width="100%">&ndash;&gt;-->
+            <!--&lt;!&ndash;</mask>&ndash;&gt;-->
+
+            <!--<mask class="pattern-mask" x="0" y="0" width="1" height="1" >-->
+                <!--<rect x="0" y="0" height="100%" width="100%"-->
+                      <!--fill="url(#diagonal-stripe-1)"-->
+                      <!--stroke="url(#diagonal-stripe-1)">-->
+                <!--</rect>-->
             <!--</mask>-->
+        <!--</defs>-->
 
-            <mask class="pattern-mask" x="0" y="0" width="1" height="1" >
-                <rect x="0" y="0" height="100%" width="100%"
-                      fill="url(#diagonal-stripe-1)"
-                      stroke="url(#diagonal-stripe-1)">
-                </rect>
-            </mask>
-        </defs>
+        <!--&lt;!&ndash;<g id="overlay" data-bind="attr:{mask: url('between-pattern_'+patient}">&ndash;&gt;-->
+            <!--&lt;!&ndash;<rect x="0" y="0" height="100%" width="100%"  mask="url(#pattern-mask)"></rect>&ndash;&gt;-->
+        <!--&lt;!&ndash;</g>&ndash;&gt;-->
 
-        <!--<g id="overlay" data-bind="attr:{mask: url('between-pattern_'+patient}">-->
-            <!--<rect x="0" y="0" height="100%" width="100%"  mask="url(#pattern-mask)"></rect>-->
-        <!--</g>-->
-
-        <!--<path class="hull hull_right" d="M100,225L100,150L80,112L50,90L25,150L25,225Z"></path>-->
-    </svg>
-</div>
+        <!--&lt;!&ndash;<path class="hull hull_right" d="M100,225L100,150L80,112L50,90L25,150L25,225Z"></path>&ndash;&gt;-->
+    <!--</svg>-->
+<!--</div>-->
 
 <script src="src/js/utilities.js"></script>
 <script src="src/js/main.js"></script>

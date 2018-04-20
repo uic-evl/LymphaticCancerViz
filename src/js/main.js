@@ -247,16 +247,16 @@ var App = App || {};
   App.graphWidth = _.find(App.template.nodes, {"name": "6"}).x - _.find(App.template.nodes, {"name": "RP"}).x;
   App.graphHeight = _.find(App.template.nodes, {"name": "4"}).y - _.find(App.template.nodes, {"name": "RP"}).y;
 
-  let template_svg = d3.select("#virtualGraph")
-      .append("svg")
-      .attr("width", App.graphSVGWidth)
-      .attr("height", App.graphSVGHeight),
-
-  template_pattern = d3.select("#virtualPattern svg")
-        .attr("width", App.graphSVGWidth)
-        .attr("height", App.graphSVGHeight);
-
-  createNetwork(template_pattern, App.template);
+  // let template_svg = d3.select("#virtualGraph")
+  //     .append("svg")
+  //     .attr("width", App.graphSVGWidth)
+  //     .attr("height", App.graphSVGHeight),
+  //
+  // template_pattern = d3.select("#virtualPattern svg")
+  //       .attr("width", App.graphSVGWidth)
+  //       .attr("height", App.graphSVGHeight);
+  //
+  // createNetwork(template_pattern, App.template);
 
   function addNodes(svg, lymphNodes) {
     let nodes = svg.selectAll("circle.node")
@@ -348,60 +348,35 @@ var App = App || {};
 
     function createBubbles(svg, groups,id) {
 
-      // let group_split = _.partition(groups,["between_nodes", true]);
-
-        // groups.forEach(function(group,j){
-          // if(!group.length) return;
-
-          /* Between node group */
-          // if(j === 0){
-          //
-          //     let pattern = d3.select("#defs")
-          //       .append("mask")
-          //         .attr("id", "between-pattern_"+id)
-          //         .attr("maskUnits","userSpaceOnUse")
-          //         .attr("x",0)
-          //         .attr("y",0)
-          //         .attr("width","100%")
-          //         .attr("height","100%")
-          //       .append("g")
-          //         .attr("transform", "translate(" + App.transformX + ",-" + App.transformY + ")")
-          //         .attr("id", "bubbleSet");
-          //
-          //     /* Adds the convex hulls */
-          //     pattern.selectAll("path")
-          //         .data(group)
-          //         .enter().insert("path", "circle")
-          //         .classed("hull", true)
-          //         .classed("between_nodes", (d)=>{return d.between_nodes})
-          //         .classed("hull_left", (d)=>{return groupFill(d)})
-          //         .classed("hull_right", (d)=>{return !groupFill(d)})
-          //         .attr("d", function (d) {
-          //             if (d.nodes.length > 0) {
-          //                 return groupPath(d.nodes[0]);
-          //             }
-          //         });
-          //
-          //     d3.select(svg.node().parentNode)
-          //         .select("#overlay")
-          //         .attr("mask", "url(#between-pattern_"+id+")");
-          // }
-
-          /* Adds the convex hulls */
-          svg.selectAll("path")
+        d3.select("#between_pattern_"+id)
+            .selectAll("path")
               .data(groups)
               .enter().insert("path", "circle")
               .classed("hull", true)
-              .classed("between_nodes", (d)=>{
-                return d.between_nodes})
+              .classed("between_nodes", (d)=>{return d.between_nodes})
               .classed("hull_left", (d)=>{return groupFill(d)})
               .classed("hull_right", (d)=>{return !groupFill(d)})
               .attr("d", function (d) {
-                  if (d.nodes.length > 0) {
+                  if (d.nodes.length > 0 && d.between_nodes) {
                       return groupPath(d.nodes[0]);
                   }
-              });
-      // });
+              })
+            .attr("transform", "translate(" + App.transformX + ",-" + App.transformY + ")");
+
+      /* Adds the convex hulls */
+      svg.selectAll("path")
+          .data(groups)
+          .enter().insert("path", "circle")
+          .classed("hull", true)
+          .classed("between_nodes", (d)=>{
+            return d.between_nodes})
+          .classed("hull_left", (d)=>{return groupFill(d)})
+          .classed("hull_right", (d)=>{return !groupFill(d)})
+          .attr("d", function (d) {
+              if (d.nodes.length > 0) {
+                  return groupPath(d.nodes[0]);
+              }
+          });
     }
 
   function createNetwork(svg, data) {
@@ -427,15 +402,21 @@ var App = App || {};
   App.createVisualizations = function (ranking) {
     ranking.forEach(function (patient) {
 
-      let clone = template_pattern.node().cloneNode(true),
-          $network = $('#patient' + patient.patient)
-              .append(clone)
-              .attr("id", "svg_"+patient.patient),
-          g = $network.find('#bubbleSet')[0];
+      // let clone = template_pattern.node().cloneNode(true),
+      //     $network = $('#patient' + patient.patient)
+      //         .append(clone)
+      //         .attr("id", "svg_"+patient.patient),
+      //     g = $network.find('#bubbleSet')[0];
           // p = $network.find('#patternSet')[0];
 
+        let svg = d3.select('#patient' + patient.patient+ " svg")
+                  .attr("width", App.graphSVGWidth)
+                  .attr("height", App.graphSVGHeight)
+            ,
         /*Create the bubbles around the infected nodes */
-        createBubbles(d3.select(g), patient.groups, patient.patient);
+        g = createNetwork(svg, App.template);
+
+        createBubbles(svg.select("#bubbleSet"), patient.groups, patient.patient);
     });
   }
 
