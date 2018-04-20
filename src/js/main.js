@@ -244,19 +244,52 @@ var App = App || {};
   App.nodeRadius = 15;
 
   /* Define the end-to-end size of the graph */
-  App.graphWidth = _.find(App.template.nodes, {"name": "6"}).x - _.find(App.template.nodes, {"name": "RP"}).x;
+  App.graphWidth  = _.find(App.template.nodes, {"name": "6"}).x - _.find(App.template.nodes, {"name": "RP"}).x;
   App.graphHeight = _.find(App.template.nodes, {"name": "4"}).y - _.find(App.template.nodes, {"name": "RP"}).y;
 
-  // let template_svg = d3.select("#virtualGraph")
-  //     .append("svg")
-  //     .attr("width", App.graphSVGWidth)
-  //     .attr("height", App.graphSVGHeight),
-  //
-  // template_pattern = d3.select("#virtualPattern svg")
-  //       .attr("width", App.graphSVGWidth)
-  //       .attr("height", App.graphSVGHeight);
-  //
-  // createNetwork(template_pattern, App.template);
+    App.initializeLegend = function() {
+        let svg = d3.select("#legend"),
+            data = ["Left", "Right", "Both", "Both"],
+            itemWidth = 40,
+            itemHeight = 30,
+            width = svg.node().clientWidth,
+            color = ["#7570b3", "#1b9e77", "#1b9e77","#7570b3"];
+
+        let legendGroup = svg.append("g")
+            .attr("height", itemHeight)
+            .attr("width", width);
+            // .attr("transform", "translate("+(width-150)+",10)");
+
+        let legend = legendGroup.selectAll(".legend")
+            .data(data)
+            .enter()
+            .append("g")
+            .attr("transform", function(d,i) {
+                if(i > 2) i = 2;
+              return "translate(" +  (i * itemWidth) + "," + 10 + ")"; })
+            .attr("class","legend");
+
+        legend.append('rect')
+            .attr("width",itemWidth)
+            .attr("height",itemHeight)
+            .attr("x", function(d,i) { if(i > 2) return (2 * 5); else return (i*5)})
+            .attr("fill", function(d,i) {  return color[i]; })
+            .attr("opacity", "0.6");
+
+        legend.append('text')
+            .attr("x", function(d,i) {
+              if(i > 2) i = 2;
+              return itemWidth/2.0 + (i * 5)})
+            .attr("y", function(d,i) {if(i > 2) i = 2; return itemHeight/2.0;} )
+            .style("font-weight", "bolder")
+            // .style("stroke", "white")
+            .style("fill", "white")
+            .style("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .text(function(d,i) {
+                if(i > 2) i = 2;
+                return d; })
+    };
 
   function addNodes(svg, lymphNodes) {
     let nodes = svg.selectAll("circle.node")
@@ -401,14 +434,6 @@ var App = App || {};
 
   App.createVisualizations = function (ranking) {
     ranking.forEach(function (patient) {
-
-      // let clone = template_pattern.node().cloneNode(true),
-      //     $network = $('#patient' + patient.patient)
-      //         .append(clone)
-      //         .attr("id", "svg_"+patient.patient),
-      //     g = $network.find('#bubbleSet')[0];
-          // p = $network.find('#patternSet')[0];
-
         let svg = d3.select('#patient' + patient.patient+ " svg")
                   .attr("width", App.graphSVGWidth)
                   .attr("height", App.graphSVGHeight)
