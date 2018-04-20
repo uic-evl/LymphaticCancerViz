@@ -505,19 +505,19 @@ function Patients() {
     }
 
     function extract_nodes(patient, between){
-        return _.chain(patient.nodes)
+        let nodes =  _.chain(patient.nodes)
             .reduce(function(result, value) {
                 /* Check for two digits */
                 if( _.parseInt(value.substring(1)) > 9){
                     /* Node 2 is split into A and B */
-                    if(value[1] === "2"){
-                        result.push(value[0] + value[1] + 'A');
-                        result.push(value[0] + value[1] + 'B');
-                    }
-                    else{
-                        result.push(value[0] + value[1]);
-                    }
-                    result.push(value[0] + value[2]);
+                    // if(value[1] === "2"){
+                    //     result.push(value[0] + value[1] + 'A');
+                    //     result.push(value[0] + value[1] + 'B');
+                    // }
+                    // else{
+                    //     result.push(value[0] + value[1]);
+                    // }
+                    // result.push(value[0] + value[2]);
                     between.push(value);
                 }
                 else {
@@ -534,6 +534,8 @@ function Patients() {
             .partition(function (p) {
                 return p[0] === 'L';
             }).value();
+
+        return nodes;
     }
 
     function parse_clusters(patient, clusters, key, labels){
