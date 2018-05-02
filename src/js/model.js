@@ -638,13 +638,20 @@ function Patients() {
         .defer(d3.csv, "data/csv/clusters/03_2018/cluster_complete_3_2018_k=2.csv")
         .defer(d3.csv, "data/csv/clusters/03_2018/cluster_complete_3_2018_k=3.csv")
         .defer(d3.csv, "data/csv/clusters/03_2018/cluster_complete_3_2018_k=4.csv")
-        .defer(d3.csv, "data/csv/clusters/03_2018/cluster_weighted_4_2018_k=3.csv")
-        .defer(d3.csv, "data/csv/clusters/03_2018/cluster_weighted_41_different_4_2018.csv")
+        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_complete_4_2018_k=5.csv")
+        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_complete_4_2018_k=6.csv")
+        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_4_2018_k=3.csv")
+        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_4_2018_k=4.csv")
+        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_4_2018_k=5.csv")
+        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_41_different_4_2018.csv")
         .defer(d3.csv, "data/csv/predictions/predict_outcome_lymph.csv")
         // .defer(d3.json, "data/json/tanimoto_edges.json")
         //.defer(d3.json, "data/json/jaccard.json")
-        .await(function (error, weighted, clusters_ak2, clusters_ak3, clusters_ak5,
-                         clusters_ac2, clusters_ac3 ,clusters_a4, cluster_wc3, diff, predictions) {
+        .await(function (error, weighted,
+                         clusters_ak2, clusters_ak3, clusters_ak5,
+                         clusters_c2, clusters_c3 , clusters_c4, clusters_c5, clusters_c6,
+                         cluster_wc3, cluster_wc4, cluster_wc5,
+                         diff, predictions) {
             if (error){ return console.warn(error); }
 
             App.weighted = weighted;
@@ -657,10 +664,17 @@ function Patients() {
             App.weighted.forEach(function (patient) {
 
                 // extract the clusters based on the patient's id
-                let patient_clusters = parse_clusters(patient.id, [clusters_ak2, clusters_ak3, clusters_ak5,
-                                clusters_ac2, clusters_ac3,clusters_a4, cluster_wc3, diff],
-                    "group", ["Average, k=2", "Average, k=3", "Average, k=5",
-                                "Complete, k=2", "Complete, k=3","Complete, k=4", "Weighted, k=3", "Diff., k=1" ] ),
+                let patient_clusters = parse_clusters(patient.id,
+                    [
+                        // clusters_ak2, clusters_ak3, clusters_ak5,
+                        /*clusters_c2,*/ clusters_c3, /*clusters_c4,*/ clusters_c5, clusters_c6,
+                        cluster_wc3,cluster_wc4,cluster_wc5,
+                        diff],
+                    "group", [
+                                // "Average, k=2", "Average, k=3", "Average, k=5",
+                                /*"Complete, k=2",*/ "Complete, k=3",/*"Complete, k=4",*/"Complete, k=5","Complete, k=6",
+                                "Weighted, k=3", "Weighted, k=4", "Weighted, k=5",
+                                "Diff., k=1" ] ),
                     patient_predictions = parse_predictions(patient,predictions),
                     between = [],
                     nodes = extract_nodes(patient, between);
