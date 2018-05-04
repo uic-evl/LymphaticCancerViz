@@ -206,6 +206,10 @@ function Patients() {
         filterPatients(current);
         placeSelectedPatientFirst(current);
 
+        /* Set the menu/body margin */
+        let h = $("#menuBody")[0].clientHeight;
+        d3.select("#mainContainer").style("margin-top", h+(h/10));
+
         // Render to the screen
         App.createVisualizations(self.rankings());
     }
