@@ -47,13 +47,13 @@
     border-radius: 6px 0 6px 6px;
 }
 
-#clusterMenu, #SEMenu {
+#clusterMenu, #SEMenu, #dendroMenu {
     margin-top: 0;
     margin-left: 20px;
     min-width: inherit;
 }
 
-#clusterLabel, #SELabel {
+#clusterLabel, #SELabel, #dendroLabel {
     margin-left: 0;
 }
 
