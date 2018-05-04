@@ -11,6 +11,8 @@ function patient_sort(key, left, right) {
 function Patients() {
     let self = this,
         dropdown = document.getElementById("clusterLabel"),
+        dendroDrop = document.getElementById("dendroLabel"),
+
         SEdropdown = document.getElementById("SELabel"),
         sideEffectMap = {"Feeding Tube":"feedingTube_post", "Aspiration":"aspiration_post", "Neck Boost":"neck_boost"};
 
@@ -490,10 +492,10 @@ function Patients() {
                 self.group_class = e.target.value || e.target.firstElementChild.value;
                 let group_value = _.trim(e.target.textContent);
 
-                dropdown.firstChild.textContent = self.cluster_class + ": " + group_value + ' ';
+                dendroDrop.firstChild.textContent = self.group_class + ": " + group_value + ' ';
 
                 // set the cluster selector to the value
-                let group = {name: self.cluster_class, value: parseInt(group_value.split(" ")[1])};
+                let group = {name: self.group_class, value: parseInt(group_value.split(" ")[1])};
                 self.currentGroup(group);
 
                 if(self.currentType() === "By Cluster" && self.currentGroup()) {
