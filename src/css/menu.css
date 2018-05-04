@@ -39,6 +39,10 @@
     float: none;
 }
 
+.dropdown {
+    display: inline-block;
+}
+
 .dropdown-submenu.pull-left>.dropdown-menu {
     left: -100%;
     margin-left: 10px;
