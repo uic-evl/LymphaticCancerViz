@@ -667,12 +667,12 @@ function Patients() {
                 let patient_clusters = parse_clusters(patient.id,
                     [
                         // clusters_ak2, clusters_ak3, clusters_ak5,
-                        /*clusters_c2,*/ clusters_c3, /*clusters_c4,*/ clusters_c5, clusters_c6,
+                        clusters_c2, clusters_c3, clusters_c4, clusters_c5, clusters_c6,
                         cluster_wc3,cluster_wc4,cluster_wc5,
                         diff],
                     "group", [
                                 // "Average, k=2", "Average, k=3", "Average, k=5",
-                                /*"Complete, k=2",*/ "Complete, k=3",/*"Complete, k=4",*/"Complete, k=5","Complete, k=6",
+                                "Complete, k=2", "Complete, k=3","Complete, k=4","Complete, k=5","Complete, k=6",
                                 "Weighted, k=3", "Weighted, k=4", "Weighted, k=5",
                                 "Diff., k=1" ] ),
                     patient_predictions = parse_predictions(patient,predictions),
