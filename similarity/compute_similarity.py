@@ -465,6 +465,9 @@ if __name__ == "__main__":
         # add the nodes to the graph
         tween = parse_graph_nodes(left, right, parsed_nodes)
 
+        if tween:
+            continue
+
         # set the max number of nodes
         right_nodes = right.get_nodes()
         left_nodes = left.get_nodes()
@@ -489,7 +492,6 @@ if __name__ == "__main__":
 
         # keep the rest of the parsed attributes
         patient_attr[id] = result[int(id)]
-
 
     all_patients = rp_patients.copy()
     all_patients.update(non_rp_patients)
