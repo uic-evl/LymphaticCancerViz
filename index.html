@@ -30,7 +30,7 @@
             <div id="byPatient" class="col-md-2"></div>
             <!-- /ko -->
 
-            <div id="byCluster" data-bind="css: {'col-md-3': currentType()=='By Cluster', 'col-md-2': currentType()=='By Patient'}">
+            <div id="byCluster" class="col-md-2" data-bind="style:{ width: currentType() === 'By Patient' ? 0 : 'inherit' }">
                 <span data-bind="text: currentType"></span>
             </div>
 
@@ -75,7 +75,7 @@
                 </select>
             </div>
 
-            <div class="col-md-1">
+            <div class="col-md-2">
                <svg id="legend" width="100%" height="50px">
 
                </svg>
@@ -85,7 +85,7 @@
     </div>
 </nav>
 
-<div class="container-fluid" style="margin-top: 55px">
+<div id="mainContainer" class="container-fluid" >
     <!--<div data-bind="css: { row: ($index()+1) % $parent.maxNodes == 0 }">-->
     <div id="appBody" class="row hidden" data-bind="foreach: rankings">
         <div class="patient_container" data-bind=" css: { 'col-md-2': $parent.maxNodes > 5, 'col-md-3': $parent.maxNodes < 6  } ">
