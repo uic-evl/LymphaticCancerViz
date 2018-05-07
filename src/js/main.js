@@ -253,7 +253,7 @@ var App = App || {};
             itemWidth = 40,
             itemHeight = 30,
             width = svg.node().clientWidth,
-            color = ["#7570b3", "#1b9e77", "#1b9e77","#7570b3"];
+            color = ["#1b9e77", "#7570b3", "#1b9e77", "#7570b3"];
 
         let legendGroup = svg.append("g")
             .attr("height", itemHeight)
