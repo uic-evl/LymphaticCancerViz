@@ -36,37 +36,37 @@ var App = App || {};
       name: "3",
       x: 132,
       y: 140,
-      index: 4
+      index: 3
     },
     {
       name: "4",
       x: 132,
       y: 232,
-      index: 5
+      index: 4
     },
     {
       name: "5A",
       x: 41,
       y: 140,
-      index: 6
+      index: 5
     },
     {
       name: "5B",
       x: 41,
       y: 232,
-      index: 7
+      index: 6
     },
     {
       name: "6",
       x: 230,
       y: 186,
-      index: 8
+      index: 7
     },
     {
       name: "RP",
       x: 17,
       y: 20,
-      index: 9
+      index: 8
     },
 
     // {
@@ -95,8 +95,8 @@ var App = App || {};
     },
     {
       name: "2",
-      x: 80,
-      y: 112,
+      x: 65,
+      y: 101,
       index: 2
     },
     // {
@@ -109,37 +109,37 @@ var App = App || {};
       name: "3",
       x: 100,
       y: 150,
-      index: 4
+      index: 3
     },
     {
       name: "4",
       x: 100,
       y: 225,
-      index: 5
+      index: 4
     },
     {
       name: "5A",
       x: 25,
       y: 150,
-      index: 6
+      index: 5
     },
     {
       name: "5B",
       x: 25,
       y: 225,
-      index: 7
+      index: 6
     },
     {
       name: "6",
       x: 165,
       y: 186,
-      index: 8
+      index: 7
     },
     {
       name: "RP",
       x: 15,
       y: 50,
-      index: 9
+      index: 8
     }];
   App.template.links = [
     {
@@ -155,7 +155,7 @@ var App = App || {};
     {
       source: _.find(App.template.nodes, {"name": "1B"}).index,
       target: _.find(App.template.nodes, {"name": "2"}).index,
-      name: "1B-2A"
+      name: "1B-2"
     },
     {
       source: _.find(App.template.nodes, {"name": "1B"}).index,
@@ -170,7 +170,7 @@ var App = App || {};
     {
       source: _.find(App.template.nodes, {"name": "2"}).index,
       target: _.find(App.template.nodes, {"name": "3"}).index,
-      name: "2A-3"
+      name: "2-3"
     },
     // {
     //   source: _.find(App.template.nodes, {"name": "2A"}).index,
@@ -179,7 +179,7 @@ var App = App || {};
     {
       source: _.find(App.template.nodes, {"name": "2"}).index,
       target: _.find(App.template.nodes, {"name": "5A"}).index,
-      name: "2B-5A"
+      name: "2-5A"
     },
     {
       source: _.find(App.template.nodes, {"name": "3"}).index,
