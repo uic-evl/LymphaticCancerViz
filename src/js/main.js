@@ -21,17 +21,17 @@ var App = App || {};
       index: 1
     },
     {
-      name: "2A",
+      name: "2",
       x: 112,
       y: 112,
       index: 2
     },
-    {
-      name: "2B",
-      x: 82,
-      y: 80,
-      index: 3
-    },
+    // {
+    //   name: "2B",
+    //   x: 82,
+    //   y: 80,
+    //   index: 3
+    // },
     {
       name: "3",
       x: 132,
@@ -94,17 +94,17 @@ var App = App || {};
       index: 1
     },
     {
-      name: "2A",
+      name: "2",
       x: 80,
       y: 112,
       index: 2
     },
-    {
-      name: "2B",
-      x: 50,
-      y: 90,
-      index: 3
-    },
+    // {
+    //   name: "2B",
+    //   x: 50,
+    //   y: 90,
+    //   index: 3
+    // },
     {
       name: "3",
       x: 100,
@@ -154,7 +154,7 @@ var App = App || {};
     },
     {
       source: _.find(App.template.nodes, {"name": "1B"}).index,
-      target: _.find(App.template.nodes, {"name": "2A"}).index,
+      target: _.find(App.template.nodes, {"name": "2"}).index,
       name: "1B-2A"
     },
     {
@@ -162,13 +162,13 @@ var App = App || {};
       target: _.find(App.template.nodes, {"name": "3"}).index,
       name: "1B-3"
     },
+    // {
+    //   source: _.find(App.template.nodes, {"name": "2A"}).index,
+    //   target: _.find(App.template.nodes, {"name": "2B"}).index,
+    //   name: "2A-2B"
+    // },
     {
-      source: _.find(App.template.nodes, {"name": "2A"}).index,
-      target: _.find(App.template.nodes, {"name": "2B"}).index,
-      name: "2A-2B"
-    },
-    {
-      source: _.find(App.template.nodes, {"name": "2A"}).index,
+      source: _.find(App.template.nodes, {"name": "2"}).index,
       target: _.find(App.template.nodes, {"name": "3"}).index,
       name: "2A-3"
     },
@@ -177,7 +177,7 @@ var App = App || {};
     //   target: _.find(App.template.nodes, {"name": "5A"}).index,
     // },
     {
-      source: _.find(App.template.nodes, {"name": "2B"}).index,
+      source: _.find(App.template.nodes, {"name": "2"}).index,
       target: _.find(App.template.nodes, {"name": "5A"}).index,
       name: "2B-5A"
     },
@@ -219,10 +219,10 @@ var App = App || {};
   App.template.edgeList = [
     ["1A", "1B"],
     ["1A", "6"],
-    ["1B", "2A" ],
-    ["2A", "2B" ],
-    ["2A" , "3" ],
-    ["2B" , "5A" ],
+    ["1B", "2" ],
+    // ["2A", "2B" ],
+    ["2" , "3" ],
+    ["2" , "5A" ],
     ["3" , "4" ],
     ["3" , "5A" ],
     ["3" , "6" ],

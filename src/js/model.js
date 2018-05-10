@@ -600,13 +600,14 @@ function Patients() {
                     between.push(value);
                 }
                 else {
-                    if(value.length === 2 && value[1] === "2"){
-                        result.push(value[0] + value[1] + 'A');
-                        result.push(value[0] + value[1] + 'B');
-                    }
-                    else {
-                        result.push(value);
-                    }
+                    result.push(value);
+                    // if(value.length === 2 && value[1] === "2"){
+                    //     result.push(value[0] + value[1] + 'A');
+                    //     result.push(value[0] + value[1] + 'B');
+                    // }
+                    // else {
+                    //     result.push(value);
+                    // }
                 }
                 return result;
             }, [])
@@ -643,13 +644,13 @@ function Patients() {
                 semantic_idx = (btw[0] === "L") ? 0 : 1;
 
             for(let i = 0; i < nodes_split.length; i++){
-                if(nodes_split[i] === "2") {
-                    tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+"2A", btw[0]+"2B"]);
-                    between_nodes = [btw[0]+"2A", btw[0]+"2B"];
-                }
-                else {
+                // if(nodes_split[i] === "2") {
+                //     tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+"2A", btw[0]+"2B"]);
+                //     between_nodes = [btw[0]+"2A", btw[0]+"2B"];
+                // }
+                // else {
                     between_nodes.push(btw[0]+nodes_split[i]);
-                }
+//                }
             }
         });
 
