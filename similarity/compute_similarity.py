@@ -373,7 +373,7 @@ def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
             current_graph = right
 
         # if the node is 5, then we add both a and b
-        if len(node[1:]) == 1 and (node[1:] == "5" or node[1:] == "1" or node[1:] == "2"):
+        if len(node[1:]) == 1 and (node[1:] == "5" or node[1:] == "1"):
             new_nodes = [node + 'A', node + 'B']
         elif node[1:].lower() == "3a":
             new_nodes = [node[0] + '3']
@@ -384,11 +384,7 @@ def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
             if n[1:] == "23" or n[1:] == "234" or n[1:] == "34":
                 tween = 1
                 for c in n[1:]:
-                    if c == "2":
-                        set_graph_node(current_graph, semantic + "2A", 0.125)
-                        set_graph_node(current_graph, semantic + "2B", 0.125)
-                    else:
-                        set_graph_node(current_graph, semantic + c, 0.25)
+                    set_graph_node(current_graph, semantic + c, 0.25)
             else:
                 if n[1:].lower() == "rp":
                     set_graph_node(current_graph, n, -3.0)
@@ -480,7 +476,7 @@ if __name__ == "__main__":
             patient.set_graphs(left, right, 1.0)
         else:
             patient.set_output_nodes(parsed_nodes)
-            patient.set_graphs(left, right, 0.125)
+            patient.set_graphs(left, right, 0.25)
 
         # add the graphs to the non-rp dictionary
         if "rp" not in (right_nodes + left_nodes):
