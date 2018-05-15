@@ -413,7 +413,7 @@ if __name__ == "__main__":
 
     with open(data, 'r') as csvFile:
         # create the csv reader
-        reader = csv.DictReader(csvFile, delimiter='~')
+        reader = csv.DictReader(csvFile, delimiter='\t')
         # parse the rows
         result = parse_input_data(reader)
 
@@ -460,9 +460,9 @@ if __name__ == "__main__":
 
         # add the nodes to the graph
         tween = parse_graph_nodes(left, right, parsed_nodes)
-
-        if tween:
-            continue
+        #
+        # if tween:
+        #     continue
 
         # set the max number of nodes
         right_nodes = right.get_nodes()
