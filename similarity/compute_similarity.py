@@ -359,7 +359,7 @@ def parse_tumor_position(tumor_position):
     return tumor_position
 
 
-def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
+def parse_graph_nodes(id, parsed_nodes):
     # add the nodes to the graph
     tween = 0
     for node in parsed_nodes:
@@ -374,7 +374,8 @@ def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
 
         # if the node is 5, then we add both a and b
         if len(node[1:]) == 1 and (node[1:] == "5" or node[1:] == "1"):
-            print node[1:]
+
+            print node[1:] + " " + str(id)
             new_nodes = [node + 'A', node + 'B']
         elif node[1:].lower() == "3a":
             new_nodes = [node[0] + '3']
@@ -460,7 +461,7 @@ if __name__ == "__main__":
         right = Graph(lymph_nodes, lymph_nodes)
 
         # add the nodes to the graph
-        tween = parse_graph_nodes(left, right, parsed_nodes)
+        tween = parse_graph_nodes(id, parsed_nodes)
         #
         # if tween:
         #     continue
