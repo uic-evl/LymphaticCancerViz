@@ -462,9 +462,9 @@ if __name__ == "__main__":
 
         # add the nodes to the graph
         tween = parse_graph_nodes(id, parsed_nodes)
-        #
-        # if tween:
-        #     continue
+
+        if tween:
+            continue
 
         # set the max number of nodes
         right_nodes = right.get_nodes()
