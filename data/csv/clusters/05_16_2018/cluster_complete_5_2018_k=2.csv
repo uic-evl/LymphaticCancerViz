@@ -1,4 +1,4 @@
-patientId,clusterId,dendogramId,group
+patientId,clusterId,dendogramId,groupId
 1,45,1,2
 2,66,2,1
 3,45,3,2

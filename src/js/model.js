@@ -621,7 +621,7 @@ function Patients() {
         /* iterate over the clusters and extract the patient's cluster */
         let centers = {};
         clusters.forEach(function(cluster,i){
-            let pat = _.find(cluster, {"patientId": String(patient)});
+            let pat = _.find(cluster, function(o) {return o["patientId"] == patient})//{"patientId": String(patient)});
             if(pat) {
                 centers[labels[i]] = parseInt(pat[key]);
             }
@@ -725,15 +725,15 @@ function Patients() {
         // .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=2.csv")
         // .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=3.csv")
         // .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=5.csv")
-        .defer(d3.csv, "data/csv/clusters/05_2018/cluster_complete_5_2018_k=2.csv")
-        .defer(d3.csv, "data/csv/clusters/05_2018/cluster_complete_5_2018_k=3.csv")
-        .defer(d3.csv, "data/csv/clusters/05_2018/cluster_complete_5_2018_k=4.csv")
-        .defer(d3.csv, "data/csv/clusters/05_2018/cluster_complete_5_2018_k=5.csv")
-        .defer(d3.csv, "data/csv/clusters/05_2018/cluster_complete_5_2018_k=6.csv")
-        .defer(d3.csv, "data/csv/clusters/05_2018/cluster_weighted_5_2018_k=3.csv")
-        .defer(d3.csv, "data/csv/clusters/05_2018/cluster_weighted_5_2018_k=4.csv")
-        .defer(d3.csv, "data/csv/clusters/05_2018/cluster_weighted_5_2018_k=5.csv")
-        .defer(d3.csv, "data/csv/clusters/05_10_2018/cluster_weighted_5_2018_k=6.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=2.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=3.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=4.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=5.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=6.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=3.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=4.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=5.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=6.csv")
         // .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_41_different_4_2018.csv")
         .defer(d3.csv, "data/csv/predictions/predict_outcome_lymph.csv")
         // .defer(d3.json, "data/json/tanimoto_edges.json")
