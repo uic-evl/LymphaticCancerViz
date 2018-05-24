@@ -8,7 +8,7 @@ now = datetime.datetime.now()
 def csv_from_excel(wkbk, name, sheet):
     wb = xlrd.open_workbook(wkbk)
     sh = wb.sheet_by_name(sheet)
-    your_csv_file = open('cluster_' + name[0] + '_' + str(now.month) + '_' + str(now.year) + '_k=' + prefix[1] + '_20.csv', 'wb')
+    your_csv_file = open('cluster_' + name[0] + '_' + str(now.month) + '_' + str(now.year) + '_k=' + prefix[1] + '.csv', 'wb')
     wr = csv.writer(your_csv_file)
 
     for rownum in xrange(sh.nrows):
