@@ -734,7 +734,8 @@ function Patients() {
         .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=4.csv")
         .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=5.csv")
         .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=6.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/unique_cluster.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=9.csv")
+        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=10.csv")
         // .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_41_different_4_2018.csv")
         .defer(d3.csv, "data/csv/predictions/predict_outcome_lymph.csv")
         // .defer(d3.json, "data/json/tanimoto_edges.json")
@@ -742,7 +743,7 @@ function Patients() {
         .await(function (error, weighted,
                          // clusters_ak2, clusters_ak3, clusters_ak5,
                          clusters_c2, clusters_c3 , clusters_c4, clusters_c5, clusters_c6,
-                         cluster_wc3, cluster_wc4, cluster_wc5, cluster_wc6, unique,
+                         cluster_wc3, cluster_wc4, cluster_wc5, cluster_wc6,cluster_wc9, cluster_wc10,
                          // diff,
                          predictions) {
             if (error){ return console.warn(error); }
@@ -761,14 +762,14 @@ function Patients() {
                     [
                         // clusters_ak2, clusters_ak3, clusters_ak5,
                         clusters_c2, clusters_c3, clusters_c4, clusters_c5, clusters_c6,
-                        cluster_wc3,cluster_wc4,cluster_wc5,cluster_wc6,unique
+                        cluster_wc3,cluster_wc4,cluster_wc5,cluster_wc6,cluster_wc9,cluster_wc10
                     //    diff
                     ],
                     "groupId",
                     [
                                 // "Average, k=2", "Average, k=3", "Average, k=5",
                                 "Complete, k=2", "Complete, k=3","Complete, k=4","Complete, k=5","Complete, k=6",
-                                "Weighted, k=3", "Weighted, k=4", "Weighted, k=5", "Weighted, k=6", "Unique"
+                                "Weighted, k=3", "Weighted, k=4", "Weighted, k=5", "Weighted, k=6","Weighted, k=9","Weighted, k=10"
                                 // "Diff., k=1"
                     ] ),
                     patient_dendogramIds = parse_clusters(patient.id,
@@ -777,7 +778,7 @@ function Patients() {
                         /*clusters_c2, clusters_c3, clusters_c4, clusters_c5,*/
                         clusters_c6,
                         // cluster_wc3,cluster_wc4,cluster_wc5,
-                        cluster_wc6,unique
+                        cluster_wc6, cluster_wc9, cluster_wc10
                         //    diff
                     ],
                     "dendogramId",
@@ -787,7 +788,7 @@ function Patients() {
                         // "Complete, k=2", "Complete, k=3",/*"Complete, k=4",*/"Complete, k=5",
                         "Complete, k=6",
                         // "Weighted, k=3", "Weighted, k=4", "Weighted, k=5",
-                        "Weighted, k=6","Unique"
+                        "Weighted, k=6", "Weighted, k=9", "Weighted, k=10",
                         // "Diff., k=1"
                     ] ),
                     patient_predictions = parse_predictions(patient,predictions),
