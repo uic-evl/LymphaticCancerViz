@@ -53,7 +53,6 @@ def write_to_csv(current_patient, patient_order, scores):
 
     return
 
-
 # Write out the patient metadata and scores to the JSON file for the web interface
 def write_to_json(current_patient, patient_order, scores):
     # write the output
@@ -279,7 +278,10 @@ def compute_similarity(patient_list):
 
             # Compute the scores
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
+
+
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
+
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
 
@@ -502,7 +504,7 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['weighted']:
+    for output in ['jaccard']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_edges.json'
