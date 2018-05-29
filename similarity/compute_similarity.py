@@ -273,23 +273,21 @@ def compute_similarity(patient_list):
             common_combined_nodes = sorted(
                 list(set(patientA.get_all_combined_nodes()) | set(patientB.get_all_combined_nodes())))
 
-            bigrams_a = patientA.get_all_bigrams()
-            bigrams_b = patientB.get_all_bigrams()
+            bigrams_a = patientA.get_all_combined_nodes_bigrams()
+            bigrams_b = patientB.get_all_combined_nodes_bigrams()
 
-            common_combined_bigrams = sorted( list( set(bigrams_a) | set(bigrams_b) ) )
-
-            common_nodes_bigrams = common_combined_nodes + common_combined_bigrams
+            common_nodes_bigrams = sorted( list( set(bigrams_a) | set(bigrams_b) ) )
 
             # Create the edge vector for each patient
             vector_a_edges = patientA.get_edges_vector(common_list)
             vector_b_edges = patientB.get_edges_vector(common_list)
 
             #  Create the node vector for each patient
-            vector_a_nodes = patientA.get_nodes_vector(common_combined_nodes)
-            vector_b_nodes = patientB.get_nodes_vector(common_combined_nodes)
+            vector_a_nodes = patientA.get_nodes_vector(common_combined_nodes, False)
+            vector_b_nodes = patientB.get_nodes_vector(common_combined_nodes, False)
 
-            vector_a_nodes_bigrams = patientA.get_nodes_vector(common_nodes_bigrams)
-            vector_b_nodes_bigrams = patientB.get_nodes_vector(common_nodes_bigrams)
+            vector_a_nodes_bigrams = patientA.get_nodes_vector(common_nodes_bigrams, True)
+            vector_b_nodes_bigrams = patientB.get_nodes_vector(common_nodes_bigrams, True)
 
             # Compute the scores
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
