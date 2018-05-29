@@ -53,6 +53,7 @@ def write_to_csv(current_patient, patient_order, scores):
 
     return
 
+
 # Write out the patient metadata and scores to the JSON file for the web interface
 def write_to_json(current_patient, patient_order, scores):
     # write the output
@@ -153,15 +154,15 @@ def init_matrix_file(m_header):
     m.write('\r')
 
 
-def read_matrix_data(file):
+def read_matrix_data(mfile):
     global lymph_nodes
     global adjacency_matrix
 
-    with open(file, 'r') as csvFile:
+    with open(mfile, 'r') as mCsvFile:
         # create a csv reader
-        reader = csv.reader(csvFile, delimiter=',')
+        mReader = csv.reader(mCsvFile, delimiter=',')
         # iterate over the rows of the csv file
-        for row in reader:
+        for row in mReader:
 
             # first row, read the lymph node headers
             if not row[0]:
@@ -318,11 +319,11 @@ def set_graph_node(cg, infected, score):
     cg.set_value_at(infected[1:], infected[1:], score)
 
 
-def parse_input_data(reader):
-    result = {}
-    for row in reader:
+def parse_input_data(m_reader):
+    m_result = {}
+    for row in m_reader:
         key = row.pop('Dummy ID')
-        if key in result:
+        if key in m_result:
             pass
         parsed = {}
         for attr in row:
@@ -331,40 +332,40 @@ def parse_input_data(reader):
                 id = id[:-1]
             parsed[id] = row[attr]
         if key.isdigit():
-            result[int(key)] = parsed
-    return result
+            m_result[int(key)] = parsed
+    return m_result
 
 
-def parse_patient_nodes(nodes):
+def parse_patient_nodes(m_nodes):
     # strip out the white space string
-    stripped_nodes = [x.strip(" ").replace('L RPLN', 'LRP') for x in nodes]
+    stripped_nodes = [x.strip(" ").replace('L RPLN', 'LRP') for x in m_nodes]
     stripped_nodes = [x.strip(" ").replace('R RPLN', 'RRP') for x in stripped_nodes]
 
     stripped_nodes = list(set(stripped_nodes))
 
-    parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in stripped_nodes]
-    parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
-    parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in parsed_nodes]
+    m_parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in stripped_nodes]
+    m_parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in m_parsed_nodes]
+    m_parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in m_parsed_nodes]
 
-    return parsed_nodes
-
-
-def parse_tumor_position(tumor_position):
-    if tumor_position.lower() == 'l':
-        tumor_position = "Left"
-    elif tumor_position.lower() == 'r':
-        tumor_position = "Right"
-    elif tumor_position.lower() == 'bilateral':
-        tumor_position = "BiLat."
-    elif tumor_position.lower() == "midline":
-        tumor_position = "Midline"
-    return tumor_position
+    return m_parsed_nodes
 
 
-def parse_graph_nodes(id, parsed_nodes):
+def parse_tumor_position(m_tumor_position):
+    if m_tumor_position.lower() == 'l':
+        m_tumor_position = "Left"
+    elif m_tumor_position.lower() == 'r':
+        m_tumor_position = "Right"
+    elif m_tumor_position.lower() == 'bilateral':
+        m_tumor_position = "BiLat."
+    elif m_tumor_position.lower() == "midline":
+        m_tumor_position = "Midline"
+    return m_tumor_position
+
+
+def parse_graph_nodes(m_id, m_parsed_nodes):
     # add the nodes to the graph
-    tween = 0
-    for node in parsed_nodes:
+    m_tween = 0
+    for node in m_parsed_nodes:
         if len(node) > 5:
             continue
 
@@ -374,33 +375,34 @@ def parse_graph_nodes(id, parsed_nodes):
         if node[0] == 'R':
             current_graph = right
 
-        # if the node is 5, then we add both a and b
-        if len(node[1:]) == 1 and (node[1:] == "5" or node[1:] == "1"):
-
-            print node[1:] + " " + str(id)
+        # if the node is 2 and no sub node, then we add both a and b
+        if len(node[1:]) == 1 and (node[1:] == "2"):
             new_nodes = [node + 'A', node + 'B']
-        elif node[1:].lower() == "3a":
-            new_nodes = [node[0] + '3']
 
         # add the nodes to the graph
         for n in new_nodes:
             semantic = n[0]
             if n[1:] == "23" or n[1:] == "234" or n[1:] == "34":
-                tween = 1
+                m_tween = 1
                 for c in n[1:]:
-                    set_graph_node(current_graph, semantic + c, 0.25)
+                    if c == "2":
+                        set_graph_node(current_graph, semantic + "2A", 0.125)
+                        set_graph_node(current_graph, semantic + "2B", 0.125)
+                    else:
+                        set_graph_node(current_graph, semantic + c, 0.25)
             else:
                 if n[1:].lower() == "rp":
                     set_graph_node(current_graph, n, -3.0)
                 else:
                     set_graph_node(current_graph, n, 1.0)
-    return tween
+    return m_tween
 
 
 # Driver starts here
 if __name__ == "__main__":
     data = sys.argv[1]
     connectivity = sys.argv[2]
+    version = sys.argv[3]
 
     patient_attr = {}
     result = {}
@@ -409,7 +411,7 @@ if __name__ == "__main__":
     # iterate over the rows of the csv file
     valid_ids = []
 
-    node_column_name = 'Affected_Lymph_node_UPPER'
+    node_column_name = 'Affected_Lymph_node_' + str(version)
     tumor_column_name = 'Tm_Laterality'
 
     # read in the adjacency matrix
@@ -464,7 +466,7 @@ if __name__ == "__main__":
 
         # add the nodes to the graph
         tween = parse_graph_nodes(id, parsed_nodes)
-
+        #
         if tween:
             continue
 
@@ -504,7 +506,7 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['jaccard']:
+    for output in ['nodes']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_edges.json'
