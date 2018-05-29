@@ -18,6 +18,7 @@ g_sorted_scores = {}
 
 tanimoto_edges_output = {}
 tanimoto_nodes_output = {}
+tanimoto_bigrams_output = {}
 tanimoto_weighted_output = {}
 jaccard_output = {}
 
@@ -148,17 +149,17 @@ def write_patient_data(scores_all):
 
 def init_matrix_file(m_header):
     global m
-    m = open('data/matrices/' + output + '_' + 'matrix.csv', 'w')
+    m = open('./data/matrices/' + output + '_' + 'matrix.csv', 'w')
     m.write(",")
     m.write(m_header)
     m.write('\r')
 
 
-def read_matrix_data(mfile):
+def read_matrix_data(m_file):
     global lymph_nodes
     global adjacency_matrix
 
-    with open(mfile, 'r') as mCsvFile:
+    with open(m_file, 'r') as mCsvFile:
         # create a csv reader
         mReader = csv.reader(mCsvFile, delimiter=',')
         # iterate over the rows of the csv file
@@ -242,7 +243,8 @@ def sort_by_scores(scores, other_patients):
 
 
 def compute_similarity(patient_list):
-    global patients_pointer, tanimoto_edges_output, tanimoto_nodes_output, tanimoto_weighted_output, jaccard_output
+    global patients_pointer, tanimoto_edges_output, tanimoto_nodes_output, tanimoto_weighted_output, \
+        tanimoto_bigrams_output, jaccard_output
 
     # calculate the similarity and output it to the files
     od = OrderedDict(sorted(patient_list.items()))
@@ -257,6 +259,8 @@ def compute_similarity(patient_list):
         # store the scores of the test
         tanimoto_edges_scores = []
         tanimoto_nodes_scores = []
+        tanimoto_bigrams_scores = []
+
         jaccard_scores = []
 
         # iterate over all of the other patients
@@ -269,6 +273,13 @@ def compute_similarity(patient_list):
             common_combined_nodes = sorted(
                 list(set(patientA.get_all_combined_nodes()) | set(patientB.get_all_combined_nodes())))
 
+            bigrams_a = patientA.get_all_bigrams()
+            bigrams_b = patientB.get_all_bigrams()
+
+            common_combined_bigrams = sorted( list( set(bigrams_a) | set(bigrams_b) ) )
+
+            common_nodes_bigrams = common_combined_nodes + common_combined_bigrams
+
             # Create the edge vector for each patient
             vector_a_edges = patientA.get_edges_vector(common_list)
             vector_b_edges = patientB.get_edges_vector(common_list)
@@ -277,11 +288,13 @@ def compute_similarity(patient_list):
             vector_a_nodes = patientA.get_nodes_vector(common_combined_nodes)
             vector_b_nodes = patientB.get_nodes_vector(common_combined_nodes)
 
+            vector_a_nodes_bigrams = patientA.get_nodes_vector(common_nodes_bigrams)
+            vector_b_nodes_bigrams = patientB.get_nodes_vector(common_nodes_bigrams)
+
             # Compute the scores
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
-
-
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
+            tanimoto_bigrams = sim.compute_tanimoto_coeff(vector_a_nodes_bigrams, vector_b_nodes_bigrams)
 
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
@@ -289,6 +302,7 @@ def compute_similarity(patient_list):
             # Save the scores to their respective arrays
             tanimoto_edges_scores.append(tanimoto_edges)
             tanimoto_nodes_scores.append(tanimoto_nodes)
+            tanimoto_bigrams_scores.append(tanimoto_bigrams)
             jaccard_scores.append(jaccard)
 
         # Find the maximum score (necessary because there may be no edges )
@@ -300,12 +314,15 @@ def compute_similarity(patient_list):
 
         # Normalize all of the scores (tanimoto nodes, jaccard, and weighted tanimoto)
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
+        tanimoto_bigrams_scores = [float(i) / max(tanimoto_bigrams_scores) for i in tanimoto_bigrams_scores]
         jaccard_scores = [float(i) / max(jaccard_scores) for i in jaccard_scores]
-        tanimoto = [tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in
+        tanimoto = [tanimoto_edges_scores[i] * 0.5 + tanimoto_bigrams_scores[i] * 0.5 for i in
                     range(len(tanimoto_edges_scores))]
 
         tanimoto_edges_output[keyA] = sort_by_scores(tanimoto_edges_scores, other_patients)
         tanimoto_nodes_output[keyA] = sort_by_scores(tanimoto_nodes_scores, other_patients)
+        tanimoto_bigrams_output[keyA] = sort_by_scores(tanimoto_bigrams_scores, other_patients)
+
         tanimoto_weighted_output[keyA] = sort_by_scores(tanimoto, other_patients)
         jaccard_output[keyA] = sort_by_scores(jaccard_scores, other_patients)
 
@@ -506,7 +523,7 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['nodes']:
+    for output in ['bigram', 'nodes']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_edges.json'
@@ -522,6 +539,11 @@ if __name__ == "__main__":
             file_name = 'data/json/tanimoto_weighted.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_weighted_output
+        elif output == "bigram":
+            init_matrix_file(header)
+            file_name = 'data/json/tanimoto_bigrams.json'
+            f = open(file_name, 'w')
+            scores_out = tanimoto_bigrams_output
         elif output == "jaccard":
             init_matrix_file(header)
             file_name = 'data/json/jaccard.json'

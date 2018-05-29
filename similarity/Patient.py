@@ -16,6 +16,29 @@ class Patient(object):
         self.adjacency_matrix = []
         self.bilateral = []
         self.output_nodes = []
+        self.bigrams_left = []
+        self.bigrams_right = []
+
+    def set_bigrams_left(self):
+        left_nodes = self.left_graph.get_nodes()
+        for s in list(itertools.combinations(left_nodes,2)):
+            # the two nodes are connected
+            n1 = self.lymph_nodes.index(s[0])
+            n2 = self.lymph_nodes.index(s[1])
+
+            if int(self.adjacency_matrix[n1][n2]) == 1:
+                self.bigrams_left.append(s[0] + s[1])
+
+    def set_bigrams_right(self):
+        right_nodes = self.right_graph.get_nodes()
+        for s in list(itertools.combinations(right_nodes, 2)):
+            # the two nodes are connected
+            n1 = self.lymph_nodes.index(s[0])
+            n2 = self.lymph_nodes.index(s[1])
+
+            if int(self.adjacency_matrix[n1][n2]) == 1:
+                self.bigrams_right.append(s[0]+s[1])
+
 
     def set_output_nodes(self, lymph_nodes):
         self.output_nodes = lymph_nodes
@@ -32,9 +55,6 @@ class Patient(object):
             row = self.lymph_nodes.index(node)
             for idx, col in enumerate(self.adjacency_matrix[row]):
                 neighbor = self.lymph_nodes[idx]
-                # # check for the connecting edges
-                # if node == neighbor and (node == '6' or node == '1a'):
-                #     self.left_graph.set_edge(node, node)
 
                 if int(col) == 1 and node != neighbor:
                     self.left_graph.set_edge(node, neighbor,value)
@@ -44,12 +64,12 @@ class Patient(object):
             for idx, col in enumerate(self.adjacency_matrix[row]):
                 neighbor = self.lymph_nodes[idx]
 
-                # check for the connecting edges
-                # if node == neighbor and (node == '6' or node == '1a'):
-                #     self.right_graph.set_edge(node, node)
-
                 if int(col) == 1 and node != neighbor:
                     self.right_graph.set_edge(node, neighbor,value)
+
+        self.set_bigrams_left()
+        self.set_bigrams_right()
+
 
     def set_adjacency_matrix(self, matrix):
         self.adjacency_matrix = matrix
@@ -82,7 +102,7 @@ class Patient(object):
             n2 = self.lymph_nodes.index(s[1])
 
             if int(self.adjacency_matrix[n1][n2]) == 1:
-                nodes_left.append(s[0] + s[1])
+                #nodes_left.append(s[0] + s[1])
 
                 if s[0] not in included_left:
                     included_left.append(s[0])
@@ -107,7 +127,7 @@ class Patient(object):
             n2 = self.lymph_nodes.index(s[1])
 
             if int(self.adjacency_matrix[n1][n2]) == 1:
-                nodes_right.append(s[0]+s[1])
+                #nodes_right.append(s[0]+s[1])
 
                 if s[0] not in included_right:
                     included_right.append(s[0])
@@ -121,6 +141,15 @@ class Patient(object):
                 nodes_right.append(r)
 
         return nodes_right
+
+    def get_bigrams_left(self):
+        return self.bigrams_left
+
+    def get_bigrams_right(self):
+        return self.bigrams_right
+
+    def get_all_bigrams(self):
+        return sorted(self.get_bigrams_left() + self.get_bigrams_right())
 
     def get_all_combined_nodes(self):
         left_nodes = self.get_combined_left_nodes()
@@ -184,9 +213,6 @@ class Patient(object):
 
         left_edges = self.left_graph.get_edges()
         right_edges = self.right_graph.get_edges()
-
-        value_left = 1
-        value_right = 1
 
         vector = np.zeros(len(common_edges))
 
