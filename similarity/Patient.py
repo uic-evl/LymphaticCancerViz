@@ -142,6 +142,56 @@ class Patient(object):
 
         return nodes_right
 
+    def get_combined_right_nodes_bigrams(self):
+        right_nodes = self.right_graph.get_nodes()
+        nodes_right = []
+        included_right = []
+        for s in list(itertools.combinations(right_nodes, 2)):
+            # the two nodes are connected
+            n1 = self.lymph_nodes.index(s[0])
+            n2 = self.lymph_nodes.index(s[1])
+
+            if int(self.adjacency_matrix[n1][n2]) == 1:
+                nodes_right.append(s[0]+s[1])
+
+                if s[0] not in included_right:
+                    included_right.append(s[0])
+                    nodes_right.append(s[0])
+                if s[1] not in included_right:
+                    included_right.append(s[1])
+                    nodes_right.append(s[1])
+
+        for r in right_nodes:
+            if r not in included_right:
+                nodes_right.append(r)
+
+        return nodes_right
+
+    def get_combined_left_nodes_bigrams(self):
+        left_nodes = self.left_graph.get_nodes()
+        nodes_left = []
+        included_left = []
+        for s in list(itertools.combinations(left_nodes,2)):
+            # the two nodes are connected
+            n1 = self.lymph_nodes.index(s[0])
+            n2 = self.lymph_nodes.index(s[1])
+
+            if int(self.adjacency_matrix[n1][n2]) == 1:
+                #nodes_left.append(s[0] + s[1])
+
+                if s[0] not in included_left:
+                    included_left.append(s[0])
+                    nodes_left.append(s[0])
+                if s[1] not in included_left:
+                    included_left.append(s[1])
+                    nodes_left.append(s[1])
+
+        for l in left_nodes:
+            if l not in included_left:
+                nodes_left.append(l)
+
+        return nodes_left
+
     def get_bigrams_left(self):
         return self.bigrams_left
 
@@ -154,6 +204,14 @@ class Patient(object):
     def get_all_combined_nodes(self):
         left_nodes = self.get_combined_left_nodes()
         right_nodes = self.get_combined_right_nodes()
+
+        self.bilateral = ["Bilateral"] if (len(left_nodes) > 0 and len(right_nodes) > 0) else []
+
+        return sorted(left_nodes + right_nodes + self.bilateral)
+
+    def get_all_combined_nodes_bigrams(self):
+        left_nodes = self.get_combined_left_nodes_bigrams()
+        right_nodes = self.get_combined_right_nodes_bigrams()
 
         self.bilateral = ["Bilateral"] if (len(left_nodes) > 0 and len(right_nodes) > 0) else []
 
@@ -177,10 +235,14 @@ class Patient(object):
     def get_gender(self):
         return self.gender
 
-    def get_nodes_vector(self, common_nodes):
+    def get_nodes_vector(self, common_nodes, bigram):
 
-        left_nodes = self.get_combined_left_nodes()
-        right_nodes = self.get_combined_right_nodes()
+        if(bigram):
+            left_nodes = self.get_combined_left_nodes_bigrams()
+            right_nodes = self.get_combined_right_nodes_bigrams()
+        else:
+            left_nodes = self.get_combined_left_nodes()
+            right_nodes = self.get_combined_right_nodes()
 
         vector = np.zeros(len(common_nodes))
         value_left = 1
