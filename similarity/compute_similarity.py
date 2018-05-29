@@ -314,7 +314,7 @@ def compute_similarity(patient_list):
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
         tanimoto_bigrams_scores = [float(i) / max(tanimoto_bigrams_scores) for i in tanimoto_bigrams_scores]
         jaccard_scores = [float(i) / max(jaccard_scores) for i in jaccard_scores]
-        tanimoto = [tanimoto_edges_scores[i] * 0.5 + tanimoto_bigrams_scores[i] * 0.5 for i in
+        tanimoto = [tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in
                     range(len(tanimoto_edges_scores))]
 
         tanimoto_edges_output[keyA] = sort_by_scores(tanimoto_edges_scores, other_patients)
@@ -521,7 +521,7 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['bigram', 'nodes']:
+    for output in ['weighted', 'bigrams', 'nodes']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_edges.json'
