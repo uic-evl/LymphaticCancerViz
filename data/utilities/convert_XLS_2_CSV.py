@@ -34,8 +34,8 @@ if __name__ == "__main__":
             if filename.endswith(".xlsx"):
                 name = filename.split("link=")[1][:-5]
                 metric = filename.split('_')
-                if metric[2] == 'PREV' or metric[1] in ['edges', 'jaccard', 'weighted'] \
-                    or metric[0] in ['edges', 'jaccard', 'weighted']:
+                if metric[2] == 'PREV' or metric[1] in ['edges', 'jaccard'] \
+                    or metric[0] in ['edges', 'jaccard']:
                     continue
                 prefix = name.split("_k=")
                 print metric
