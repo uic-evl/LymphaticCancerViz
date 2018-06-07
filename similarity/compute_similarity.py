@@ -316,7 +316,7 @@ def compute_similarity(patient_list):
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
         tanimoto_bigrams_scores = [float(i) / max(tanimoto_bigrams_scores) for i in tanimoto_bigrams_scores]
         jaccard_scores = [float(i) / max(jaccard_scores) for i in jaccard_scores]
-        tanimoto_weighted = [tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in
+        tanimoto_weighted = [tanimoto_edges_scores[i] * 0.5 + tanimoto_bigrams_scores[i] * 0.5 for i in
                     range(len(tanimoto_edges_scores))]
 
         tanimoto_edges_output[keyA] = sort_by_scores(tanimoto_edges_scores, other_patients)
@@ -483,8 +483,8 @@ if __name__ == "__main__":
         # add the nodes to the graph
         tween = parse_graph_nodes(id, parsed_nodes)
 
-        # if tween:
-        #     continue
+        if tween:
+            continue
 
         # set the max number of nodes
         right_nodes = right.get_nodes()
@@ -522,7 +522,7 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['bigram']:
+    for output in ['weighted']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/v1.3.2_2_combined/tanimoto_edges_'+version+'.json'
@@ -535,7 +535,7 @@ if __name__ == "__main__":
             scores_out = tanimoto_nodes_output
         elif output == "weighted":
             init_matrix_file(header)
-            file_name = 'data/v1.3.2_2_combined/tanimoto_weighted_'+version+'.json'
+            file_name = 'data/json/tanimoto_weighted_'+version+'.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_weighted_output
         elif output == "bigram":

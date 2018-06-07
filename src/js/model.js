@@ -17,6 +17,7 @@ function Patients() {
 
         SEdropdown = document.getElementById("SELabel"),
         sideEffectMap = {"Feeding Tube":"feedingTube_post", "Aspiration":"aspiration_post", "Neck Boost":"neck_boost"};
+        App.self = self;
 
     App.changePatient = function(patient) {
         /* Get the selected patient */
@@ -357,8 +358,8 @@ function Patients() {
             self.sideEffectCaption(undefined);
             self.sideEffect_class = null;
 
-            self.currentPrediction(undefined);
-            self.currentPredictionVariable(undefined);
+            // self.currentPrediction(undefined);
+            // self.currentPredictionVariable(undefined);
 
             self.rankings.removeAll();
             self.clusters.removeAll();
@@ -722,9 +723,8 @@ function Patients() {
     }
 
        App.utils.readFiles(function (error, weighted,
-                                         bigrams_c2, bigrams_c3 , bigrams_c4, bigrams_w2, bigrams_w3 , bigrams_w4,
-                                         nodes_c2, nodes_c3 , nodes_c4, nodes_w2, nodes_w3 , nodes_w4
-                         )
+                                         bigrams_c2, bigrams_c3 , bigrams_c4, bigrams_c5, bigrams_w2, bigrams_w3 , bigrams_w4, bigrams_w5,
+                                         nodes_c2, nodes_c3 , nodes_c4, nodes_c5, nodes_w2, nodes_w3 , nodes_w4, nodes_w5, diffs_n_b)
        {
             if (error){ return console.warn(error); }
 
@@ -737,23 +737,47 @@ function Patients() {
                 // extract the clusters based on the patient's id
                 let patient_groups = parse_clusters(patient.id,
                     [
-                        bigrams_c2, bigrams_c3 , bigrams_c4, bigrams_w2, bigrams_w3 , bigrams_w4,
-                        nodes_c2, nodes_c3 , nodes_c4, nodes_w2, nodes_w3 , nodes_w4
+                        // bigrams_c2, bigrams_c3 , bigrams_c4,
+                        bigrams_c5,
+                        // bigrams_w2, bigrams_w3 , bigrams_w4,
+                        bigrams_w5,
+                        // nodes_c2, nodes_c3 , nodes_c4,
+                        nodes_c5,
+                        // nodes_w2, nodes_w3 , nodes_w4,
+                        nodes_w5, diffs_n_b
                     ],
                     "groupId",
                     [
-                                "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4","Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
-                                "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4","Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
+                        // "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4",
+                        "Bigrams, Comp. k=5",
+                        // "Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
+                        "Bigrams, Weight. k=5",
+                        // "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4",
+                        "Labels, Comp. k=5",
+                        // "Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
+                        "Labels, Weight. k=5", "Diffs, Labels & Bigrams"
                     ] ),
                     patient_dendogramIds = parse_clusters(patient.id,
                     [
-                        bigrams_c2, bigrams_c3 , bigrams_c4, bigrams_w2, bigrams_w3 , bigrams_w4,
-                        nodes_c2, nodes_c3 , nodes_c4, nodes_w2, nodes_w3 , nodes_w4
+                        // bigrams_c2, bigrams_c3 , bigrams_c4,
+                        bigrams_c5,
+                        // bigrams_w2, bigrams_w3 , bigrams_w4,
+                        bigrams_w5,
+                        // nodes_c2, nodes_c3 , nodes_c4,
+                        nodes_c5,
+                        // nodes_w2, nodes_w3 , nodes_w4,
+                        nodes_w5, diffs_n_b
                     ],
                     "dendogramId",
                     [
-                        "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4","Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
-                        "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4","Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
+                        // "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4",
+                        "Bigrams, Comp. k=5",
+                        // "Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
+                        "Bigrams, Weight. k=5",
+                        // "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4",
+                        "Labels, Comp. k=5",
+                        // "Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
+                        "Labels, Weight. k=5", "Diffs, Labels & Bigrams"
                     ] ),
                     between = [],
                     nodes = extract_nodes(patient, between);
