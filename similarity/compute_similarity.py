@@ -148,7 +148,7 @@ def write_patient_data(scores_all):
 
 def init_matrix_file(m_header):
     global m
-    m = open('data/matrices/' + output + '_' + 'matrix.csv', 'w')
+    m = open('./data/matrices/' + output + '_' + 'matrix.csv', 'w')
     m.write(",")
     m.write(m_header)
     m.write('\r')
@@ -254,6 +254,9 @@ def compute_similarity(patient_list):
     # iterate over the patients and compute the similarity
     for keyA, patientA in patients_pointer.iteritems():
 
+        # if keyA != 10013:
+        #     continue
+
         # store the scores of the test
         tanimoto_edges_scores = []
         tanimoto_nodes_scores = []
@@ -261,6 +264,9 @@ def compute_similarity(patient_list):
 
         # iterate over all of the other patients
         for keyB, patientB in other_patients.iteritems():
+
+            # if keyB != 10023:
+            #     continue
 
             # Find all of the common edges between patient A and patient B
             common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
@@ -282,6 +288,10 @@ def compute_similarity(patient_list):
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
+
+            # if keyA == 10013 and keyB == 10023:
+            #     print common_list
+
 
             # Save the scores to their respective arrays
             tanimoto_edges_scores.append(tanimoto_edges)
@@ -308,6 +318,7 @@ def compute_similarity(patient_list):
 
 
 def set_graph_node(cg, infected, score):
+
     # set the level
     cg.set_node_value(infected[1:])
     # add the full node name to keep track
@@ -344,7 +355,7 @@ def parse_patient_nodes(nodes):
     parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
     parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in parsed_nodes]
 
-    return parsed_nodes
+    return sorted(parsed_nodes)
 
 
 def parse_tumor_position(tumor_position):
@@ -393,6 +404,8 @@ def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
                 if n[1:].lower() == "rp":
                     set_graph_node(current_graph, n, -3.0)
                 else:
+                    if int(id) == 10013 or int(id) == 10023:
+                        print id, n
                     set_graph_node(current_graph, n, 1.0)
     return tween
 
@@ -447,6 +460,7 @@ if __name__ == "__main__":
 
         # parse the nodes
         parsed_nodes = parse_patient_nodes(nodes)
+
         # get the longest item (test purposes)
         longest_item = max(parsed_nodes, key=len)
 
