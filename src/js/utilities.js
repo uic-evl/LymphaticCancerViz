@@ -81,11 +81,13 @@ var App = App || {};
             .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_nodes_6_2018_k=3.csv")
             .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_nodes_6_2018_k=4.csv")
             .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_nodes_6_2018_k=5.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_nodes_6_2018_k=6.csv")
             .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=2.csv")
             .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=3.csv")
             .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=4.csv")
             .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=5.csv")
-            .defer(d3.csv, "data/csv/clusters/06_06_2018/differences/diffs_node_bigram.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=6.csv")
+            // .defer(d3.csv, "data/csv/clusters/06_06_2018/differences/diffs_node_bigram.csv")
             .await(cb)
     }
 
