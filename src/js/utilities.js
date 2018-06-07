@@ -5,9 +5,6 @@ var App = App || {};
 
   App.Utilities = function () {
 
-    /* Internal Members */
-    let self = {};
-
     function modified_bfs(source, selected_nodes, all_pairs, visited) {
 
       let q = [],
@@ -66,8 +63,28 @@ var App = App || {};
       return touched_nodes;
     }
 
+    function read_input_files(cb) {
+
+        queue()
+            .defer(d3.json, "data/json/tanimoto_bigrams_UPPER.json")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_bigrams_6_2018_k=2.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_bigrams_6_2018_k=3.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_bigrams_6_2018_k=4.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_bigrams_6_2018_k=2.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_bigrams_6_2018_k=3.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_bigrams_6_2018_k=4.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_nodes_6_2018_k=2.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_nodes_6_2018_k=3.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_complete_nodes_6_2018_k=4.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=2.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=3.csv")
+            .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=4.csv")
+            .await(cb)
+    }
+
     return {
       connectedComponents: connected_components
+        , readFiles : read_input_files
     }
 
   }

@@ -1,6 +1,8 @@
 "use strict";
 
 var App = App || {};
+/* Utility functions */
+App.utils = App.Utilities();
 
 function patient_sort(key, left, right) {
     return parseInt(left[key]) === parseInt(right[key]) ? 0 :
@@ -97,7 +99,7 @@ function Patients() {
 
         /* Setup the drop down data */
         setupClusterObservables();
-        setupPredictionObservables();
+        // setupPredictionObservables();
 
         // rankings of the patients
         self.rankings = ko.observableArray();
@@ -109,11 +111,11 @@ function Patients() {
         self.optionsCaption = ko.observable('Select a Patient');
         self.clusterCaption = ko.observable('Select a Cluster');
         self.sideEffectCaption = ko.observable('Select a Side-Effect');
-        self.predictionCaption = ko.observable('Select a Variable');
-        self.predictionProbCaption = ko.observable('Select a Probability');
+        // self.predictionCaption = ko.observable('Select a Variable');
+        // self.predictionProbCaption = ko.observable('Select a Probability');
 
         /* Menu drop-downs */
-        self.predictionVariable = ko.observableArray(["Feeding Tube","Aspirating","Enjoyment"]);
+        // self.predictionVariable = ko.observableArray(["Feeding Tube","Aspirating","Enjoyment"]);
         self.selections = ko.observableArray(["By Patient","By Cluster"]);//, "By Prediction"]);
         self.sideEffect = ko.observableArray(['Feeding Tube', 'Aspiration', "Neck Boost"]);
         self.numberToDisplay = ko.observableArray([50, 100, 'All']);
@@ -269,7 +271,7 @@ function Patients() {
         if(!newValue)return;
 
         /* Clear the default caption if it exists */
-        self.predictionProbCaption(undefined);
+        // self.predictionProbCaption(undefined);
         // clear the patient list
         self.rankings.removeAll();
         self.patients.removeAll();
@@ -336,8 +338,8 @@ function Patients() {
             // clear the patient list
             self.rankings.removeAll();
 
-            self.currentPredictionVariable(undefined);
-            self.currentPrediction(undefined);
+            // self.currentPredictionVariable(undefined);
+            // self.currentPrediction(undefined);
             self.currentPatient(undefined);
             self.sideEffectCaption(undefined);
             self.sideEffect_class = null;
@@ -398,8 +400,8 @@ function Patients() {
         /*Subscribe the the change in similarity metric */
         self.currentSorting.subscribe(changeCurrentSorting);
 
-        self.currentPrediction.subscribe(changeProbabilityRange);
-        self.currentPredictionVariable.subscribe(changeProbabilityVariable);
+        // self.currentPrediction.subscribe(changeProbabilityRange);
+        // self.currentPredictionVariable.subscribe(changeProbabilityVariable);
 
         // subscribe to the change of the how many patients to display
         self.currentDisplay.subscribe(changeNumberOfPatients);
@@ -551,7 +553,6 @@ function Patients() {
 
             }
         });
-
     }
 
     // initialize the observables
@@ -571,26 +572,26 @@ function Patients() {
         return Math.ceil(value * inv) / inv;
     }
 
-    function bin_prediction(p) {
-        return round(p, 0.05);
-    }
-
-    function parse_predictions(patient,predictions) {
-        /* extract the prediction clusters based on the id */
-        let nodes = _.chain(predictions)
-            .find(function(o){ return parseInt(o.id) === patient.id })
-            .omit(["", "id"]).value();
-
-        let index = -1;
-        if(index = _.indexOf(nodes, "23") > -1){
-            nodes[index] = "2/3"
-        }
-        if(index = _.indexOf(nodes, "34") > -1){
-            nodes[index] = "3/4"
-        }
-
-        return nodes
-    }
+    // function bin_prediction(p) {
+    //     return round(p, 0.05);
+    // }
+    //
+    // function parse_predictions(patient,predictions) {
+    //     /* extract the prediction clusters based on the id */
+    //     let nodes = _.chain(predictions)
+    //         .find(function(o){ return parseInt(o.id) === patient.id })
+    //         .omit(["", "id"]).value();
+    //
+    //     let index = -1;
+    //     if(index = _.indexOf(nodes, "23") > -1){
+    //         nodes[index] = "2/3"
+    //     }
+    //     if(index = _.indexOf(nodes, "34") > -1){
+    //         nodes[index] = "3/4"
+    //     }
+    //
+    //     return nodes
+    // }
 
     function extract_nodes(patient, between){
         return _.chain(patient.nodes)
@@ -601,13 +602,13 @@ function Patients() {
                 }
                 else {
                     result.push(value);
-                    // if(value.length === 2 && value[1] === "2"){
-                    //     result.push(value[0] + value[1] + 'A');
-                    //     result.push(value[0] + value[1] + 'B');
-                    // }
-                    // else {
-                    //     result.push(value);
-                    // }
+                    if(value.length === 2 && value[1] === "2"){
+                        result.push(value[0] + value[1] + 'A');
+                        result.push(value[0] + value[1] + 'B');
+                    }
+                    else {
+                        result.push(value);
+                    }
                 }
                 return result;
             }, [])
@@ -621,7 +622,7 @@ function Patients() {
         /* iterate over the clusters and extract the patient's cluster */
         let centers = {};
         clusters.forEach(function(cluster,i){
-            let pat = _.find(cluster, function(o) {return o["patientId"] == patient})//{"patientId": String(patient)});
+            let pat = _.find(cluster, function(o) {return o["patientId"] == patient});
             if(pat) {
                 centers[labels[i]] = parseInt(pat[key]);
             }
@@ -720,39 +721,15 @@ function Patients() {
         return groups;
     }
 
-    queue()
-        .defer(d3.json, "data/json/tanimoto_weighted.json")
-        // .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=2.csv")
-        // .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=3.csv")
-        // .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=5.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=2.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=3.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=4.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=5.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_complete_5_2018_k=6.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=3.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=4.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=5.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=6.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=9.csv")
-        .defer(d3.csv, "data/csv/clusters/05_16_2018/cluster_weighted_5_2018_k=10.csv")
-        // .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_41_different_4_2018.csv")
-        .defer(d3.csv, "data/csv/predictions/predict_outcome_lymph.csv")
-        // .defer(d3.json, "data/json/tanimoto_edges.json")
-        //.defer(d3.json, "data/json/jaccard.json")
-        .await(function (error, weighted,
-                         // clusters_ak2, clusters_ak3, clusters_ak5,
-                         clusters_c2, clusters_c3 , clusters_c4, clusters_c5, clusters_c6,
-                         cluster_wc3, cluster_wc4, cluster_wc5, cluster_wc6,cluster_wc9, cluster_wc10,
-                         // diff,
-                         predictions) {
+       App.utils.readFiles(function (error, weighted,
+                                         bigrams_c2, bigrams_c3 , bigrams_c4, bigrams_w2, bigrams_w3 , bigrams_w4,
+                                         nodes_c2, nodes_c3 , nodes_c4, nodes_w2, nodes_w3 , nodes_w4
+                         )
+       {
             if (error){ return console.warn(error); }
 
             App.weighted = weighted;
             App.sites = [];
-
-            /* Utility functions */
-            App.utils = App.Utilities();
 
             /* Iterate through the data and pull out each patient's information */
             App.weighted.forEach(function (patient) {
@@ -760,38 +737,24 @@ function Patients() {
                 // extract the clusters based on the patient's id
                 let patient_groups = parse_clusters(patient.id,
                     [
-                        // clusters_ak2, clusters_ak3, clusters_ak5,
-                        clusters_c2, clusters_c3, clusters_c4, clusters_c5, clusters_c6,
-                        cluster_wc3,cluster_wc4,cluster_wc5,cluster_wc6,cluster_wc9,cluster_wc10
-                    //    diff
+                        bigrams_c2, bigrams_c3 , bigrams_c4, bigrams_w2, bigrams_w3 , bigrams_w4,
+                        nodes_c2, nodes_c3 , nodes_c4, nodes_w2, nodes_w3 , nodes_w4
                     ],
                     "groupId",
                     [
-                                // "Average, k=2", "Average, k=3", "Average, k=5",
-                                "Complete, k=2", "Complete, k=3","Complete, k=4","Complete, k=5","Complete, k=6",
-                                "Weighted, k=3", "Weighted, k=4", "Weighted, k=5", "Weighted, k=6","Weighted, k=9","Weighted, k=10"
-                                // "Diff., k=1"
+                                "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4","Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
+                                "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4","Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
                     ] ),
                     patient_dendogramIds = parse_clusters(patient.id,
                     [
-                        // clusters_ak2, clusters_ak3, clusters_ak5,
-                        /*clusters_c2, clusters_c3, clusters_c4, clusters_c5,*/
-                        clusters_c6,
-                        // cluster_wc3,cluster_wc4,cluster_wc5,
-                        cluster_wc6, cluster_wc9, cluster_wc10
-                        //    diff
+                        bigrams_c2, bigrams_c3 , bigrams_c4, bigrams_w2, bigrams_w3 , bigrams_w4,
+                        nodes_c2, nodes_c3 , nodes_c4, nodes_w2, nodes_w3 , nodes_w4
                     ],
                     "dendogramId",
                     [
-                        // "Average, k=2", "Average, k=3", "Average, k=5",
-                        // "Complete, k=2", "Complete, k=3",/*"Complete, k=4",*/"Complete, k=5","Complete, k=6",
-                        // "Complete, k=2", "Complete, k=3",/*"Complete, k=4",*/"Complete, k=5",
-                        "Complete, k=6",
-                        // "Weighted, k=3", "Weighted, k=4", "Weighted, k=5",
-                        "Weighted, k=6", "Weighted, k=9", "Weighted, k=10",
-                        // "Diff., k=1"
+                        "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4","Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
+                        "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4","Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
                     ] ),
-                    patient_predictions = parse_predictions(patient,predictions),
                     between = [],
                     nodes = extract_nodes(patient, between);
 
@@ -811,16 +774,7 @@ function Patients() {
                     "aspiration_post" : patient["Aspiration_rate_Post-therapy"] ? patient["Aspiration_rate_Post-therapy"] : "NA",
                     "neck_boost" : patient["Neck_boost"] ? patient["Neck_boost"] : "NA",
                     "clusters": patient_groups,
-                    "dendrogram": patient_dendogramIds,
-                    "predictions":
-                        {
-                            "enjoyment": parseFloat(patient_predictions.pred_Enjoy),
-                            "enjoyment_bin": bin_prediction(parseFloat(patient_predictions.pred_Enjoy)),
-                            "feeding_tube": parseFloat(patient_predictions.prob_feeding_tube),
-                            "feeding_tube_bin": bin_prediction(parseFloat(patient_predictions.prob_feeding_tube)),
-                            "aspirating": parseFloat(patient_predictions.prob_aspiration),
-                            "aspirating_bin": bin_prediction(parseFloat(patient_predictions.prob_aspiration)),
-                        }
+                    "dendrogram": patient_dendogramIds
                 };
                 /* Create the bubble sets for every patient */
                 site.groups  = extract_bubble_groups(site);
