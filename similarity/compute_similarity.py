@@ -417,7 +417,7 @@ if __name__ == "__main__":
 
     with open(data, 'r') as csvFile:
         # create the csv reader
-        reader = csv.DictReader(csvFile, delimiter='~')
+        reader = csv.DictReader(csvFile, delimiter='\t')
         # parse the rows
         result = parse_input_data(reader)
 
@@ -465,6 +465,9 @@ if __name__ == "__main__":
         # add the nodes to the graph
         tween = parse_graph_nodes(left, right, parsed_nodes)
 
+        if tween:
+            continue
+
         # set the max number of nodes
         right_nodes = right.get_nodes()
         left_nodes = left.get_nodes()
@@ -502,7 +505,7 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['weighted']:
+    for output in ['nodes']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/json/tanimoto_edges.json'
