@@ -1,6 +1,6 @@
 import sys, csv, copy, json
-import unicodedata, datetime
-from pprint import pprint
+from operator import itemgetter
+import datetime
 from collections import OrderedDict
 from Graph import Graph
 from Patient import Patient
@@ -84,12 +84,12 @@ def write_to_json(current_patient, patient_order, scores):
 
 
 # Write out the similarity matrix to a csv file
-def write_to_scores(file_name, header):
+def write_to_scores(m_file_name, m_header):
     # read in the json file
-    json_data = json.load(open(file_name, 'r'), object_pairs_hook=OrderedDict)
+    json_data = json.load(open(m_file_name, 'r'), object_pairs_hook=OrderedDict)
     # create a csv vile
-    idx = file_name.rfind('/')
-    name = file_name[idx:-5] + '_Data_and_Scores_' + str(now.month) + '_' + str(now.year) + '.csv'
+    idx = m_file_name.rfind('/')
+    name = m_file_name[idx:-5] + '_Data_and_Scores_' + str(now.month) + '_' + str(now.year) + '.csv'
     name = name[1].upper() + name[2:]
     csv_name = './data/scores/' + name
     csv_file = open(csv_name, 'w')
@@ -114,7 +114,7 @@ def write_to_scores(file_name, header):
                     header_titles.append(h)
                 col += 1
             # write the header
-            header_list = header.split(",")
+            header_list = m_header.split(",")
             csv_writer.writerow(header_titles + header_list)
             count += 1
         # parse the values
@@ -154,15 +154,15 @@ def init_matrix_file(m_header):
     m.write('\r')
 
 
-def read_matrix_data(file):
+def read_matrix_data(m_file):
     global lymph_nodes
     global adjacency_matrix
 
-    with open(file, 'r') as csvFile:
+    with open(m_file, 'r') as m_csvFile:
         # create a csv reader
-        reader = csv.reader(csvFile, delimiter=',')
+        m_reader = csv.reader(m_csvFile, delimiter=',')
         # iterate over the rows of the csv file
-        for row in reader:
+        for row in m_reader:
 
             # first row, read the lymph node headers
             if not row[0]:
@@ -269,7 +269,9 @@ def compute_similarity(patient_list):
             #     continue
 
             # Find all of the common edges between patient A and patient B
-            common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
+            a_edges = set(patientA.get_all_edges())
+            b_edges = set(patientB.get_all_edges())
+            common_list = sorted(list(a_edges | b_edges))
 
             # Find all of the common node/node pairs between patient A and patient B
             common_combined_nodes = sorted(
@@ -288,10 +290,6 @@ def compute_similarity(patient_list):
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
-
-            # if keyA == 10013 and keyB == 10023:
-            #     print common_list
-
 
             # Save the scores to their respective arrays
             tanimoto_edges_scores.append(tanimoto_edges)
@@ -344,36 +342,53 @@ def parse_input_data(reader):
     return result
 
 
-def parse_patient_nodes(nodes):
+def parse_patient_nodes(m_nodes):
+
     # strip out the white space string
-    stripped_nodes = [x.strip(" ").replace('L RPLN', 'LRP') for x in nodes]
+    stripped_nodes = [x.strip(" ").replace('L RPLN', 'LRP') for x in m_nodes]
     stripped_nodes = [x.strip(" ").replace('R RPLN', 'RRP') for x in stripped_nodes]
 
-    stripped_nodes = list(set(stripped_nodes))
+    # stripped_nodes = list(set(stripped_nodes))
 
-    parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in stripped_nodes]
-    parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in parsed_nodes]
-    parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in parsed_nodes]
+    m_parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in stripped_nodes]
+    m_parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in m_parsed_nodes]
+    m_parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in m_parsed_nodes]
 
-    return sorted(parsed_nodes)
+    lrp = 0
+    rrp = 0
+    if 'LRP' in m_parsed_nodes:
+        m_parsed_nodes.remove('LRP')
+        lrp = "LRP"
+    if 'RRP' in m_parsed_nodes:
+        m_parsed_nodes.remove('RRP')
+        rrp = 'RRP'
+
+    sorted(m_parsed_nodes, key=itemgetter(slice(1, None)))
+
+    if lrp is not 0:
+        m_parsed_nodes.append(lrp)
+    if rrp is not 0:
+        m_parsed_nodes.append(rrp)
+
+    return m_parsed_nodes
 
 
-def parse_tumor_position(tumor_position):
-    if tumor_position.lower() == 'l':
-        tumor_position = "Left"
-    elif tumor_position.lower() == 'r':
-        tumor_position = "Right"
-    elif tumor_position.lower() == 'bilateral':
-        tumor_position = "BiLat."
-    elif tumor_position.lower() == "midline":
-        tumor_position = "Midline"
-    return tumor_position
+def parse_tumor_position(m_tumor_position):
+    if m_tumor_position.lower() == 'l':
+        m_tumor_position = "Left"
+    elif m_tumor_position.lower() == 'r':
+        m_tumor_position = "Right"
+    elif m_tumor_position.lower() == 'bilateral':
+        m_tumor_position = "BiLat."
+    elif m_tumor_position.lower() == "midline":
+        m_tumor_position = "Midline"
+    return m_tumor_position
 
 
-def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
+def parse_graph_nodes(left_graph, right_graph, m_parsed_nodes):
     # add the nodes to the graph
-    tween = 0
-    for node in parsed_nodes:
+    m_tween = 0
+    for node in m_parsed_nodes:
         if len(node) > 5:
             continue
 
@@ -393,7 +408,7 @@ def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
         for n in new_nodes:
             semantic = n[0]
             if n[1:] == "23" or n[1:] == "234" or n[1:] == "34":
-                tween = 1
+                m_tween = 1
                 for c in n[1:]:
                     if c == "2":
                         set_graph_node(current_graph, semantic + "2A", 0.125)
@@ -404,10 +419,8 @@ def parse_graph_nodes(left_graph, right_graph, parsed_nodes):
                 if n[1:].lower() == "rp":
                     set_graph_node(current_graph, n, -3.0)
                 else:
-                    if int(id) == 10013 or int(id) == 10023:
-                        print id, n
                     set_graph_node(current_graph, n, 1.0)
-    return tween
+    return m_tween
 
 
 # Driver starts here
@@ -435,16 +448,16 @@ if __name__ == "__main__":
         result = parse_input_data(reader)
 
     # Parse the input data
-    for id in result:
-        id = str(id)
+    for m_id in result:
+        m_id = str(m_id)
         # no id given, we can't use
-        if len(id) == 0:
+        if len(m_id) == 0:
             continue
 
         parsed = {}
 
         # get the patient number and create the patient object
-        patient_id = int(id)
+        patient_id = int(m_id)
         patient = Patient(patient_id)
 
         # add the possible lymph nodes to the patient
@@ -452,7 +465,7 @@ if __name__ == "__main__":
         patient.set_adjacency_matrix(adjacency_matrix)
 
         # parse the nodes from the row
-        nodes = result[int(id)][node_column_name].split(',')
+        nodes = result[int(m_id)][node_column_name].split(',')
 
         # No infected nodes available
         if 'N/A' in nodes or len(nodes[0]) == 0:
@@ -465,11 +478,11 @@ if __name__ == "__main__":
         longest_item = max(parsed_nodes, key=len)
 
         # get and set the patient gender
-        gender = str(result[int(id)]["Gender"]).lower()
+        gender = str(result[int(m_id)]["Gender"]).lower()
         patient.set_gender(gender)
 
         # get and set the tumor position
-        tumor_position = parse_tumor_position(result[int(id)][tumor_column_name].strip(" "))
+        tumor_position = parse_tumor_position(result[int(m_id)][tumor_column_name].strip(" "))
         patient.set_tumor_position(tumor_position)
 
         # create the graph for the left and right lymph nodes
@@ -505,8 +518,7 @@ if __name__ == "__main__":
             rp_ids.append(patient_id)
 
         # keep the rest of the parsed attributes
-        patient_attr[id] = result[int(id)]
-
+        patient_attr[m_id] = result[int(m_id)]
 
     all_patients = rp_patients.copy()
     all_patients.update(non_rp_patients)
