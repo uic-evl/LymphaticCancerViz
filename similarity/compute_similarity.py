@@ -258,6 +258,9 @@ def compute_similarity(patient_list):
     # iterate over the patients and compute the similarity
     for keyA, patientA in patients_pointer.iteritems():
 
+        # if keyA != 10013:
+        #     continue
+
         # store the scores of the test
         tanimoto_edges_scores = []
         tanimoto_nodes_scores = []
@@ -267,6 +270,9 @@ def compute_similarity(patient_list):
 
         # iterate over all of the other patients
         for keyB, patientB in other_patients.iteritems():
+
+            # if keyB != 10023:
+            #     continue
 
             # Find all of the common edges between patient A and patient B
             common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
@@ -408,7 +414,7 @@ def parse_graph_nodes(m_id, m_parsed_nodes):
                         set_graph_node(current_graph, semantic + c, 0.25)
             else:
                 if n[1:].lower() == "rp":
-                    set_graph_node(current_graph, n, -3.0)
+                    set_graph_node(current_graph, n, -2.0)
                 else:
                     set_graph_node(current_graph, n, 1.0)
     return m_tween
@@ -522,15 +528,15 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['weighted']:
+    for output in ['weighted', 'bigram']:
         if output == "edges":
             init_matrix_file(header)
-            file_name = 'data/v1.3.2_2_combined/tanimoto_edges_'+version+'.json'
+            file_name = 'data/json/tanimoto_edges_'+version+'.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_edges_output
         elif output == "nodes":
             init_matrix_file(header)
-            file_name = 'data/v1.3.2_2_combined/tanimoto_nodes_'+version+'.json'
+            file_name = 'data/json/tanimoto_nodes_'+version+'.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_nodes_output
         elif output == "weighted":
@@ -545,7 +551,7 @@ if __name__ == "__main__":
             scores_out = tanimoto_bigrams_output
         elif output == "jaccard":
             init_matrix_file(header)
-            file_name = 'data/v1.3.2_2_combined/jaccard_'+version+'.json'
+            file_name = 'data/json/jaccard_'+version+'.json'
             f = open(file_name, 'w')
             scores_out = jaccard_output
 

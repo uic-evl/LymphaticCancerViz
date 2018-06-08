@@ -39,7 +39,6 @@ class Patient(object):
             if int(self.adjacency_matrix[n1][n2]) == 1:
                 self.bigrams_right.append(s[0]+s[1])
 
-
     def set_output_nodes(self, lymph_nodes):
         self.output_nodes = lymph_nodes
 
@@ -70,7 +69,6 @@ class Patient(object):
         self.set_bigrams_left()
         self.set_bigrams_right()
 
-
     def set_adjacency_matrix(self, matrix):
         self.adjacency_matrix = matrix
 
@@ -95,24 +93,9 @@ class Patient(object):
     def get_combined_left_nodes(self):
         left_nodes = self.left_graph.get_nodes()
         nodes_left = []
-        included_left = []
-        for s in list(itertools.combinations(left_nodes,2)):
-            # the two nodes are connected
-            n1 = self.lymph_nodes.index(s[0])
-            n2 = self.lymph_nodes.index(s[1])
-
-            if int(self.adjacency_matrix[n1][n2]) == 1:
-                #nodes_left.append(s[0] + s[1])
-
-                if s[0] not in included_left:
-                    included_left.append(s[0])
-                    nodes_left.append(s[0])
-                if s[1] not in included_left:
-                    included_left.append(s[1])
-                    nodes_left.append(s[1])
 
         for l in left_nodes:
-            if l not in included_left:
+            if l not in nodes_left:
                 nodes_left.append(l)
 
         return nodes_left
@@ -120,24 +103,9 @@ class Patient(object):
     def get_combined_right_nodes(self):
         right_nodes = self.right_graph.get_nodes()
         nodes_right = []
-        included_right = []
-        for s in list(itertools.combinations(right_nodes, 2)):
-            # the two nodes are connected
-            n1 = self.lymph_nodes.index(s[0])
-            n2 = self.lymph_nodes.index(s[1])
-
-            if int(self.adjacency_matrix[n1][n2]) == 1:
-                #nodes_right.append(s[0]+s[1])
-
-                if s[0] not in included_right:
-                    included_right.append(s[0])
-                    nodes_right.append(s[0])
-                if s[1] not in included_right:
-                    included_right.append(s[1])
-                    nodes_right.append(s[1])
 
         for r in right_nodes:
-            if r not in included_right:
+            if r not in nodes_right:
                 nodes_right.append(r)
 
         return nodes_right
@@ -171,13 +139,13 @@ class Patient(object):
         left_nodes = self.left_graph.get_nodes()
         nodes_left = []
         included_left = []
-        for s in list(itertools.combinations(left_nodes,2)):
+        for s in list(itertools.combinations(left_nodes, 2)):
             # the two nodes are connected
             n1 = self.lymph_nodes.index(s[0])
             n2 = self.lymph_nodes.index(s[1])
 
             if int(self.adjacency_matrix[n1][n2]) == 1:
-                #nodes_left.append(s[0] + s[1])
+                nodes_left.append(s[0] + s[1])
 
                 if s[0] not in included_left:
                     included_left.append(s[0])
@@ -205,9 +173,9 @@ class Patient(object):
         left_nodes = self.get_combined_left_nodes()
         right_nodes = self.get_combined_right_nodes()
 
-        self.bilateral = ["Bilateral"] if (len(left_nodes) > 0 and len(right_nodes) > 0) else []
+        self.bilateral = []
 
-        return sorted(left_nodes + right_nodes + self.bilateral)
+        return sorted(left_nodes + right_nodes)
 
     def get_all_combined_nodes_bigrams(self):
         left_nodes = self.get_combined_left_nodes_bigrams()
@@ -237,7 +205,7 @@ class Patient(object):
 
     def get_nodes_vector(self, common_nodes, bigram):
 
-        if(bigram):
+        if bigram:
             left_nodes = self.get_combined_left_nodes_bigrams()
             right_nodes = self.get_combined_right_nodes_bigrams()
         else:
