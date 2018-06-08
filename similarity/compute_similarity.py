@@ -534,22 +534,22 @@ if __name__ == "__main__":
     for output in ['weighted', 'nodes']:
         if output == "edges":
             init_matrix_file(header)
-            file_name = 'data/json/tanimoto_edges.json'
+            file_name = './data/json/tanimoto_edges.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_edges_output
         elif output == "nodes":
             init_matrix_file(header)
-            file_name = 'data/json/tanimoto_nodes.json'
+            file_name = './data/json/tanimoto_nodes.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_nodes_output
         elif output == "weighted":
             init_matrix_file(header)
-            file_name = 'data/json/tanimoto_weighted.json'
+            file_name = './data/json/tanimoto_weighted.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_weighted_output
         elif output == "jaccard":
             init_matrix_file(header)
-            file_name = 'data/json/jaccard.json'
+            file_name = './data/json/jaccard.json'
             f = open(file_name, 'w')
             scores_out = jaccard_output
 
