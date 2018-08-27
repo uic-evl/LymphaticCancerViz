@@ -23,7 +23,7 @@ tanimoto_weighted_output = {}
 jaccard_output = {}
 
 output = ""
-version = ""
+parsing = ""
 ids = []
 rp_ids = []
 non_rp_ids = []
@@ -93,7 +93,7 @@ def write_to_scores(fileName, header):
     idx = fileName.rfind('/')
     name = fileName[idx:-5] + '_Data_and_Scores_' + str(now.month) + '_' + str(now.year) + '.csv'
     name = name[1].upper() + name[2:]
-    csv_name = './data/scores/' + name
+    csv_name = './data/'+version+'/scores/' + name
     csv_file = open(csv_name, 'w')
 
     # our writing object
@@ -151,7 +151,7 @@ def write_patient_data(scores_all):
 
 def init_matrix_file(m_header):
     global m
-    m = open('./data/matrices/' + output + '_' + version + '_' + 'matrix.csv', 'w')
+    m = open('./data/'+version+'/matrices/' + output + '_' + parsing + '_' + 'matrix.csv', 'w')
     m.write(",")
     m.write(m_header)
     m.write('\r')
@@ -425,15 +425,15 @@ if __name__ == "__main__":
     data = sys.argv[1]
     connectivity = sys.argv[2]
     version = sys.argv[3]
+    parsing = "UPPER"
 
     patient_attr = {}
-    result = {}
 
     patients_w_dupes = []
     # iterate over the rows of the csv file
     valid_ids = []
 
-    node_column_name = 'Affected_Lymph_node_' + str(version)
+    node_column_name = 'Affected_Lymph_node_' + str(parsing)
     tumor_column_name = 'Tm_Laterality'
 
     # read in the adjacency matrix
@@ -528,30 +528,30 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['weighted', 'bigram']:
+    for output in ['weighted', 'nodes']:
         if output == "edges":
             init_matrix_file(header)
-            file_name = 'data/json/tanimoto_edges_'+version+'.json'
+            file_name = 'data/'+version+'/json/tanimoto_edges_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_edges_output
         elif output == "nodes":
             init_matrix_file(header)
-            file_name = 'data/json/tanimoto_nodes_'+version+'.json'
+            file_name = 'data/'+version+'/json/tanimoto_nodes_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_nodes_output
         elif output == "weighted":
             init_matrix_file(header)
-            file_name = 'data/json/tanimoto_weighted_'+version+'.json'
+            file_name = 'data/'+version+'/json/tanimoto_weighted_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_weighted_output
         elif output == "bigram":
             init_matrix_file(header)
-            file_name = 'data/json/tanimoto_bigrams_'+version+'.json'
+            file_name = 'data/'+version+'/json/tanimoto_bigrams_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_bigrams_output
         elif output == "jaccard":
             init_matrix_file(header)
-            file_name = 'data/json/jaccard_'+version+'.json'
+            file_name = 'data/'+version+'/json/jaccard_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = jaccard_output
 
