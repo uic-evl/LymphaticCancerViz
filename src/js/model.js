@@ -722,7 +722,7 @@ function Patients() {
         return groups;
     }
 
-       App.utils.readFiles(function (error, weighted, weighted_w6, bigrams_w6, nodes_w6
+       App.utils.readFiles(function (error, weighted, weighted_w4, nodes_w4
                                          /*weighted_c2, weighted_c3 , weighted_c4, weighted_c5, weighted_c6, weighted_w2, weighted_w3 , weighted_w4, weighted_w5,weighted_w6,
                                          nodes_c2, nodes_c3 , nodes_c4, nodes_c5, nodes_c6, nodes_w2, nodes_w3 , nodes_w4, nodes_w5,nodes_w6 //diffs_n_b
 
@@ -742,48 +742,48 @@ function Patients() {
                 let patient_groups = parse_clusters(patient.id,
                     [
                         // bigrams_c2, bigrams_c3 , bigrams_c4,
-                        weighted_w6,
+                        weighted_w4,
                         // bigrams_w2, bigrams_w3 , bigrams_w4,
                         // bigrams_w6,
                         // nodes_c2, nodes_c3 , nodes_c4,
                         // nodes_c6,
                         // nodes_w2, nodes_w3 , nodes_w4,
-                        nodes_w6,// diffs_n_b
+                        nodes_w4,// diffs_n_b
                     ],
                     "groupId",
                     [
                         // "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4",
                         // "Weighted, Comp. k=6",
                         // "Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
-                        "Weighted, Weight. k=6",
+                        "Weighted, Weight. k=4",
                         // "Bigrams, Weight. k=6",
                         // "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4",
                         // "Labels, Comp. k=6",
                         // "Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
-                        "Labels, Weight. k=6",// "Diffs, Labels & Bigrams"
+                        "Labels, Weight. k=4",// "Diffs, Labels & Bigrams"
                     ] ),
                     patient_dendogramIds = parse_clusters(patient.id,
                     [
                         // bigrams_c2, bigrams_c3 , bigrams_c4,
-                        weighted_w6,
+                        weighted_w4,
                         // bigrams_w2, bigrams_w3 , bigrams_w4,
                         // bigrams_w6,
                         // nodes_c2, nodes_c3 , nodes_c4,
                         // nodes_c6,
                         // nodes_w2, nodes_w3 , nodes_w4,
-                        nodes_w6,// diffs_n_b
+                        nodes_w4,// diffs_n_b
                     ],
                     "dendogramId",
                     [
                         // "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4",
                         // "Weighted, Comp. k=6",
                         // "Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
-                        "Weighted, Weight. k=6",
+                        "Weighted, Weight. k=4",
                         // "Bigrams, Weight. k=6",
                         // "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4",
                         // "Labels, Comp. k=6",
                         // "Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
-                        "Labels, Weight. k=6",// "Diffs, Labels & Bigrams"
+                        "Labels, Weight. k=4",// "Diffs, Labels & Bigrams"
                     ] ),
                     between = [],
                     nodes = extract_nodes(patient, between);
