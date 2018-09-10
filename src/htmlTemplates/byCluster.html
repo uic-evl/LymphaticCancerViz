@@ -1,8 +1,8 @@
-    <div class="row">
-        <div class="col-md-6">
+    <!--<div class="row">-->
+        <!--<div class="col-md-6">-->
             <div class="dropdown">
                 <a id="clusterLabel" data-toggle="dropdown" class="btn menu clusters"
-                   data-target="#" data-bind="visible: currentType() === 'By Cluster'">Cluster<!-- || currentPatient() ">Cluster-->
+                   data-target="#" data-bind="visible: currentType() === 'By Cluster'">Cluster
                     <span class="caret"></span>
                 </a>
                 <ul id="clusterMenu" class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu"
@@ -25,9 +25,32 @@
                     </li>
                 </ul>
             </div>
-        </div>
 
-    </div>
+            <div class="dropdown">
+                <a id="dendroLabel" data-toggle="dropdown" class="btn menu clusters"
+                   data-target="#" data-bind="visible: currentType() === 'By Cluster'">Group
+                    <span class="caret"></span>
+                </a>
+                <ul id="dendroMenu" class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu"
+                    data-bind="foreach: dendrogram">
+                    <li class="dropdown-submenu">
+                        <a tabindex="-1" href="#"><span data-bind="text: name"></span></a>
+                        <ul class="dropdown-menu" data-bind="foreach: count">
+                            <li data-bind="css: {
+                                disabled: $root.currentPatient()
+                                       && $root.currentType() === 'By Patient'
+                                       && $root.currentPatient().dendrogram.indexOf(name +'_'+ dendrogram) < 0,
+                                highlighted: $root.currentPatient()
+                                       && $root.currentType() === 'By Patient'
+                                       && $root.currentPatient().dendrogram.indexOf(name +'_'+ dendrogram) > -1} ">
+                                <a class="cluster" href="#">
+                                    <span class="cluster" data-bind="text: 'Group ' + dendrogram, value: name"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
 
-
-
+        <!--</div>-->
+    <!--</div>-->

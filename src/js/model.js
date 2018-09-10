@@ -1,6 +1,8 @@
 "use strict";
 
 var App = App || {};
+/* Utility functions */
+App.utils = App.Utilities();
 
 function patient_sort(key, left, right) {
     return parseInt(left[key]) === parseInt(right[key]) ? 0 :
@@ -11,8 +13,11 @@ function patient_sort(key, left, right) {
 function Patients() {
     let self = this,
         dropdown = document.getElementById("clusterLabel"),
+        dendroDrop = document.getElementById("dendroLabel"),
+
         SEdropdown = document.getElementById("SELabel"),
         sideEffectMap = {"Feeding Tube":"feedingTube_post", "Aspiration":"aspiration_post", "Neck Boost":"neck_boost"};
+        App.self = self;
 
     App.changePatient = function(patient) {
         /* Get the selected patient */
@@ -23,7 +28,9 @@ function Patients() {
 
     function setupClusterObservables() {
         self.clusters = ko.observableArray();
+        self.dendrogram = ko.observableArray();
         self.currentCluster = ko.observable();
+        self.currentGroup = ko.observable();
 
         let cluster_groups = [];
         _.keys(App.sites[0].clusters).forEach(function(name){
@@ -34,7 +41,20 @@ function Patients() {
             cluster_groups.push({name:name, count:cluster_names, group: name.split("_")[0]})
         });
 
+
+        let dendrogram_groups = [];
+        _.keys(App.sites[0].dendrogram).forEach(function(name){
+            let dendro_names = [],
+            m = _.maxBy(App.sites, function(o) {
+                return o.dendrogram[name];
+            }).dendrogram[name];
+            _.range(1, m+1).forEach(function(c){
+                dendro_names.push({dendrogram: c, name: name});
+            });
+            dendrogram_groups.push({name:name, count:dendro_names, group: name.split("_")[0]})
+        });
         self.cluster_groups = [cluster_groups];
+        self.dendrogram_groups = [dendrogram_groups];
         self.sortingAlgorithms = ko.observableArray(["Tanimoto Weighted"]);//, "Jaccard", "Tanimoto Nodes"]);
     }
 
@@ -80,7 +100,7 @@ function Patients() {
 
         /* Setup the drop down data */
         setupClusterObservables();
-        setupPredictionObservables();
+        // setupPredictionObservables();
 
         // rankings of the patients
         self.rankings = ko.observableArray();
@@ -92,11 +112,11 @@ function Patients() {
         self.optionsCaption = ko.observable('Select a Patient');
         self.clusterCaption = ko.observable('Select a Cluster');
         self.sideEffectCaption = ko.observable('Select a Side-Effect');
-        self.predictionCaption = ko.observable('Select a Variable');
-        self.predictionProbCaption = ko.observable('Select a Probability');
+        // self.predictionCaption = ko.observable('Select a Variable');
+        // self.predictionProbCaption = ko.observable('Select a Probability');
 
         /* Menu drop-downs */
-        self.predictionVariable = ko.observableArray(["Feeding Tube","Aspirating","Enjoyment"]);
+        // self.predictionVariable = ko.observableArray(["Feeding Tube","Aspirating","Enjoyment"]);
         self.selections = ko.observableArray(["By Patient","By Cluster"]);//, "By Prediction"]);
         self.sideEffect = ko.observableArray(['Feeding Tube', 'Aspiration', "Neck Boost"]);
         self.numberToDisplay = ko.observableArray([50, 100, 'All']);
@@ -169,12 +189,17 @@ function Patients() {
             self.currentCluster(undefined);
 
             let site = _.find(App.sites, {patient: newValue.id}),
-                patient_clusters = [];
+                patient_clusters = [], patient_dendrogram = [];
 
             self.clusters().forEach(function(c){
                 patient_clusters.push(c.name + "_" + site.clusters[c.name]);
             });
+            self.dendrogram().forEach(function(c){
+                patient_dendrogram.push(c.name + "_" + site.dendrogram[c.name]);
+            });
+
             newValue.clusters = patient_clusters;
+            newValue.dendrogram = patient_dendrogram;
         }
         // clear the array
         self.rankings.removeAll();
@@ -183,6 +208,10 @@ function Patients() {
 
         filterPatients(current);
         placeSelectedPatientFirst(current);
+
+        /* Set the menu/body margin */
+        let h = $("#menuBody")[0].clientHeight;
+        d3.select("#mainContainer").style("margin-top", h+(h/10));
 
         // Render to the screen
         App.createVisualizations(self.rankings());
@@ -204,6 +233,11 @@ function Patients() {
                 self.clusters.removeAll();
                 self.cluster_groups[0].forEach(function(c){
                     self.clusters.push(c);
+                });
+
+                self.dendrogram.removeAll();
+                self.dendrogram_groups[0].forEach(function(c){
+                    self.dendrogram.push(c);
                 });
             }
         }
@@ -238,7 +272,7 @@ function Patients() {
         if(!newValue)return;
 
         /* Clear the default caption if it exists */
-        self.predictionProbCaption(undefined);
+        // self.predictionProbCaption(undefined);
         // clear the patient list
         self.rankings.removeAll();
         self.patients.removeAll();
@@ -305,12 +339,11 @@ function Patients() {
             // clear the patient list
             self.rankings.removeAll();
 
-            self.currentPredictionVariable(undefined);
-            self.currentPrediction(undefined);
+            // self.currentPredictionVariable(undefined);
+            // self.currentPrediction(undefined);
             self.currentPatient(undefined);
             self.sideEffectCaption(undefined);
             self.sideEffect_class = null;
-
 
             self.currentSorting(self.sortingAlgorithms[0]);
 
@@ -325,13 +358,19 @@ function Patients() {
             self.sideEffectCaption(undefined);
             self.sideEffect_class = null;
 
-            self.currentPrediction(undefined);
-            self.currentPredictionVariable(undefined);
+            // self.currentPrediction(undefined);
+            // self.currentPredictionVariable(undefined);
 
             self.rankings.removeAll();
             self.clusters.removeAll();
+            self.dendrogram.removeAll();
 
             _.flatten(_.clone(self.cluster_groups)).forEach(function(c){ self.clusters.push(c); });
+            _.flatten(_.clone(self.dendrogram_groups)).forEach(function(c){
+                self.dendrogram.push(c);
+            });
+
+            console.log();
         }
 
         else if(newValue === "By Prediction"){
@@ -362,8 +401,8 @@ function Patients() {
         /*Subscribe the the change in similarity metric */
         self.currentSorting.subscribe(changeCurrentSorting);
 
-        self.currentPrediction.subscribe(changeProbabilityRange);
-        self.currentPredictionVariable.subscribe(changeProbabilityVariable);
+        // self.currentPrediction.subscribe(changeProbabilityRange);
+        // self.currentPredictionVariable.subscribe(changeProbabilityVariable);
 
         // subscribe to the change of the how many patients to display
         self.currentDisplay.subscribe(changeNumberOfPatients);
@@ -397,9 +436,35 @@ function Patients() {
         });
     }
 
+    function filterByGroup(seClass) {
+        // clear the patient list
+        self.patients.removeAll();
+        self.rankings.removeAll();
+
+        if(!seClass) {
+            SEdropdown.firstChild.textContent = "Side-Effect";
+            self.sideEffect_class = null;
+        }
+
+        App.data = App.weighted;
+
+        // add to the list only the patients in the current cluster
+        _.filter(App.sites, function(site) {
+            return parseInt(site.dendrogram[self.currentGroup().name]) === parseInt(self.currentGroup().value);
+        })
+            .forEach(function(p){
+                // find the patient in the data and add it to the list
+                let patient = _.find(App.data, function (o) {
+                    return o.id === p.patient;
+                });
+                self.patients.push(_.clone(patient));
+            });
+    }
+
     function setupMenu() {
         /*Subscribe the the change in clustering menu */
         let clusterMenu = document.getElementById("clusterMenu");
+        let groupMenu = document.getElementById("dendroMenu");
         let sideEffectMenu = document.getElementById("SEMenu");
 
         clusterMenu.addEventListener("click", function(e){
@@ -427,6 +492,33 @@ function Patients() {
                 }
             }
         });
+
+        groupMenu.addEventListener("click", function(e){
+
+            if (e.target.className === 'cluster') {
+                self.group_class = e.target.value || e.target.firstElementChild.value;
+                let group_value = _.trim(e.target.textContent);
+
+                dendroDrop.firstChild.textContent = self.group_class + ": " + group_value + ' ';
+
+                // set the cluster selector to the value
+                let group = {name: self.group_class, value: parseInt(group_value.split(" ")[1])};
+                self.currentGroup(group);
+
+                if(self.currentType() === "By Cluster" && self.currentGroup()) {
+                    filterByGroup();
+                    self.currentPatient(self.patients()[0]);
+                }
+                /* Touch the current observable to re-render the scene */
+                else if(self.currentPatient()) {
+                    self.rankings.removeAll();
+                    filterPatients(self.currentPatient());
+                    // Render to the screen
+                    App.createVisualizations(self.rankings());
+                }
+            }
+        });
+
 
         sideEffectMenu.addEventListener("click", function(e) {
             if (e.target.className === 'sideEffect') {
@@ -462,7 +554,6 @@ function Patients() {
 
             }
         });
-
     }
 
     // initialize the observables
@@ -482,26 +573,26 @@ function Patients() {
         return Math.ceil(value * inv) / inv;
     }
 
-    function bin_prediction(p) {
-        return round(p, 0.05);
-    }
-
-    function parse_predictions(patient,predictions) {
-        /* extract the prediction clusters based on the id */
-        let nodes = _.chain(predictions)
-            .find(function(o){ return parseInt(o.id) === patient.id })
-            .omit(["", "id"]).value();
-
-        let index = -1;
-        if(index = _.indexOf(nodes, "23") > -1){
-            nodes[index] = "2/3"
-        }
-        if(index = _.indexOf(nodes, "34") > -1){
-            nodes[index] = "3/4"
-        }
-
-        return nodes
-    }
+    // function bin_prediction(p) {
+    //     return round(p, 0.05);
+    // }
+    //
+    // function parse_predictions(patient,predictions) {
+    //     /* extract the prediction clusters based on the id */
+    //     let nodes = _.chain(predictions)
+    //         .find(function(o){ return parseInt(o.id) === patient.id })
+    //         .omit(["", "id"]).value();
+    //
+    //     let index = -1;
+    //     if(index = _.indexOf(nodes, "23") > -1){
+    //         nodes[index] = "2/3"
+    //     }
+    //     if(index = _.indexOf(nodes, "34") > -1){
+    //         nodes[index] = "3/4"
+    //     }
+    //
+    //     return nodes
+    // }
 
     function extract_nodes(patient, between){
         return _.chain(patient.nodes)
@@ -511,6 +602,7 @@ function Patients() {
                     between.push(value);
                 }
                 else {
+                    result.push(value);
                     if(value.length === 2 && value[1] === "2"){
                         result.push(value[0] + value[1] + 'A');
                         result.push(value[0] + value[1] + 'B');
@@ -531,7 +623,7 @@ function Patients() {
         /* iterate over the clusters and extract the patient's cluster */
         let centers = {};
         clusters.forEach(function(cluster,i){
-            let pat = _.find(cluster, {"patientId": String(patient)});
+            let pat = _.find(cluster, function(o) {return o["patientId"] == patient});
             if(pat) {
                 centers[labels[i]] = parseInt(pat[key]);
             }
@@ -554,13 +646,13 @@ function Patients() {
                 semantic_idx = (btw[0] === "L") ? 0 : 1;
 
             for(let i = 0; i < nodes_split.length; i++){
-                if(nodes_split[i] === "2") {
-                    tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+"2A", btw[0]+"2B"]);
-                    between_nodes = [btw[0]+"2A", btw[0]+"2B"];
-                }
-                else {
+                // if(nodes_split[i] === "2") {
+                //     tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+"2A", btw[0]+"2B"]);
+                //     between_nodes = [btw[0]+"2A", btw[0]+"2B"];
+                // }
+                // else {
                     between_nodes.push(btw[0]+nodes_split[i]);
-                }
+//                }
             }
         });
 
@@ -630,52 +722,88 @@ function Patients() {
         return groups;
     }
 
-    queue()
-        .defer(d3.json, "data/json/tanimoto_weighted.json")
-        .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=2.csv")
-        .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=3.csv")
-        .defer(d3.csv, "data/csv/clusters/03_2018/cluster_average_3_2018_k=5.csv")
-        .defer(d3.csv, "data/csv/clusters/03_2018/cluster_complete_3_2018_k=2.csv")
-        .defer(d3.csv, "data/csv/clusters/03_2018/cluster_complete_3_2018_k=3.csv")
-        .defer(d3.csv, "data/csv/clusters/03_2018/cluster_complete_3_2018_k=4.csv")
-        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_complete_4_2018_k=5.csv")
-        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_complete_4_2018_k=6.csv")
-        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_4_2018_k=3.csv")
-        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_4_2018_k=4.csv")
-        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_4_2018_k=5.csv")
-        .defer(d3.csv, "data/csv/clusters/04_2018/cluster_weighted_41_different_4_2018.csv")
-        .defer(d3.csv, "data/csv/predictions/predict_outcome_lymph.csv")
-        // .defer(d3.json, "data/json/tanimoto_edges.json")
-        //.defer(d3.json, "data/json/jaccard.json")
-        .await(function (error, weighted,
-                         clusters_ak2, clusters_ak3, clusters_ak5,
-                         clusters_c2, clusters_c3 , clusters_c4, clusters_c5, clusters_c6,
-                         cluster_wc3, cluster_wc4, cluster_wc5,
-                         diff, predictions) {
+       App.utils.readFiles(function (error, weighted, weighted_w3 , weighted_w4, weighted_w6,
+                                     weighted_c3 , weighted_c4, weighted_c6,
+                                         /*weighted_c2, weighted_c3 , weighted_c4, weighted_c5, weighted_c6, weighted_w2, weighted_w3 , weighted_w4, weighted_w5,weighted_w6,
+                                         nodes_c2, nodes_c3 , nodes_c4, nodes_c5, nodes_c6, nodes_w2, nodes_w3 , nodes_w4, nodes_w5,nodes_w6 //diffs_n_b
+
+       */
+
+       )
+       {
             if (error){ return console.warn(error); }
 
             App.weighted = weighted;
             App.sites = [];
 
-            /* Utility functions */
-            App.utils = App.Utilities();
-
             /* Iterate through the data and pull out each patient's information */
             App.weighted.forEach(function (patient) {
 
                 // extract the clusters based on the patient's id
-                let patient_clusters = parse_clusters(patient.id,
+                let patient_groups = parse_clusters(patient.id,
                     [
-                        // clusters_ak2, clusters_ak3, clusters_ak5,
-                        clusters_c2, clusters_c3, clusters_c4, clusters_c5, clusters_c6,
-                        cluster_wc3,cluster_wc4,cluster_wc5,
-                        diff],
-                    "group", [
-                                // "Average, k=2", "Average, k=3", "Average, k=5",
-                                "Complete, k=2", "Complete, k=3","Complete, k=4","Complete, k=5","Complete, k=6",
-                                "Weighted, k=3", "Weighted, k=4", "Weighted, k=5",
-                                "Diff., k=1" ] ),
-                    patient_predictions = parse_predictions(patient,predictions),
+                        // bigrams_c2, bigrams_c3 , bigrams_c4,
+                        weighted_w3,
+                        weighted_w4,
+                        weighted_w6,
+                      weighted_c3,
+                      weighted_c4,
+                      weighted_c6,
+                        // bigrams_w2, bigrams_w3 , bigrams_w4,
+                        // bigrams_w6,
+                        // nodes_c2, nodes_c3 , nodes_c4,
+                        // nodes_c6,
+                        // nodes_w2, nodes_w3 , nodes_w4,
+                        //nodes_w4,// diffs_n_b
+                    ],
+                    "groupId",
+                    [
+                        // "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4",
+                        // "Weighted, Comp. k=6",
+                        // "Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
+                        "Weighted, Weight. k=3",
+                        "Weighted, Weight. k=4",
+                        "Weighted, Weight. k=6",
+                      "Weighted, Comp. k=3",
+                      "Weighted, Comp. k=4",
+                      "Weighted, Comp. k=6",
+                        // "Bigrams, Weight. k=6",
+                        // "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4",
+                        // "Labels, Comp. k=6",
+                        // "Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
+                        // "Labels, Weight. k=4",// "Diffs, Labels & Bigrams"
+                    ] ),
+                    patient_dendogramIds = parse_clusters(patient.id,
+                    [
+                        // bigrams_c2, bigrams_c3 , bigrams_c4,
+                      weighted_w3,
+                      weighted_w4,
+                      weighted_w6,
+                      weighted_c3,
+                      weighted_c4,
+                      weighted_c6,                        // bigrams_w2, bigrams_w3 , bigrams_w4,
+                        // bigrams_w6,
+                        // nodes_c2, nodes_c3 , nodes_c4,
+                        // nodes_c6,
+                        // nodes_w2, nodes_w3 , nodes_w4,
+                        // nodes_w4,// diffs_n_b
+                    ],
+                    "dendogramId",
+                    [
+                        // "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4",
+                        // "Weighted, Comp. k=6",
+                        // "Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
+                      "Weighted, Weight. k=3",
+                      "Weighted, Weight. k=4",
+                      "Weighted, Weight. k=6",
+                      "Weighted, Comp. k=3",
+                      "Weighted, Comp. k=4",
+                      "Weighted, Comp. k=6",                        // "Bigrams, Weight. k=6",
+                        // "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4",
+                        // "Labels, Comp. k=6",
+                        // "Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
+                        //"Labels, Weight. k=4",// "Diffs, Labels & Bigrams"
+                    ] ),
                     between = [],
                     nodes = extract_nodes(patient, between);
 
@@ -694,16 +822,8 @@ function Patients() {
                     "aspiration_pre" : patient["Aspiration_rate_Pre-therapy"] ? patient["Aspiration_rate_Pre-therapy"] : "NA" ,
                     "aspiration_post" : patient["Aspiration_rate_Post-therapy"] ? patient["Aspiration_rate_Post-therapy"] : "NA",
                     "neck_boost" : patient["Neck_boost"] ? patient["Neck_boost"] : "NA",
-                    "clusters": patient_clusters,
-                    "predictions":
-                        {
-                            "enjoyment": parseFloat(patient_predictions.pred_Enjoy),
-                            "enjoyment_bin": bin_prediction(parseFloat(patient_predictions.pred_Enjoy)),
-                            "feeding_tube": parseFloat(patient_predictions.prob_feeding_tube),
-                            "feeding_tube_bin": bin_prediction(parseFloat(patient_predictions.prob_feeding_tube)),
-                            "aspirating": parseFloat(patient_predictions.prob_aspiration),
-                            "aspirating_bin": bin_prediction(parseFloat(patient_predictions.prob_aspiration)),
-                        }
+                    "clusters": patient_groups,
+                    "dendrogram": patient_dendogramIds
                 };
                 /* Create the bubble sets for every patient */
                 site.groups  = extract_bubble_groups(site);
