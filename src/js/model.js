@@ -796,8 +796,7 @@ function Patients() {
                         // "Weighted, Comp. k=6",
                         // "Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
                       "Spatial k=6",
-"" +
-"\"                      "Non-Spatial k=6",
+                        "Non-Spatial k=6",
                       // "Bigrams, Weight. k=6",
                         // "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4",
                         // "Labels, Comp. k=6",
