@@ -414,7 +414,7 @@ def parse_graph_nodes(m_id, m_parsed_nodes):
                         set_graph_node(current_graph, semantic + c, 0.25)
             else:
                 if n[1:].lower() == "rp":
-                    set_graph_node(current_graph, n, -2.0)
+                    set_graph_node(current_graph, n, -1.0)
                 else:
                     set_graph_node(current_graph, n, 1.0)
     return m_tween
@@ -528,7 +528,7 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['weighted', 'nodes']:
+    for output in ['nodes']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/'+version+'/json/tanimoto_edges_' + parsing + '.json'
