@@ -3,13 +3,16 @@
 <style>
 
 .node circle {
-  fill: #fff;
   stroke: steelblue;
   stroke-width: 1.5px;
 }
 
 .node {
   font: 10px sans-serif;
+}
+
+.parent, .grandparent {
+  fill: lightsteelblue
 }
 
 .link {
@@ -23,45 +26,170 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-var width = 800,
-    height = 550;
+let width = 2600,
+    height = 1020;
 
-var cluster = d3.layout.cluster()
-    .size([height, width - 160]);
+let cluster = d3.layout.cluster()
+    .size([width, height-160]);
 
-var diagonal = d3.svg.diagonal()
-    .projection(function(d) { return [d.y, d.x]; });
+let diagonal = d3.svg.diagonal()
+  .projection(function(d) { return [d.x, d.y]; });
 
-var svg = d3.select("body").append("svg")
+let data, maxDepth = 0;
+
+let svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height)
   .append("g")
-    .attr("transform", "translate(40,0)");
+    .attr("transform", "translate(0,40)");
 
-d3.json("d3-dendrogram.json", function(error, root) {
-  var nodes = cluster.nodes(root),
-      links = cluster.links(nodes);
 
-  var link = svg.selectAll(".link")
+function elbow(d, i) {
+  let path =  "M" + d.source.x + "," + d.source.y
+    + "H" + d.target.x + "V" + d.target.y ;
+  // if(d.target._children && d.target._children.length)
+  //   path += "H" + d.target.x;
+  return path;
+}
+
+function getMaxDepth(root) {
+  let fringe = [{node: root, depth: 1}];
+  let current = fringe.pop();
+  let max = 0, currentLeaves = 0;
+  let childrenCounts = [];
+
+  while (current && current.node) {
+    let node = current.node, children = node.children;
+
+    // Find all children of this node.
+    if (children.length === 2) {
+      fringe.push({node: children[0], depth: current.depth + 1});
+      fringe.push({node: children[1], depth: current.depth + 1});
+    }
+    else if (children.length === 1) {
+      fringe.push({node: children[0], depth: current.depth + 1});
+    }
+    else {
+      currentLeaves += 1;
+    }
+
+    if (current.depth > max) {
+      max = current.depth;
+      childrenCounts.push(currentLeaves);
+
+      if(children) {
+        childrenCounts[max-1] += children.length;
+      }
+
+    }
+    else if(children) {
+      childrenCounts[current.depth-1] += children.length;
+    }
+
+    current = fringe.pop();
+  }
+
+  return childrenCounts;
+}
+
+function getNumberChildrenPerDepth(root, maxDepth) {
+
+
+
+  let fringe = [{node: root, depth: 1}]
+    , current = fringe.pop()
+    , max = 0;
+
+  while (current && current.node) {
+    let node = current.node, children = node.children;
+
+    // Find all children of this node.
+    if (children.length === 2) {
+      fringe.push({node: children[0], depth: current.depth + 1});
+      fringe.push({node: children[1], depth: current.depth + 1});
+    }
+    else if (children.length === 1) {
+      fringe.push({node: children[0], depth: current.depth + 1});
+    }
+
+    /* */
+    childrenCounts[current.depth] += current.depth;
+
+    current = fringe.pop();
+  }
+
+
+
+}
+
+function update(root) {
+  let nodes = cluster.nodes(root);
+
+  svg.selectAll("path.link").remove();
+  svg.selectAll("g.node").remove();
+
+  let links = cluster.links(nodes)
+    , link = svg.selectAll(".link")
       .data(links)
-    .enter().append("path")
+      .enter().append("path")
       .attr("class", "link")
-      .attr("d", diagonal);
+    .attr("d", elbow);
+      // .attr("d", diagonal);
 
-  var node = svg.selectAll(".node")
-      .data(nodes)
+  let node = svg.selectAll(".node")
+    .data(nodes)
     .enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+    .attr("class", "node")
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   node.append("circle")
-      .attr("r", 4.5);
-  //
-  // node.append("text")
-  //     .attr("dx", function(d) { return d.children ? -8 : 8; })
-  //     .attr("dy", 3)
-  //     .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
-  //     .text(function(d) { return d.name; });
+    .attr("r", 4.5)
+    .attr("class", (d) => {
+      let children = d.children || d._children;
+      return (children && children.length) ? (children.some(function(c) { return c.children; })
+        ? "grandparent"
+        : "parent")
+        : "child";
+    })
+    .on("click", click);
+
+  node.append("text")
+    .attr("dx", function(d) { return d.children ? -8 : 8; })
+    .attr("dy", 3)
+    .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+    .text(function(d) {
+      return (d3.select(this.parentNode).select("circle").attr("class") === "child") ?  d.name : "";
+
+    });
+}
+function collapse(d) {
+  if (d.children) {
+    d._children = d.children;
+    d._children.forEach(collapse);
+    d.children = null;
+  }
+}
+
+// Toggle children on click.
+function click(d) {
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  } else {
+    d.children = d._children;
+    d._children = null;
+  }
+  update(data);
+}
+
+d3.json("d3-dendrogram.json", function(error, hier) {
+
+  data = hier;
+
+  //maxDepth = getMaxDepth(hier);
+
+  data.children.forEach(collapse);
+  update(data);
 });
 
 d3.select(self.frameElement).style("height", height + "px");

@@ -48,25 +48,6 @@ id2name = dict(zip(range(len(labels)), labels))
 
 Z = linkage(similarity_matrix, 'weighted')
 
-# Example data: gene expression
-# geneExp = {'genes' : ['a', 'b', 'c', 'd', 'e', 'f'],
-#      	   'exp1': [-2.2, 5.6, 0.9, -0.23, -3, 0.1],
-# 	   'exp2': [5.4, -0.5, 2.33, 3.1, 4.1, -3.2]
-#           }
-# df = pd.DataFrame( geneExp )
-
-# Create dictionary for labeling nodes by their IDs
-# labels = list(df.genes)
-# id2name = dict(zip(range(len(labels)), labels))
-
-# Determine distances (default is Euclidean)
-# dataMatrix = np.array( df[['exp1', 'exp2']] )
-# distMat = scipy.spatial.distance.pdist( dataMatrix )
-#
-# # Cluster hierarchicaly using scipy
-# clusters = scipy.cluster.hierarchy.linkage(distMat, method='single')
-
-
 plt.figure(figsize=(25, 10))
 plt.title('Hierarchical Clustering Dendrogram')
 plt.xlabel('sample index')
@@ -79,8 +60,9 @@ tree = dendrogram(
     leaf_rotation=90.,  # rotates the x axis labels
     leaf_font_size=8,  # font size for the x axis labels
     color_threshold=5.4,
-    labels=labels, orientation='right'
+    labels=labels, orientation='top'
 )
+plt.show()
 
 T = hierarchy.to_tree( Z , rd=False )
 d3Dendro = dict(children=[], name="Root1")
@@ -88,5 +70,3 @@ add_node( T, d3Dendro )
 label_tree( d3Dendro["children"][0] )
 json.dump(d3Dendro, open("d3-dendrogram.json", "w"), sort_keys=True, indent=4)
 
-
-plt.show()
