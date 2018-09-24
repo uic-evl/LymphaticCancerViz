@@ -4,7 +4,9 @@
 
 .node circle {
   stroke: steelblue;
-  stroke-width: 1.5px;
+  /*stroke-width: 1.5px;*/
+  fill: lightsteelblue
+
 }
 
 .node {
@@ -26,16 +28,14 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-let width = 2600,
-    height = 1020;
+let width = 1600
+    , height = 1020
+    , yOffset = 160;
 
 let cluster = d3.layout.cluster()
-    .size([width, height-160]);
+    .size([width, height-yOffset]);
 
-let diagonal = d3.svg.diagonal()
-  .projection(function(d) { return [d.x, d.y]; });
-
-let data, maxDepth = 0;
+let data, yScale;
 
 let svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -52,78 +52,17 @@ function elbow(d, i) {
   return path;
 }
 
-function getMaxDepth(root) {
-  let fringe = [{node: root, depth: 1}];
-  let current = fringe.pop();
-  let max = 0, currentLeaves = 0;
-  let childrenCounts = [];
-
-  while (current && current.node) {
-    let node = current.node, children = node.children;
-
-    // Find all children of this node.
-    if (children.length === 2) {
-      fringe.push({node: children[0], depth: current.depth + 1});
-      fringe.push({node: children[1], depth: current.depth + 1});
-    }
-    else if (children.length === 1) {
-      fringe.push({node: children[0], depth: current.depth + 1});
-    }
-    else {
-      currentLeaves += 1;
-    }
-
-    if (current.depth > max) {
-      max = current.depth;
-      childrenCounts.push(currentLeaves);
-
-      if(children) {
-        childrenCounts[max-1] += children.length;
-      }
-
-    }
-    else if(children) {
-      childrenCounts[current.depth-1] += children.length;
-    }
-
-    current = fringe.pop();
-  }
-
-  return childrenCounts;
-}
-
-function getNumberChildrenPerDepth(root, maxDepth) {
-
-
-
-  let fringe = [{node: root, depth: 1}]
-    , current = fringe.pop()
-    , max = 0;
-
-  while (current && current.node) {
-    let node = current.node, children = node.children;
-
-    // Find all children of this node.
-    if (children.length === 2) {
-      fringe.push({node: children[0], depth: current.depth + 1});
-      fringe.push({node: children[1], depth: current.depth + 1});
-    }
-    else if (children.length === 1) {
-      fringe.push({node: children[0], depth: current.depth + 1});
-    }
-
-    /* */
-    childrenCounts[current.depth] += current.depth;
-
-    current = fringe.pop();
-  }
-
-
-
-}
-
 function update(root) {
+
   let nodes = cluster.nodes(root);
+
+  nodes.forEach(function(d) {
+    if(d.dist) {
+      if(d.dist && !d.collapsed){
+        d.y = height - yScale(d.dist) - yOffset;
+      }
+    }
+  });
 
   svg.selectAll("path.link").remove();
   svg.selectAll("g.node").remove();
@@ -132,25 +71,23 @@ function update(root) {
     , link = svg.selectAll(".link")
       .data(links)
       .enter().append("path")
-      .attr("class", "link")
+  // .filter((d)=>{
+  //   return d.dist > 2.5
+  // })
+  .attr("class", "link")
     .attr("d", elbow);
       // .attr("d", diagonal);
 
   let node = svg.selectAll(".node")
     .data(nodes)
     .enter().append("g")
+  .filter((d)=>{return d.dist > 0})
     .attr("class", "node")
-    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    .attr("dist", (d)=>d.dist)
+    .attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
 
   node.append("circle")
-    .attr("r", 4.5)
-    .attr("class", (d) => {
-      let children = d.children || d._children;
-      return (children && children.length) ? (children.some(function(c) { return c.children; })
-        ? "grandparent"
-        : "parent")
-        : "child";
-    })
+    .attr("r", 2.5)
     .on("click", click);
 
   node.append("text")
@@ -162,11 +99,19 @@ function update(root) {
 
     });
 }
-function collapse(d) {
+
+function collapse(dist, d) {
   if (d.children) {
-    d._children = d.children;
-    d._children.forEach(collapse);
-    d.children = null;
+
+    if(d.dist < dist) {
+      d._children = d.children;
+      d._children.forEach(collapse.bind(this, dist));
+      d.children = null;
+      d.collapsed = true;
+    }
+    else {
+      d.children.forEach(collapse.bind(this, dist));
+    }
   }
 }
 
@@ -175,20 +120,22 @@ function click(d) {
   if (d.children) {
     d._children = d.children;
     d.children = null;
+    d.collapsed = true;
   } else {
     d.children = d._children;
     d._children = null;
+    d.collapsed = false;
   }
   update(data);
 }
 
 d3.json("d3-dendrogram.json", function(error, hier) {
-
   data = hier;
+  yScale = d3.scale.linear()
+    .domain([0, hier.children[0].dist])
+    .range([0, cluster.size()[1]]);
 
-  //maxDepth = getMaxDepth(hier);
-
-  data.children.forEach(collapse);
+  data.children.forEach(collapse.bind(this, 2.3));
   update(data);
 });
 
