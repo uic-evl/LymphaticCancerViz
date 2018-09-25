@@ -18,6 +18,8 @@
   stroke-width: 3px;
 }
 
+.x.axis path,
+.x.axis line,
 .y.axis path,
 .y.axis line {
   fill: none;

@@ -13,6 +13,7 @@ var App = App || {};
       .await(function(err, data){
         App.dendrogram.init(data);
       });
+    App.dendrogram.setCut(5.4);
   }
 
   /* start the application once the DOM is ready */
