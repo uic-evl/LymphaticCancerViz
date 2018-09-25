@@ -4,8 +4,8 @@ var App = App || {};
 const Dendrogram = (function(){
 
   let width , height
-    , padding = {x:0, y:100}
-    , margin = {left: 150, top: 40, right: 50, bottom: 20}
+    , padding = {x:0, y:50}
+    , margin = {left: 150, top: 40, right: 50, bottom: 150}
     , height_offset = margin.top + margin.bottom
     , width_offset = margin.left + margin.right;
 
@@ -84,7 +84,7 @@ const Dendrogram = (function(){
       /* Add the axis to the svg */
       let axis = d3.select(svg.node().parentNode).append("g")
         .attr("class", "y axis")
-        .attr("transform", `translate(${margin.left/2.0}, ${margin.bottom})`)
+        .attr("transform", `translate(${margin.left/2.0}, ${margin.top})`)
         .call(yAxis);
 
       // text label for the y axis
@@ -92,7 +92,7 @@ const Dendrogram = (function(){
         .attr("class", "y label")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left/2)
-        .attr("x",0 - (height / 2))
+        .attr("x",0 - ( (height-height_offset) / 2))
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
         .attr("font-weight", "bold")
@@ -102,31 +102,38 @@ const Dendrogram = (function(){
 
     this.setupXAxis = function(data) {
 
-      let maxX = d3.max(data, (d)=>d.x),
-          minX = d3.min(data, (d)=>d.x);
+      let values = data.filter((d)=> {if(d.y === cluster.size()[1]) return d.x});
 
-      xScale = d3.scale.linear()
-      .domain([minX, maxX])
-      .range([0, width-margin.right]);
-
-
-      let xAxis = d3.svg.axis()
-      .orient("bottom")
-      .scale(xScale);
-
-      let axis = d3.select(svg.node().parentNode).append("g")
+      let axis = d3.select(svg.node().parentNode).insert("g", ":first-child")
       .attr("class", "x axis")
-      .attr("transform", `translate(${margin.left/2.0}, ${height - margin.bottom - padding.y / 2.0})`)
-      .call(xAxis);
+      .attr("transform", `translate(${margin.left/2.0}, ${height - height_offset})`);
 
-      // axis.append("line")
-      // .attr("x1",x(minX))
-      // .attr("y1", height+margin.bottom)
-      // .attr("x2",x(maxX))
-      // .attr("y2", height+margin.bottom);
+      axis.append("line")
+      .attr("x1", 0)
+      .attr("x2", cluster.size()[0] + margin.left/2.0)
+      .attr("y1", margin.top)
+      .attr("y2", margin.top);
+
+      axis.selectAll(".xlabel")
+      .data(_.map(values, 'x'))
+      .enter().append("line")
+      .attr("class","ticks")
+      .attr("x1", (d)=> d + margin.left/2.0)
+      .attr("x2", (d)=> d + margin.left/2.0)
+      .attr("y1", margin.top - 4)
+      .attr("y2", margin.top + 8);
+
+      axis.append("text")
+      .attr("class", "x label")
+      .attr("x", (width-width_offset)/2.0)
+      .attr("y", margin.bottom)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "20px")
+      .attr("font-weight", "bold")
+      .attr("dy", "1em")
+      .text("Nodal Involvement");
 
     };
-
   }
 
   Dendrogram.prototype.update = function(root) {
@@ -140,7 +147,7 @@ const Dendrogram = (function(){
     self.usedColors.fill(0);
 
     nodes.forEach(function(d) {
-      if(d.dist) { if(!d.collapsed){ d.y = height - yScale(d.dist) - margin.bottom - padding.y } }
+      if(d.dist) { if(!d.collapsed){ d.y = cluster.size()[1] - yScale(d.dist)} }
       delete d.color;
     });
 
@@ -148,7 +155,8 @@ const Dendrogram = (function(){
     App.graphUtilities.iterativeInOrder(nodes[0], self.setColor.bind(self, self.cut));
 
     svg.selectAll("path.link").remove();
-    svg.selectAll("g.node").remove();
+    svg.selectAll("g").remove();
+    d3.selectAll(".x.axis").remove();
 
     self.setupXAxis(nodes);
 
@@ -189,7 +197,7 @@ const Dendrogram = (function(){
     height = document.getElementsByTagName("body")[0].offsetHeight;
 
     cluster = d3.layout.cluster()
-      .size([width - margin.left - margin.right, height - height_offset - padding.y / 2.0]);
+      .size([width - width_offset, height - height_offset ]);
 
     svg = d3.select("#dendrogram").append("svg")
       .attr("width", width)
@@ -198,7 +206,6 @@ const Dendrogram = (function(){
       .attr("transform",`translate(${margin.left},${margin.top})`);
 
     /* Create the Y scale and axis */
-
     yScale = d3.scale.linear()
       .domain([0, data.children[0].dist])
       .range([0, cluster.size()[1]]);
@@ -206,7 +213,7 @@ const Dendrogram = (function(){
     /* Setup the y-axis*/
     self.setupYAxis(data);
 
-    data.children.forEach(self.collapse.bind(this));
+    data.children.forEach(self.collapse.bind(this, 2.3));
     self.update(data);
   };
 
