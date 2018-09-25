@@ -139,6 +139,11 @@ const Dendrogram = (function(){
       .text("Nodal Involvement");
 
     };
+
+    /**/
+    this.addTicks = function(data) {
+
+    };
   }
 
   Dendrogram.prototype.update = function(root) {
