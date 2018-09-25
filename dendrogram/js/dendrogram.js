@@ -4,19 +4,21 @@ var App = App || {};
 const Dendrogram = (function(){
 
   let width , height
-    , padding = [100,40]
+    , padding = {x:0, y:100}
     , margin = {left: 150, top: 40, right: 50, bottom: 20}
-    , height_offset = margin.top + margin.bottom;
+    , height_offset = margin.top + margin.bottom
+    , width_offset = margin.left + margin.right;
 
   let cluster;
 
-  let svg, yScale, data;
+  let svg, yScale, xScale, data;
 
   function Dendrogram(colorScale) {
 
     let self = this;
     self.colorIndex = 0;
     self.colorScale = colorScale || colorbrewer.Set1["9"];
+    self.cut = 0;
 
     /* Ensures all the colros have been used before skipping to the next */
     self.usedColors = new Array(self.colorScale.length);
@@ -29,7 +31,6 @@ const Dendrogram = (function(){
 
     this.collapse = (dist, d) => {
       if (d.children) {
-
         if(d.dist < dist) {
           d._children = d.children;
           d._children.forEach(self.collapse.bind(this, dist));
@@ -68,7 +69,7 @@ const Dendrogram = (function(){
           self.colorIndex++;
         }
       }
-    }
+    };
 
     this.setupYAxis = function(data) {
 
@@ -83,7 +84,7 @@ const Dendrogram = (function(){
       /* Add the axis to the svg */
       let axis = d3.select(svg.node().parentNode).append("g")
         .attr("class", "y axis")
-        .attr("transform", `translate(${margin.left/2.0}, ${padding[1]})`)
+        .attr("transform", `translate(${margin.left/2.0}, ${margin.bottom})`)
         .call(yAxis);
 
       // text label for the y axis
@@ -97,11 +98,38 @@ const Dendrogram = (function(){
         .attr("font-weight", "bold")
         .attr("dy", "1em")
         .text("Merge Level");
-    }
+    };
+
+    this.setupXAxis = function(data) {
+
+      let maxX = d3.max(data, (d)=>d.x),
+          minX = d3.min(data, (d)=>d.x);
+
+      xScale = d3.scale.linear()
+      .domain([minX, maxX])
+      .range([0, width-margin.right]);
+
+
+      let xAxis = d3.svg.axis()
+      .orient("bottom")
+      .scale(xScale);
+
+      let axis = d3.select(svg.node().parentNode).append("g")
+      .attr("class", "x axis")
+      .attr("transform", `translate(${margin.left/2.0}, ${height - margin.bottom - padding.y / 2.0})`)
+      .call(xAxis);
+
+      // axis.append("line")
+      // .attr("x1",x(minX))
+      // .attr("y1", height+margin.bottom)
+      // .attr("x2",x(maxX))
+      // .attr("y2", height+margin.bottom);
+
+    };
 
   }
 
-  Dendrogram.prototype.update = function(root, cut) {
+  Dendrogram.prototype.update = function(root) {
 
     let self = this
       , nodes = cluster.nodes(root);
@@ -111,41 +139,37 @@ const Dendrogram = (function(){
     self.usedColors = new Array(self.colorScale.length);
     self.usedColors.fill(0);
 
-    /* Assign color based on the cut */
-    App.graphUtilities.iterativeInOrder(nodes[0], self.setColor.bind(self, cut || 0));
-
     nodes.forEach(function(d) {
-      if(d.dist) {
-        if(d.dist && !d.collapsed){
-          d.y = height - yScale(d.dist) - height_offset;
-        }
-      }
+      if(d.dist) { if(!d.collapsed){ d.y = height - yScale(d.dist) - margin.bottom - padding.y } }
+      delete d.color;
     });
+
+    /* Assign color based on the cut */
+    App.graphUtilities.iterativeInOrder(nodes[0], self.setColor.bind(self, self.cut));
 
     svg.selectAll("path.link").remove();
     svg.selectAll("g.node").remove();
+
+    self.setupXAxis(nodes);
 
     let links = cluster.links(nodes)
       , link = svg.selectAll(".link")
       .data(links)
       .enter().append("path")
-      // .filter((d)=>{
-      //   return d.dist > 2.5
-      // })
       .attr("class", "link")
       .attr("d", self.elbow)
-      .attr("stroke", (d) => { return (d.source.color === d.target.color) ? d.source.color : "black"; });
+      .attr("stroke", (d) => { return (d.source.color === d.target.color) ? d.source.color : "black";});
 
     let node = svg.selectAll(".node")
       .data(nodes)
       .enter().append("g")
-      // .filter((d)=>{return d.dist > 0})
+      .filter((d)=>{return d.dist > 0})
       .attr("class", "node")
       .attr("dist", (d)=>d.dist)
       .attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
 
     node.append("circle")
-      .attr("r", 2.5)
+      .attr("r", 4.5)
       .on("click", self.click);
     //
     // node.append("text")
@@ -165,7 +189,7 @@ const Dendrogram = (function(){
     height = document.getElementsByTagName("body")[0].offsetHeight;
 
     cluster = d3.layout.cluster()
-      .size([width - margin.left - margin.right, height - height_offset]);
+      .size([width - margin.left - margin.right, height - height_offset - padding.y / 2.0]);
 
     svg = d3.select("#dendrogram").append("svg")
       .attr("width", width)
@@ -182,9 +206,11 @@ const Dendrogram = (function(){
     /* Setup the y-axis*/
     self.setupYAxis(data);
 
-    data.children.forEach(self.collapse.bind(this, 2.3));
-    self.update(data, 5.4);
+    data.children.forEach(self.collapse.bind(this));
+    self.update(data);
   };
+
+  Dendrogram.prototype.setCut = function(cut) { this.cut = cut;};
 
   return Dendrogram;
 
