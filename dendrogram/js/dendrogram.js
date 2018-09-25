@@ -79,7 +79,12 @@ const Dendrogram = (function(){
 
       let yAxis = d3.svg.axis()
         .orient("left")
-        .scale(yAxisScale);
+        .scale(yAxisScale)
+        /* Grid lines */
+        // .innerTickSize(-width)
+        // .outerTickSize(0)
+        // .tickPadding(10)
+      ;
 
       /* Add the axis to the svg */
       let axis = d3.select(svg.node().parentNode).append("g")
