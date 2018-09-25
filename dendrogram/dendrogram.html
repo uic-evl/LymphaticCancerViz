@@ -1,144 +1,25 @@
-<!DOCTYPE html>
+<html>
 <meta charset="utf-8">
-<style>
 
-.node circle {
-  stroke: steelblue;
-  /*stroke-width: 1.5px;*/
-  fill: lightsteelblue
+<head>
 
-}
+  <link type="text/css" rel="stylesheet" href="css/main.css" >
 
-.node {
-  font: 10px sans-serif;
-}
 
-.parent, .grandparent {
-  fill: lightsteelblue
-}
+  <script type='text/javascript' src='../lib/js/d3.min.js'></script>
+  <script type='text/javascript' src='../lib/js/colorbrewer.min.js'></script>
+  <script type='text/javascript' src='../lib/js/lodash.min.js'></script>
+  <script src="../lib/js/queue.v1.min.js"></script>
 
-.link {
-  fill: none;
-  stroke: #ccc;
-  stroke-width: 1.5px;
-}
+  <script type='text/javascript' src='js/utilities.js'></script>
+  <script type='text/javascript' src='js/dendrogram.js'></script>
+  <script type='text/javascript' src='js/main.js'></script>
+</head>
 
-</style>
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script>
 
-let width = 1600
-    , height = 1020
-    , yOffset = 160;
+<div id="dendrogram"></div>
 
-let cluster = d3.layout.cluster()
-    .size([width, height-yOffset]);
+</body>
 
-let data, yScale;
-
-let svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height)
-  .append("g")
-    .attr("transform", "translate(0,40)");
-
-
-function elbow(d, i) {
-  let path =  "M" + d.source.x + "," + d.source.y
-    + "H" + d.target.x + "V" + d.target.y ;
-  // if(d.target._children && d.target._children.length)
-  //   path += "H" + d.target.x;
-  return path;
-}
-
-function update(root) {
-
-  let nodes = cluster.nodes(root);
-
-  nodes.forEach(function(d) {
-    if(d.dist) {
-      if(d.dist && !d.collapsed){
-        d.y = height - yScale(d.dist) - yOffset;
-      }
-    }
-  });
-
-  svg.selectAll("path.link").remove();
-  svg.selectAll("g.node").remove();
-
-  let links = cluster.links(nodes)
-    , link = svg.selectAll(".link")
-      .data(links)
-      .enter().append("path")
-  // .filter((d)=>{
-  //   return d.dist > 2.5
-  // })
-  .attr("class", "link")
-    .attr("d", elbow);
-      // .attr("d", diagonal);
-
-  let node = svg.selectAll(".node")
-    .data(nodes)
-    .enter().append("g")
-  .filter((d)=>{return d.dist > 0})
-    .attr("class", "node")
-    .attr("dist", (d)=>d.dist)
-    .attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
-
-  node.append("circle")
-    .attr("r", 2.5)
-    .on("click", click);
-
-  node.append("text")
-    .attr("dx", function(d) { return d.children ? -8 : 8; })
-    .attr("dy", 3)
-    .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
-    .text(function(d) {
-      return (d3.select(this.parentNode).select("circle").attr("class") === "child") ?  d.name : "";
-
-    });
-}
-
-function collapse(dist, d) {
-  if (d.children) {
-
-    if(d.dist < dist) {
-      d._children = d.children;
-      d._children.forEach(collapse.bind(this, dist));
-      d.children = null;
-      d.collapsed = true;
-    }
-    else {
-      d.children.forEach(collapse.bind(this, dist));
-    }
-  }
-}
-
-// Toggle children on click.
-function click(d) {
-  if (d.children) {
-    d._children = d.children;
-    d.children = null;
-    d.collapsed = true;
-  } else {
-    d.children = d._children;
-    d._children = null;
-    d.collapsed = false;
-  }
-  update(data);
-}
-
-d3.json("d3-dendrogram.json", function(error, hier) {
-  data = hier;
-  yScale = d3.scale.linear()
-    .domain([0, hier.children[0].dist])
-    .range([0, cluster.size()[1]]);
-
-  data.children.forEach(collapse.bind(this, 2.3));
-  update(data);
-});
-
-d3.select(self.frameElement).style("height", height + "px");
-
-</script>
+</html>
