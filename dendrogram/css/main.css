@@ -1,0 +1,33 @@
+.node circle {
+  stroke: steelblue;
+  /*stroke-width: 1.5px;*/
+  fill: lightsteelblue
+
+}
+
+.node {
+  font: 10px sans-serif;
+}
+
+.parent, .grandparent {
+  fill: lightsteelblue
+}
+
+.link {
+  fill: none;
+  stroke-width: 3px;
+}
+
+.y.axis path,
+.y.axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+  stroke-width: 3px;
+}
+
+.y.label text {
+  text-anchor: middle;
+  font-weight: bold;
+  font-size: 24px ;
+}
