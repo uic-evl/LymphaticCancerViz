@@ -177,7 +177,6 @@ const Dendrogram = (function(){
     };
 
     this.getGraph = function() {
-
       let me = this
         , img = new Image()
         , svgString = new XMLSerializer().serializeToString(d3.select("#templates svg").node())
@@ -208,7 +207,11 @@ const Dendrogram = (function(){
     /**/
     this.addInvolvementImages = function(data) {
 
-      this.getGraph().then(function(png){ self.setupXAxis(data, png);});
+      this.getGraph().then(function(png){
+
+        self.setupXAxis(data, png);
+
+      });
 
     };
   }
@@ -229,7 +232,15 @@ const Dendrogram = (function(){
     });
 
     /* Assign color based on the cut */
-    App.graphUtilities.iterativeInOrder(nodes[0], self.setColor.bind(self, self.cut));
+    App.graphUtilities.iterativeInOrder(nodes[0], function(node){
+      self.setColor(self.cut, node);
+      // App.graphUtilities.getGroupConsensus(cluster);
+
+      if(node.cluster && node.cluster.length > 0) {
+        console.log(node.cluster);
+      }
+
+    });
 
     svg.selectAll("path.link").remove();
     svg.selectAll("g").remove();
@@ -277,6 +288,7 @@ const Dendrogram = (function(){
       left: Math.ceil(width/100)*10, top: Math.ceil(height/100)*2,
       right: Math.ceil(width/100)*5, bottom: Math.ceil(height/100)*20
     };
+
     height_offset = margin.top + margin.bottom;
     width_offset = margin.left + margin.right;
 
