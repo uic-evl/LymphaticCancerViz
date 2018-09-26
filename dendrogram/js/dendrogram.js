@@ -5,7 +5,7 @@ const Dendrogram = (function(){
 
   let width , height
     , padding = {x:0, y:50}
-    , margin = {left: 150, top: 40, right: 50, bottom: 150}
+    , margin = {left: 150, top: 30, right: 60, bottom: 150}
     , height_offset = margin.top + margin.bottom
     , width_offset = margin.left + margin.right;
 
@@ -54,7 +54,7 @@ const Dendrogram = (function(){
         d._children = null;
         d.collapsed = false;
       }
-      self.update(data);
+      self.update();
     };
 
     this.setColor = function(cut, d) {
@@ -96,7 +96,7 @@ const Dendrogram = (function(){
       axis.append("text")
         .attr("class", "y label")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left/2)
+        .attr("y", 0 - margin.left/3)
         .attr("x",0 - ( (height-height_offset) / 2))
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
@@ -105,7 +105,7 @@ const Dendrogram = (function(){
         .text("Merge Level");
     };
 
-    this.setupXAxis = function(data) {
+    this.setupXAxis = function(data, png, size) {
 
       let values = data.filter((d)=> {if(d.y === cluster.size()[1]) return d.x});
 
@@ -119,14 +119,32 @@ const Dendrogram = (function(){
       .attr("y1", margin.top)
       .attr("y2", margin.top);
 
-      axis.selectAll(".xlabel")
-      .data(_.map(values, 'x'))
-      .enter().append("line")
-      .attr("class","ticks")
-      .attr("x1", (d)=> d + margin.left/2.0)
-      .attr("x2", (d)=> d + margin.left/2.0)
-      .attr("y1", margin.top - 4)
-      .attr("y2", margin.top + 8);
+      // axis.selectAll(".xlabel")
+      // .data(_.map(values, 'x'))
+      // .enter().append("line")
+      // .attr("class","ticks")
+      // .attr("x1", (d)=> d + margin.left/2.0)
+      // .attr("x2", (d)=> d + margin.left/2.0)
+      // .attr("y1", margin.top - 4)
+      // .attr("y2", margin.top + 8);
+
+      let ticks = axis.selectAll(".ximages")
+        .data(_.map(values, 'x')).enter()
+        .append("g");
+
+      ticks.append("image")
+        .attr("height", size)
+        .attr("x", (d)=> d - size/2)
+        .attr("y", margin.top)
+        .attr("width", size)
+        .attr("xlink:href", png);
+
+      ticks.append("line")
+        .attr("class","ticks")
+        .attr("x1", (d)=> d)
+        .attr("x2", (d)=> d)
+        .attr("y1", margin.top - 4)
+        .attr("y2", margin.top + 8);
 
       axis.append("text")
       .attr("class", "x label")
@@ -140,16 +158,55 @@ const Dendrogram = (function(){
 
     };
 
+    this.setupTemplates = function(width, height) {
+      this.templateCanvas = d3.select("#templates").append("canvas")
+        .attr("width", width)
+        .attr("height", height).node();
+
+      this.templateCTX = this.templateCanvas.getContext("2d");
+    };
+
+    this.getGraph = function() {
+
+      let me = this
+        , img = new Image()
+        , svgString = new XMLSerializer().serializeToString(d3.select("#templates svg").node())
+        , graphSVG = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"})
+        , DOMURL = window.URL || window.webkitURL || window
+        , url = DOMURL.createObjectURL(graphSVG)
+        , canvasWidth = this.templateCanvas.width
+        , canvasHeight = this.templateCanvas.height;
+
+      return new Promise((function(resolve){
+
+        img.onload = function() {
+          /* Clear the canvas and draw the image */
+          // me.templateCTX.fillStyle = "white";
+          // me.templateCTX.fillRect(0, 0, canvasWidth, canvasHeight);
+          me.templateCTX.drawImage(img, 0, 0);
+
+          /* Access the PNG source, clean up the image, and resolve the promise */
+          let png = me.templateCanvas.toDataURL("image/png");
+          DOMURL.revokeObjectURL(png);
+
+          resolve(png);
+        };
+        img.src = url;
+      }));
+    };
+
     /**/
-    this.addTicks = function(data) {
+    this.addInvolvementImages = function(data) {
+
+      this.getGraph().then(function(png){ self.setupXAxis(data, png, 75);});
 
     };
   }
 
-  Dendrogram.prototype.update = function(root) {
+  Dendrogram.prototype.update = function() {
 
     let self = this
-      , nodes = cluster.nodes(root);
+      , nodes = cluster.nodes(data);
 
     /* Reset the coloring variables */
     self.colorIndex = 0;
@@ -168,7 +225,7 @@ const Dendrogram = (function(){
     svg.selectAll("g").remove();
     d3.selectAll(".x.axis").remove();
 
-    self.setupXAxis(nodes);
+    self.addInvolvementImages(nodes);
 
     let links = cluster.links(nodes)
       , link = svg.selectAll(".link")
@@ -199,21 +256,26 @@ const Dendrogram = (function(){
     //   });
   };
 
-  Dendrogram.prototype.init = function(hier) {
+  Dendrogram.prototype.init = function(hier, options) {
     let self = this;
     data = hier;
 
     width = document.getElementsByTagName("body")[0].offsetWidth;
     height = document.getElementsByTagName("body")[0].offsetHeight;
 
+    /* Setup canvas and SVG */
+    self.setupTemplates(options.width, options.height);
+
     cluster = d3.layout.cluster()
-      .size([width - width_offset, height - height_offset ]);
+      .size([width - margin.right/2.0 - margin.left/3.0, height - height_offset ])
+      /* A value of 1 makes the separation of all nodes equal */
+      .separation((a,b)=>1);
 
     svg = d3.select("#dendrogram").append("svg")
       .attr("width", width)
       .attr("height", height)
       .append("g")
-      .attr("transform",`translate(${margin.left},${margin.top})`);
+      .attr("transform",`translate(${margin.left/2.0},${margin.top})`);
 
     /* Create the Y scale and axis */
     yScale = d3.scale.linear()
@@ -224,7 +286,7 @@ const Dendrogram = (function(){
     self.setupYAxis(data);
 
     data.children.forEach(self.collapse.bind(this, 2.3));
-    self.update(data);
+    // self.update(data);
   };
 
   Dendrogram.prototype.setCut = function(cut) { this.cut = cut;};
