@@ -1,6 +1,6 @@
 import sys, csv, copy, json
-from operator import itemgetter
-import datetime
+import unicodedata, datetime
+from pprint import pprint
 from collections import OrderedDict
 from Graph import Graph
 from Patient import Patient
@@ -18,10 +18,12 @@ g_sorted_scores = {}
 
 tanimoto_edges_output = {}
 tanimoto_nodes_output = {}
+tanimoto_bigrams_output = {}
 tanimoto_weighted_output = {}
 jaccard_output = {}
 
 output = ""
+parsing = ""
 ids = []
 rp_ids = []
 non_rp_ids = []
@@ -34,7 +36,7 @@ m = None
 now = datetime.datetime.now()
 
 
-# Write the patient metadata anc scores to a CSV file
+# Write the patient metadata and scores to a CSV file
 def write_to_csv(current_patient, patient_order, scores):
     ordered_scores = []
     for mid in sorted(ids):
@@ -84,14 +86,14 @@ def write_to_json(current_patient, patient_order, scores):
 
 
 # Write out the similarity matrix to a csv file
-def write_to_scores(m_file_name, m_header):
+def write_to_scores(fileName, header):
     # read in the json file
-    json_data = json.load(open(m_file_name, 'r'), object_pairs_hook=OrderedDict)
+    json_data = json.load(open(fileName, 'r'), object_pairs_hook=OrderedDict)
     # create a csv vile
-    idx = m_file_name.rfind('/')
-    name = m_file_name[idx:-5] + '_Data_and_Scores_' + str(now.month) + '_' + str(now.year) + '.csv'
+    idx = fileName.rfind('/')
+    name = fileName[idx:-5] + '_Data_and_Scores_' + str(now.month) + '_' + str(now.year) + '.csv'
     name = name[1].upper() + name[2:]
-    csv_name = './data/scores/' + name
+    csv_name = './data/'+version+'/scores/' + name
     csv_file = open(csv_name, 'w')
 
     # our writing object
@@ -114,8 +116,9 @@ def write_to_scores(m_file_name, m_header):
                     header_titles.append(h)
                 col += 1
             # write the header
-            header_list = m_header.split(",")
+            header_list = header.split(",")
             csv_writer.writerow(header_titles + header_list)
+            # print header_titles
             count += 1
         # parse the values
         col = 0
@@ -148,7 +151,7 @@ def write_patient_data(scores_all):
 
 def init_matrix_file(m_header):
     global m
-    m = open('./data/matrices/' + output + '_' + 'matrix.csv', 'w')
+    m = open('./data/'+version+'/matrices/' + output + '_' + parsing + '_' + 'matrix.csv', 'w')
     m.write(",")
     m.write(m_header)
     m.write('\r')
@@ -158,11 +161,11 @@ def read_matrix_data(m_file):
     global lymph_nodes
     global adjacency_matrix
 
-    with open(m_file, 'r') as m_csvFile:
+    with open(m_file, 'r') as mCsvFile:
         # create a csv reader
-        m_reader = csv.reader(m_csvFile, delimiter=',')
+        mReader = csv.reader(mCsvFile, delimiter=',')
         # iterate over the rows of the csv file
-        for row in m_reader:
+        for row in mReader:
 
             # first row, read the lymph node headers
             if not row[0]:
@@ -242,7 +245,8 @@ def sort_by_scores(scores, other_patients):
 
 
 def compute_similarity(patient_list):
-    global patients_pointer, tanimoto_edges_output, tanimoto_nodes_output, tanimoto_weighted_output, jaccard_output
+    global patients_pointer, tanimoto_edges_output, tanimoto_nodes_output, tanimoto_weighted_output, \
+        tanimoto_bigrams_output, jaccard_output
 
     # calculate the similarity and output it to the files
     od = OrderedDict(sorted(patient_list.items()))
@@ -260,6 +264,8 @@ def compute_similarity(patient_list):
         # store the scores of the test
         tanimoto_edges_scores = []
         tanimoto_nodes_scores = []
+        tanimoto_bigrams_scores = []
+
         jaccard_scores = []
 
         # iterate over all of the other patients
@@ -269,31 +275,40 @@ def compute_similarity(patient_list):
             #     continue
 
             # Find all of the common edges between patient A and patient B
-            a_edges = set(patientA.get_all_edges())
-            b_edges = set(patientB.get_all_edges())
-            common_list = sorted(list(a_edges | b_edges))
+            common_list = sorted(list(set(patientA.get_all_edges()) | set(patientB.get_all_edges())))
 
             # Find all of the common node/node pairs between patient A and patient B
             common_combined_nodes = sorted(
                 list(set(patientA.get_all_combined_nodes()) | set(patientB.get_all_combined_nodes())))
+
+            bigrams_a = patientA.get_all_combined_nodes_bigrams()
+            bigrams_b = patientB.get_all_combined_nodes_bigrams()
+
+            common_nodes_bigrams = sorted( list( set(bigrams_a) | set(bigrams_b) ) )
 
             # Create the edge vector for each patient
             vector_a_edges = patientA.get_edges_vector(common_list)
             vector_b_edges = patientB.get_edges_vector(common_list)
 
             #  Create the node vector for each patient
-            vector_a_nodes = patientA.get_nodes_vector(common_combined_nodes)
-            vector_b_nodes = patientB.get_nodes_vector(common_combined_nodes)
+            vector_a_nodes = patientA.get_nodes_vector(common_combined_nodes, False)
+            vector_b_nodes = patientB.get_nodes_vector(common_combined_nodes, False)
+
+            vector_a_nodes_bigrams = patientA.get_nodes_vector(common_nodes_bigrams, True)
+            vector_b_nodes_bigrams = patientB.get_nodes_vector(common_nodes_bigrams, True)
 
             # Compute the scores
             tanimoto_nodes = sim.compute_tanimoto_coeff(vector_a_nodes, vector_b_nodes)
             tanimoto_edges = sim.compute_tanimoto_coeff(vector_a_edges, vector_b_edges)
+            tanimoto_bigrams = sim.compute_tanimoto_coeff(vector_a_nodes_bigrams, vector_b_nodes_bigrams)
+
             jaccard = sim.compute_jaccard_coeff(patientA.get_all_unique_nodes(),
                                                 patientB.get_all_unique_nodes())
 
             # Save the scores to their respective arrays
             tanimoto_edges_scores.append(tanimoto_edges)
             tanimoto_nodes_scores.append(tanimoto_nodes)
+            tanimoto_bigrams_scores.append(tanimoto_bigrams)
             jaccard_scores.append(jaccard)
 
         # Find the maximum score (necessary because there may be no edges )
@@ -305,18 +320,19 @@ def compute_similarity(patient_list):
 
         # Normalize all of the scores (tanimoto nodes, jaccard, and weighted tanimoto)
         tanimoto_nodes_scores = [float(i) / max(tanimoto_nodes_scores) for i in tanimoto_nodes_scores]
+        tanimoto_bigrams_scores = [float(i) / max(tanimoto_bigrams_scores) for i in tanimoto_bigrams_scores]
         jaccard_scores = [float(i) / max(jaccard_scores) for i in jaccard_scores]
-        tanimoto = [tanimoto_edges_scores[i] * 0.5 + tanimoto_nodes_scores[i] * 0.5 for i in
+        tanimoto_weighted = [tanimoto_edges_scores[i] * 0.5 + tanimoto_bigrams_scores[i] * 0.5 for i in
                     range(len(tanimoto_edges_scores))]
 
         tanimoto_edges_output[keyA] = sort_by_scores(tanimoto_edges_scores, other_patients)
         tanimoto_nodes_output[keyA] = sort_by_scores(tanimoto_nodes_scores, other_patients)
-        tanimoto_weighted_output[keyA] = sort_by_scores(tanimoto, other_patients)
+        tanimoto_bigrams_output[keyA] = sort_by_scores(tanimoto_bigrams_scores, other_patients)
+        tanimoto_weighted_output[keyA] = sort_by_scores(tanimoto_weighted, other_patients)
         jaccard_output[keyA] = sort_by_scores(jaccard_scores, other_patients)
 
 
 def set_graph_node(cg, infected, score):
-
     # set the level
     cg.set_node_value(infected[1:])
     # add the full node name to keep track
@@ -325,11 +341,11 @@ def set_graph_node(cg, infected, score):
     cg.set_value_at(infected[1:], infected[1:], score)
 
 
-def parse_input_data(reader):
-    result = {}
-    for row in reader:
+def parse_input_data(m_reader):
+    m_result = {}
+    for row in m_reader:
         key = row.pop('Dummy ID')
-        if key in result:
+        if key in m_result:
             pass
         parsed = {}
         for attr in row:
@@ -338,37 +354,20 @@ def parse_input_data(reader):
                 id = id[:-1]
             parsed[id] = row[attr]
         if key.isdigit():
-            result[int(key)] = parsed
-    return result
+            m_result[int(key)] = parsed
+    return m_result
 
 
 def parse_patient_nodes(m_nodes):
-
     # strip out the white space string
     stripped_nodes = [x.strip(" ").replace('L RPLN', 'LRP') for x in m_nodes]
     stripped_nodes = [x.strip(" ").replace('R RPLN', 'RRP') for x in stripped_nodes]
 
-    # stripped_nodes = list(set(stripped_nodes))
+    stripped_nodes = list(set(stripped_nodes))
 
     m_parsed_nodes = [x.strip(" ").replace('2/3', '23') for x in stripped_nodes]
     m_parsed_nodes = [x.strip(" ").replace('3/4', '34') for x in m_parsed_nodes]
     m_parsed_nodes = [x.strip(" ").replace('2/3/4', '234') for x in m_parsed_nodes]
-
-    lrp = 0
-    rrp = 0
-    if 'LRP' in m_parsed_nodes:
-        m_parsed_nodes.remove('LRP')
-        lrp = "LRP"
-    if 'RRP' in m_parsed_nodes:
-        m_parsed_nodes.remove('RRP')
-        rrp = 'RRP'
-
-    sorted(m_parsed_nodes, key=itemgetter(slice(1, None)))
-
-    if lrp is not 0:
-        m_parsed_nodes.append(lrp)
-    if rrp is not 0:
-        m_parsed_nodes.append(rrp)
 
     return m_parsed_nodes
 
@@ -385,7 +384,7 @@ def parse_tumor_position(m_tumor_position):
     return m_tumor_position
 
 
-def parse_graph_nodes(left_graph, right_graph, m_parsed_nodes):
+def parse_graph_nodes(m_id, m_parsed_nodes):
     # add the nodes to the graph
     m_tween = 0
     for node in m_parsed_nodes:
@@ -398,11 +397,9 @@ def parse_graph_nodes(left_graph, right_graph, m_parsed_nodes):
         if node[0] == 'R':
             current_graph = right
 
-        # if the node is 5, then we add both a and b
-        if len(node[1:]) == 1 and (node[1:] == "5" or node[1:] == "1" or node[1:] == "2"):
+        # if the node is 2 and no sub node, then we add both a and b
+        if len(node[1:]) == 1 and (node[1:] == "2"):
             new_nodes = [node + 'A', node + 'B']
-        elif node[1:].lower() == "3a":
-            new_nodes = [node[0] + '3']
 
         # add the nodes to the graph
         for n in new_nodes:
@@ -417,7 +414,7 @@ def parse_graph_nodes(left_graph, right_graph, m_parsed_nodes):
                         set_graph_node(current_graph, semantic + c, 0.25)
             else:
                 if n[1:].lower() == "rp":
-                    set_graph_node(current_graph, n, -3.0)
+                    set_graph_node(current_graph, n, -1.0)
                 else:
                     set_graph_node(current_graph, n, 1.0)
     return m_tween
@@ -427,15 +424,16 @@ def parse_graph_nodes(left_graph, right_graph, m_parsed_nodes):
 if __name__ == "__main__":
     data = sys.argv[1]
     connectivity = sys.argv[2]
+    version = sys.argv[3]
+    parsing = "UPPER"
 
     patient_attr = {}
-    result = {}
 
     patients_w_dupes = []
     # iterate over the rows of the csv file
     valid_ids = []
 
-    node_column_name = 'Affected_Lymph_node_UPPER'
+    node_column_name = 'Affected_Lymph_node_' + str(parsing)
     tumor_column_name = 'Tm_Laterality'
 
     # read in the adjacency matrix
@@ -448,16 +446,16 @@ if __name__ == "__main__":
         result = parse_input_data(reader)
 
     # Parse the input data
-    for m_id in result:
-        m_id = str(m_id)
+    for id in result:
+        id = str(id)
         # no id given, we can't use
-        if len(m_id) == 0:
+        if len(id) == 0:
             continue
 
         parsed = {}
 
         # get the patient number and create the patient object
-        patient_id = int(m_id)
+        patient_id = int(id)
         patient = Patient(patient_id)
 
         # add the possible lymph nodes to the patient
@@ -465,7 +463,7 @@ if __name__ == "__main__":
         patient.set_adjacency_matrix(adjacency_matrix)
 
         # parse the nodes from the row
-        nodes = result[int(m_id)][node_column_name].split(',')
+        nodes = result[int(id)][node_column_name].split(',')
 
         # No infected nodes available
         if 'N/A' in nodes or len(nodes[0]) == 0:
@@ -473,16 +471,15 @@ if __name__ == "__main__":
 
         # parse the nodes
         parsed_nodes = parse_patient_nodes(nodes)
-
         # get the longest item (test purposes)
         longest_item = max(parsed_nodes, key=len)
 
         # get and set the patient gender
-        gender = str(result[int(m_id)]["Gender"]).lower()
+        gender = str(result[int(id)]["Gender"]).lower()
         patient.set_gender(gender)
 
         # get and set the tumor position
-        tumor_position = parse_tumor_position(result[int(m_id)][tumor_column_name].strip(" "))
+        tumor_position = parse_tumor_position(result[int(id)][tumor_column_name].strip(" "))
         patient.set_tumor_position(tumor_position)
 
         # create the graph for the left and right lymph nodes
@@ -490,7 +487,7 @@ if __name__ == "__main__":
         right = Graph(lymph_nodes, lymph_nodes)
 
         # add the nodes to the graph
-        tween = parse_graph_nodes(left, right, parsed_nodes)
+        tween = parse_graph_nodes(id, parsed_nodes)
 
         if tween:
             continue
@@ -507,7 +504,7 @@ if __name__ == "__main__":
             patient.set_graphs(left, right, 1.0)
         else:
             patient.set_output_nodes(parsed_nodes)
-            patient.set_graphs(left, right, 0.125)
+            patient.set_graphs(left, right, 0.25)
 
         # add the graphs to the non-rp dictionary
         if "rp" not in (right_nodes + left_nodes):
@@ -518,7 +515,7 @@ if __name__ == "__main__":
             rp_ids.append(patient_id)
 
         # keep the rest of the parsed attributes
-        patient_attr[m_id] = result[int(m_id)]
+        patient_attr[id] = result[int(id)]
 
     all_patients = rp_patients.copy()
     all_patients.update(non_rp_patients)
@@ -531,25 +528,30 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['weighted', 'nodes']:
+    for output in ['nodes']:
         if output == "edges":
             init_matrix_file(header)
-            file_name = './data/json/tanimoto_edges.json'
+            file_name = 'data/'+version+'/json/tanimoto_edges_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_edges_output
         elif output == "nodes":
             init_matrix_file(header)
-            file_name = './data/json/tanimoto_nodes.json'
+            file_name = 'data/'+version+'/json/tanimoto_nodes_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_nodes_output
         elif output == "weighted":
             init_matrix_file(header)
-            file_name = './data/json/tanimoto_weighted.json'
+            file_name = 'data/'+version+'/json/tanimoto_weighted_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_weighted_output
+        elif output == "bigram":
+            init_matrix_file(header)
+            file_name = 'data/'+version+'/json/tanimoto_bigrams_' + parsing + '.json'
+            f = open(file_name, 'w')
+            scores_out = tanimoto_bigrams_output
         elif output == "jaccard":
             init_matrix_file(header)
-            file_name = './data/json/jaccard.json'
+            file_name = 'data/'+version+'/json/jaccard_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = jaccard_output
 
