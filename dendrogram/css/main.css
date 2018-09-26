@@ -1,3 +1,7 @@
+body {
+  background-color: #f5f5f5;
+}
+
 .node circle {
   stroke: steelblue;
   /*stroke-width: 1.5px;*/
@@ -8,7 +12,6 @@
 .node {
   font: 10px sans-serif;
 }
-
 .parent, .grandparent {
   fill: lightsteelblue
 }
@@ -16,6 +19,7 @@
 .link {
   fill: none;
   stroke-width: 3px;
+  shape-rendering: crispEdges;
 }
 
 .x.axis path,
@@ -37,4 +41,9 @@
 .tick line{
   opacity: 0.1;
   stroke-dasharray: 5,5;
+}
+
+.hidden {
+  visibility: hidden;
+  display: none;
 }
