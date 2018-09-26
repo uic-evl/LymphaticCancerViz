@@ -143,7 +143,7 @@ const PatientGraph = (function(){
 
       self.width = options.width;
       self.height = options.height;
-      self.padding = options.padding || 10;
+      self.padding = options.padding || 5;
       self.radius = options.radius || 10;
 
       return new Promise(function(resolve) {
