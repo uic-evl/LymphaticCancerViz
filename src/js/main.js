@@ -172,10 +172,7 @@ var App = App || {};
             target: _.find(App.template.nodes, {"name": "3"}).index,
             name: "2A-3"
         },
-        // {
-        //   source: _.find(App.template.nodes, {"name": "2A"}).index,
-        //   target: _.find(App.template.nodes, {"name": "5A"}).index,
-        // },
+
         {
             source: _.find(App.template.nodes, {"name": "2B"}).index,
             target: _.find(App.template.nodes, {"name": "5A"}).index,
@@ -186,10 +183,6 @@ var App = App || {};
             target: _.find(App.template.nodes, {"name": "4"}).index,
             name: "3-4"
         },
-        // {
-        //   source: _.find(App.template.nodes, {"name": "3"}).index,
-        //   target: _.find(App.template.nodes, {"name": "1B"}).index,
-        // },
         {
             source: _.find(App.template.nodes, {"name": "3"}).index,
             target: _.find(App.template.nodes, {"name": "5A"}).index,

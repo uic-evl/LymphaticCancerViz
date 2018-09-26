@@ -1,0 +1,49 @@
+body {
+  background-color: #f5f5f5;
+}
+
+.node circle {
+  stroke: steelblue;
+  /*stroke-width: 1.5px;*/
+  fill: lightsteelblue
+
+}
+
+.node {
+  font: 10px sans-serif;
+}
+.parent, .grandparent {
+  fill: lightsteelblue
+}
+
+.link {
+  fill: none;
+  stroke-width: 3px;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path,
+.x.axis line,
+.y.axis path,
+.y.axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+  stroke-width: 3px;
+}
+
+.y.label text {
+  text-anchor: middle;
+  font-weight: bold;
+  font-size: 24px ;
+}
+
+.tick line{
+  opacity: 0.1;
+  stroke-dasharray: 5,5;
+}
+
+.hidden {
+  visibility: hidden;
+  display: none;
+}

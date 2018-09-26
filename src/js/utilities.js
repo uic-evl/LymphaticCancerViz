@@ -66,16 +66,15 @@ var App = App || {};
     function read_input_files(cb) {
 
         queue()
-            .defer(d3.json, "data/1.3.0/json/tanimoto_weighted_UPPER.json")
+            .defer(d3.json, "data/1.3.1/json/tanimoto_weighted_UPPER.json")
 
-            // .defer(d3.csv, "data/1.3.0/clusters/weighted/cluster_weighted_weighted_6_2018_k=3.csv")
-            // .defer(d3.csv, "data/1.3.0/clusters/weighted/cluster_weighted_weighted_6_2018_k=4.csv")
-            // .defer(d3.csv, "data/1.3.0/clusters/weighted/cluster_weighted_weighted_6_2018_k=6.csv")
-            // .defer(d3.csv, "data/1.3.0/clusters/weighted/cluster_complete_weighted_6_2018_k=3.csv")
-            // .defer(d3.csv, "data/1.3.0/clusters/weighted/cluster_complete_weighted_6_2018_k=4.csv")
+            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=3.csv")
+            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=4.csv")
+            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=6.csv")
+            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_complete_weighted_9_2018_k=3.csv")
+            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_complete_weighted_9_2018_k=4.csv")
             .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=6.csv")
             .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=6.csv")
-            // .defer(d3.csv, "data/1.3.0/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=6.csv")
             // .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_weighted_9_2018_k=30.csv")
             // .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_bigrams_6_2018_k=6.csv")
             // .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=4.csv")
