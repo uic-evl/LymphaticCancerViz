@@ -3,15 +3,9 @@ var App = App || {};
 
 const Dendrogram = (function(){
 
-  let width , height
-    , padding = {x:0, y:50}
-    , margin = {left: 150, top: 30, right: 60, bottom: 150}
-    , height_offset = margin.top + margin.bottom
-    , width_offset = margin.left + margin.right;
+  let svg, yScale, data, cluster;
+  let width , height, margin, height_offset, width_offset;
 
-  let cluster;
-
-  let svg, yScale, xScale, data;
 
   function Dendrogram(colorScale) {
 
@@ -81,9 +75,9 @@ const Dendrogram = (function(){
         .orient("left")
         .scale(yAxisScale)
         /* Grid lines */
-        // .innerTickSize(-width)
-        // .outerTickSize(0)
-        // .tickPadding(10)
+        .innerTickSize(-width)
+        .outerTickSize(0)
+        .tickPadding(10)
       ;
 
       /* Add the axis to the svg */
@@ -96,8 +90,8 @@ const Dendrogram = (function(){
       axis.append("text")
         .attr("class", "y label")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left/3)
-        .attr("x",0 - ( (height-height_offset) / 2))
+        .attr("y", 0 - margin.left/2.0)
+        .attr("x",0 - ( (height-height_offset) / 2.0))
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
         .attr("font-weight", "bold")
@@ -105,9 +99,10 @@ const Dendrogram = (function(){
         .text("Merge Level");
     };
 
-    this.setupXAxis = function(data, png, size) {
+    this.setupXAxis = function(data, png) {
 
-      let values = data.filter((d)=> {if(d.y === cluster.size()[1]) return d.x});
+      let values = data.filter((d) => {if(d.y === cluster.size()[1]) return d.x})
+        , imageSize = _.clamp(Math.ceil((cluster.size()[0] + width_offset)/values.length), 20, margin.bottom/2.25);
 
       let axis = d3.select(svg.node().parentNode).insert("g", ":first-child")
       .attr("class", "x axis")
@@ -128,18 +123,33 @@ const Dendrogram = (function(){
       // .attr("y1", margin.top - 4)
       // .attr("y2", margin.top + 8);
 
-      let ticks = axis.selectAll(".ximages")
+      let ticksRow1 = axis.selectAll(".ximages")
         .data(_.map(values, 'x')).enter()
         .append("g");
 
-      ticks.append("image")
-        .attr("height", size)
-        .attr("x", (d)=> d - size/2)
+      let ticksRow2 = axis.selectAll(".ximages")
+        .data(_.map(values, 'x')).enter()
+        .append("g")
+        .filter((d,i)=>{ return i % 2 });
+
+      /* First row of graphs */
+      ticksRow1.append("image")
+        .attr("height", imageSize)
+        .attr("x", (d)=> d - imageSize/2.0)
         .attr("y", margin.top)
-        .attr("width", size)
+        .attr("width", imageSize)
         .attr("xlink:href", png);
 
-      ticks.append("line")
+      /* Second row of graphs */
+      ticksRow2.append("image")
+        .attr("height", imageSize)
+        .attr("x", (d)=> d - imageSize/2.0)
+        .attr("y", imageSize + margin.top )
+        .attr("width", imageSize)
+        .attr("xlink:href", png);
+
+      /* Tick marks under the axis */
+      ticksRow1.append("line")
         .attr("class","ticks")
         .attr("x1", (d)=> d)
         .attr("x2", (d)=> d)
@@ -148,8 +158,8 @@ const Dendrogram = (function(){
 
       axis.append("text")
       .attr("class", "x label")
-      .attr("x", (width-width_offset)/2.0)
-      .attr("y", margin.bottom)
+      .attr("x", (width-margin.left/3.0)/2.0)
+      .attr("y", imageSize*2.0 + margin.top)
       .attr("text-anchor", "middle")
       .attr("font-size", "20px")
       .attr("font-weight", "bold")
@@ -198,7 +208,7 @@ const Dendrogram = (function(){
     /**/
     this.addInvolvementImages = function(data) {
 
-      this.getGraph().then(function(png){ self.setupXAxis(data, png, 75);});
+      this.getGraph().then(function(png){ self.setupXAxis(data, png);});
 
     };
   }
@@ -262,6 +272,13 @@ const Dendrogram = (function(){
 
     width = document.getElementsByTagName("body")[0].offsetWidth;
     height = document.getElementsByTagName("body")[0].offsetHeight;
+
+    margin = {
+      left: Math.ceil(width/100)*10, top: Math.ceil(height/100)*2,
+      right: Math.ceil(width/100)*5, bottom: Math.ceil(height/100)*20
+    };
+    height_offset = margin.top + margin.bottom;
+    width_offset = margin.left + margin.right;
 
     /* Setup canvas and SVG */
     self.setupTemplates(options.width, options.height);
