@@ -11,12 +11,18 @@ var App = App || {};
   function init() {
     queue()
       .defer(d3.json, "d3-dendrogram.json")
-      .await(function(err, data){
+      .defer(d3.json, "../data/1.3.1/json/tanimoto_weighted_UPPER.json")
+      .await(function(err, dendrogram, patients){
 
-        App.dendrogram.init(data, {width:250, height:250, radius: 15});
+        App.graphUtilities.parsePatientData(patients);
+
         App.GraphFactory.init({width:250, height:250, radius: 15})
           .then(O_o => {
+
             App.GraphFactory.newGraph("#templates");
+
+            App.dendrogram.init(dendrogram, {width:250, height:250, radius: 15});
+
             App.dendrogram.update();
 
           });

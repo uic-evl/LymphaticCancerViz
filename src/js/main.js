@@ -368,26 +368,24 @@ var App = App || {};
             ).join("L") + "Z";
     };
 
-    let groupFill = function (d) {
-        return (d.orientation === "left");
-    };
+    let groupFill = function (d) { return (d.orientation === "left"); };
 
     function createBubbles(svg, groups,id) {
 
-        d3.select("#between_pattern_"+id)
-            .selectAll("path")
-            .data(groups)
-            .enter().insert("path", "circle")
-            .classed("hull", true)
-            .classed("between_nodes", (d)=>{return d.between_nodes})
-            .classed("hull_left", (d)=>{return groupFill(d)})
-            .classed("hull_right", (d)=>{return !groupFill(d)})
-            .attr("d", function (d) {
-                if (d.nodes.length > 0 && d.between_nodes) {
-                    return groupPath(d.nodes[0]);
-                }
-            })
-            .attr("transform", "translate(" + App.transformX + ",-" + App.transformY + ")");
+        // d3.select("#between_pattern_"+id)
+        //     .selectAll("path")
+        //     .data(groups)
+        //     .enter().insert("path", "circle")
+        //     .classed("hull", true)
+        //     .classed("between_nodes", (d)=>{return d.between_nodes})
+        //     .classed("hull_left", (d)=>{return groupFill(d)})
+        //     .classed("hull_right", (d)=>{return !groupFill(d)})
+        //     .attr("d", function (d) {
+        //         if (d.nodes.length > 0 && d.between_nodes) {
+        //             return groupPath(d.nodes[0]);
+        //         }
+        //     })
+        //     .attr("transform", "translate(" + App.transformX + ",-" + App.transformY + ")");
 
         /* Adds the convex hulls */
         svg.selectAll("path")
