@@ -28,6 +28,35 @@ const PatientGraph = (function(){
 
     let groupFill = function (d) { return (d.orientation === "left"); };
 
+    this.createBubbles = function(svg, groups) {
+      /* Adds the convex hulls */
+      let bubbleSet = svg.append("g")
+        .attr("transform", "translate(" + self.transformX + ",-" + self.transformY + ")");
+
+      bubbleSet.selectAll("path")
+        .data(groups)
+        .enter().insert("path", "circle")
+        .classed("hull", true)
+        .classed("between_nodes", (d)=>{return d.between_nodes})
+        .classed("hull_left", (d)=>{return groupFill(d)})
+        .classed("hull_right", (d)=>{return !groupFill(d)})
+        .attr("d", function (d) {if (d.nodes.length > 0) { return groupPath(d.nodes[0]); }});
+
+      bubbleSet.selectAll(".hull")
+        .attr("stroke-width", "40px")
+        .attr("stroke-linejoin", "round")
+        .attr("opacity", "0.6");
+
+      bubbleSet.selectAll(".hull_left")
+        .attr("fill", "#1b9e77")
+        .attr("stroke", "#1b9e77");
+
+      bubbleSet.selectAll(".hull_right")
+        .attr("fill", "#7570b3")
+        .attr("stroke", "#7570b3");
+
+    };
+
     function addNodes(svg, lymphNodes) {
       let nodes = svg.selectAll("circle.node")
         .append('g')
@@ -80,37 +109,6 @@ const PatientGraph = (function(){
       ;
     }
 
-    function createBubbles (svg, groups, id) {
-
-      d3.select("#between_pattern_"+id)
-        .selectAll("path")
-        .data(groups)
-        .enter().insert("path", "circle")
-        .classed("hull", true)
-        .classed("between_nodes", (d)=>{return d.between_nodes})
-        .classed("hull_left", (d)=>{return groupFill(d)})
-        .classed("hull_right", (d)=>{return !groupFill(d)})
-        .attr("d", function (d) {
-          if (d.nodes.length > 0 && d.between_nodes) { return groupPath(d.nodes[0]); }
-        })
-        .attr("transform", "translate(" + self.transformX + ",-" + self.transformY + ")");
-
-      /* Adds the convex hulls */
-      svg.selectAll("path")
-        .data(groups)
-        .enter().insert("path", "circle")
-        .classed("hull", true)
-        .classed("between_nodes", (d)=>{
-          return d.between_nodes})
-        .classed("hull_left", (d)=>{return groupFill(d)})
-        .classed("hull_right", (d)=>{return !groupFill(d)})
-        .attr("d", function (d) {
-          if (d.nodes.length > 0) {
-            return groupPath(d.nodes[0]);
-          }
-        });
-    }
-
     self.createNetwork = function(svg) {
 
       /*Add a group to house each graph and center it in the container */
@@ -132,6 +130,55 @@ const PatientGraph = (function(){
       addNodes(g, self.nodes);
 
       return svg;
+    };
+
+    this.extractBubbleGroups = function(i_nodes) {
+      /* Store the two groups of nodes for the convex hull -- left and right */
+      let self = this,
+          groups = [], involvement = _.clone(i_nodes);
+
+      involvement.forEach(function (t,i) {
+
+        /* Check for empty sets */
+        if(t.length === 0) return;
+
+        /* Parse the data from the partitions */
+        let group = _.chain(t).map( p => p.substring(1)).value();
+
+        let connected_components = [group];
+        /* Check the connectedness of the nodes */
+        if(group.length > 1){
+          connected_components = App.graphUtilities.connectedComponents(group, self.edges);
+        }
+
+        /* Iterate over the node groupings */
+        connected_components.forEach(function (component_nodes) {
+
+          /* Collect the nodes to be used in the convex hull*/
+          let group_nodes = d3.nest().key(function (d) {
+            return (_.indexOf(component_nodes, d.name) >= 0) ? d & 3 : 1;
+          }).entries(self.nodes);
+
+          group_nodes = _.filter(group_nodes, function (o) {
+            return o.key === "0";
+          });
+
+          /* Add the nodes to the list */
+          groups.push({
+            orientation: function() {
+
+              if(i === 0) return "left";
+              else if(i === 1) return "right";
+
+              if(t.length > 0) return (t[0][0]==="R") ? "right" : "left";
+
+            }(),
+            nodes: group_nodes,
+          });
+        });
+      });
+
+      return groups;
     };
 
   }
