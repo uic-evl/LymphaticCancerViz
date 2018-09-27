@@ -6,13 +6,13 @@ const Dendrogram = (function(){
   let svg, yScale, data, cluster;
   let width , height, margin, height_offset, width_offset;
 
-
   function Dendrogram(colorScale) {
 
     let self = this;
     self.colorIndex = 0;
     self.colorScale = colorScale || colorbrewer.Set1["9"];
     self.cut = 0;
+    self.images = {};
 
     /* Ensures all the colros have been used before skipping to the next */
     self.usedColors = new Array(self.colorScale.length);
@@ -96,10 +96,7 @@ const Dendrogram = (function(){
         .text("Merge Level");
     };
 
-    this.setupXAxis = function(data, png) {
-
-      let values = data.filter((d) => {if(d.y === cluster.size()[1]) return d.x})
-        , imageSize = _.clamp(Math.ceil((cluster.size()[0] + width_offset)/values.length), 20, margin.bottom/2.25);
+    this.setupXAxis = function(values) {
 
       let axis = d3.select(svg.node().parentNode).insert("g", ":first-child")
       .attr("class", "x axis")
@@ -121,42 +118,42 @@ const Dendrogram = (function(){
       // .attr("y2", margin.top + 8);
 
       let ticksRow1 = axis.selectAll(".ximages")
-        .data(_.map(values, 'x')).enter()
+        .data(values).enter()
         .append("g");
 
-      let ticksRow2 = axis.selectAll(".ximages")
-        .data(_.map(values, 'x')).enter()
-        .append("g")
-        .filter((d,i)=>{ return i % 2 });
+      // let ticksRow2 = axis.selectAll(".ximages")
+      //   .data(_.map(values, 'x')).enter()
+      //   .append("g")
+      //   .filter((d,i)=>{ return i % 2 });
 
       /* First row of graphs */
       ticksRow1.append("image")
-        .attr("height", imageSize)
-        .attr("x", (d)=> d - imageSize/2.0)
+        .attr("x", d => d.x - d.size/2.0)
         .attr("y", margin.top)
-        .attr("width", imageSize)
-        .attr("xlink:href", png);
+        .attr("width", d => d.size)
+        .attr("height", d => d.size)
+        .attr("xlink:href", d => d.src);
 
-      /* Second row of graphs */
-      ticksRow2.append("image")
-        .attr("height", imageSize)
-        .attr("x", (d)=> d - imageSize/2.0)
-        .attr("y", imageSize + margin.top )
-        .attr("width", imageSize)
-        .attr("xlink:href", png);
+      // /* Second row of graphs */
+      // ticksRow2.append("image")
+      //   .attr("height", imageSize)
+      //   .attr("x", (d)=> d - imageSize/2.0)
+      //   .attr("y", imageSize + margin.top )
+      //   .attr("width", imageSize)
+      //   .attr("xlink:href", png);
 
       /* Tick marks under the axis */
       ticksRow1.append("line")
         .attr("class","ticks")
-        .attr("x1", (d)=> d)
-        .attr("x2", (d)=> d)
+        .attr("x1", d => d.x)
+        .attr("x2", d => d.x)
         .attr("y1", margin.top - 4)
         .attr("y2", margin.top + 8);
 
       axis.append("text")
       .attr("class", "x label")
       .attr("x", (width-margin.left/3.0)/2.0)
-      .attr("y", imageSize*2.0 + margin.top)
+      .attr("y", values[0].size * 2.0 + margin.top)
       .attr("text-anchor", "middle")
       .attr("font-size", "20px")
       .attr("font-weight", "bold")
@@ -165,18 +162,18 @@ const Dendrogram = (function(){
 
     };
 
-    this.setupTemplates = function(width, height) {
-      this.templateCanvas = d3.select("#templates").append("canvas")
-        .attr("width", width)
-        .attr("height", height).node();
-
-      this.templateCTX = this.templateCanvas.getContext("2d");
+    this.setupTemplate = function(id) {
+      return d3.select("#templates")
+        .append("canvas")
+        .attr("id", `c${id}`)
+        .attr("width", self.templateWidth)
+        .attr("height", self.templateHeight).node();
     };
 
-    this.getGraph = function() {
-      let me = this
+    this.getGraph = function(svg, canvas) {
+      let ctx = canvas.getContext("2d")
         , img = new Image()
-        , svgString = new XMLSerializer().serializeToString(d3.select("#templates svg").node())
+        , svgString = new XMLSerializer().serializeToString(svg)
         , graphSVG = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"})
         , DOMURL = window.URL || window.webkitURL || window
         , url = DOMURL.createObjectURL(graphSVG);
@@ -184,9 +181,9 @@ const Dendrogram = (function(){
       return new Promise((function(resolve){
 
         img.onload = function() {
-          me.templateCTX.drawImage(img, 0, 0);
+          ctx.drawImage(img, 0, 0);
           /* Access the PNG source, clean up the image, and resolve the promise */
-          let png = me.templateCanvas.toDataURL("image/png");
+          let png = canvas.toDataURL("image/png");
           DOMURL.revokeObjectURL(png);
           resolve(png);
         };
@@ -197,12 +194,60 @@ const Dendrogram = (function(){
     /**/
     this.addInvolvementImages = function(data) {
 
-      this.getGraph().then(function(png){
+      let self = this;
 
-        self.setupXAxis(data, png);
+      self.graphSVG = d3.select("#templates svg").node();
+      let values = data.filter((d) => {if(d.y === cluster.size()[1]) return d.x})
+        , imageSize = _.clamp(Math.ceil((cluster.size()[0] + width_offset)/values.length), 20, margin.bottom/2.25)
+        , consensus = App.graphUtilities.getConsensus(_.map(values, "node_id"))
+        , promises = [], order = [];
 
+      _.forIn(consensus, function(involvement, key){
+
+        // if(order.length > 0) return;
+
+        let consensusSVG = d3.select(`#templates #s${key}`), canvas;
+
+        order.push(parseInt(key));
+
+        if(!self.images[key]) {
+          /* Clone the graph SVG and canvas templates */
+
+          let graphSVG = self.graphSVG.cloneNode(true);
+          graphSVG.setAttribute("id", `s${key}`);
+
+          canvas = self.setupTemplate(key);
+
+          d3.select("#templates").node().appendChild(graphSVG);
+          consensusSVG = d3.select(`#templates #s${key}`);
+
+          /* Create the connected components for the bubble groups */
+          let bubbles = App.GraphFactory.extractBubbleGroups(involvement);
+          App.GraphFactory.createBubbles(consensusSVG, bubbles);
+
+          promises.push(new Promise(function(resolve){
+            self.getGraph(consensusSVG.node(), canvas).then(function(png) {
+              /* Clean up */
+              d3.select(`#templates #s${key}`).remove();
+              d3.select(`#templates #c${key}`).remove();
+
+              self.images[key] = png;
+              resolve(png)
+            });
+          }));
+        }
+        /* The image was already stored */
+        else {promises.push(Promise.resolve(self.images[key]))}
       });
 
+      Promise.all(promises).then(function(images){
+        images.forEach(function(image,i){
+          let value = _.find(values, {"node_id":order[i]});
+          value.src = image;
+          value.size = imageSize;
+        });
+        self.setupXAxis(values);
+      });
     };
   }
 
@@ -275,7 +320,10 @@ const Dendrogram = (function(){
     width_offset = margin.left + margin.right;
 
     /* Setup canvas and SVG */
-    self.setupTemplates(options.width, options.height);
+    self.templateWidth = options.width;
+    self.templateHeight = options.height;
+
+    //self.setupTemplates(options.width, options.height);
 
     cluster = d3.layout.cluster()
       .size([width - margin.right/2.0 - margin.left/3.0, height - height_offset ])
@@ -288,6 +336,7 @@ const Dendrogram = (function(){
       .append("g")
       .attr("transform",`translate(${margin.left/2.0},${margin.top})`);
 
+
     /* Create the Y scale and axis */
     yScale = d3.scale.linear()
       .domain([0, data.children[0].dist])
@@ -297,8 +346,7 @@ const Dendrogram = (function(){
     self.setupYAxis(data);
 
     /* Setup consensus groups*/
-    App.graphUtilities.getGroupConsensus(cluster.nodes(data));
-
+    App.graphUtilities.getGroupConsensus(cluster.nodes(data), 0.66);
 
     data.children.forEach(self.collapse.bind(this, 2.3));
   };

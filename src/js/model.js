@@ -632,46 +632,46 @@ function Patients() {
 
     function extract_bubble_groups(patient) {
         /* Store the two groups of nodes for the convex hull -- left and right */
-        let groups = [], tumors = _.clone(patient.nodes), between_nodes = [],
+        let groups = [], involvement = _.clone(patient.nodes), between_nodes = [],
             nodes = App.template.nodes;
 
-        /* Check for in-between nodes */
-        patient.between_nodes.forEach(function(btw){
+//         /* Check for in-between nodes */
+//         patient.between_nodes.forEach(function(btw){
+//
+//             let nodes_split = [ btw.slice(1, -1), btw.slice(-1)],
+//                 semantic_idx = (btw[0] === "L") ? 0 : 1;
+//
+//             for(let i = 0; i < nodes_split.length; i++){
+//                 // if(nodes_split[i] === "2") {
+//                 //     involvement[semantic_idx] = _.difference(involvement[semantic_idx], [btw[0]+"2A", btw[0]+"2B"]);
+//                 //     between_nodes = [btw[0]+"2A", btw[0]+"2B"];
+//                 // }
+//                 // else {
+//                     between_nodes.push(btw[0]+nodes_split[i]);
+// //                }
+//             }
+//         });
+//
+//         /* Add the between nodes to the tumor groups */
+//         if(between_nodes.length > 0) {
+//             let found = false;
+//             involvement.forEach(function(t,i){
+//                 if(_.intersection(t, between_nodes).length === between_nodes.length) {
+//                     involvement[i] = {nodes:between_nodes, between: true};
+//                     found = true;
+//                 }
+//             });
+//             if(!found){
+//                 involvement.push({nodes:between_nodes, between: true});
+//             }
+//         }
 
-            let nodes_split = [ btw.slice(1, -1), btw.slice(-1)],
-                semantic_idx = (btw[0] === "L") ? 0 : 1;
-
-            for(let i = 0; i < nodes_split.length; i++){
-                // if(nodes_split[i] === "2") {
-                //     tumors[semantic_idx] = _.difference(tumors[semantic_idx], [btw[0]+"2A", btw[0]+"2B"]);
-                //     between_nodes = [btw[0]+"2A", btw[0]+"2B"];
-                // }
-                // else {
-                    between_nodes.push(btw[0]+nodes_split[i]);
-//                }
-            }
-        });
-
-        /* Add the between nodes to the tumor groups */
-        if(between_nodes.length > 0) {
-            let found = false;
-            tumors.forEach(function(t,i){
-                if(_.intersection(t, between_nodes).length === between_nodes.length) {
-                    tumors[i] = {nodes:between_nodes, between: true};
-                    found = true;
-                }
-            });
-            if(!found){
-                tumors.push({nodes:between_nodes, between: true});
-            }
-        }
-
-        tumors.forEach(function (t,i) {
+      involvement.forEach(function (t,i) {
             let between = false;
-            if(!_.isArray(t)){
-                t = t.nodes;
-                between = true;
-            }
+            // if(!_.isArray(t)){
+            //     t = t.nodes;
+            //     between = true;
+            // }
 
             /* Check for empty sets */
             if(t.length === 0) return;
