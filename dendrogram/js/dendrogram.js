@@ -18,10 +18,7 @@ const Dendrogram = (function(){
     self.usedColors = new Array(self.colorScale.length);
     self.usedColors.fill(0);
 
-    this.elbow = (d) => {
-      return  "M" + d.source.x + "," + d.source.y
-        + "H" + d.target.x + "V" + d.target.y ;
-    };
+    this.elbow = (d) => { return  "M" + d.source.x + "," + d.source.y + "H" + d.target.x + "V" + d.target.y ; };
 
     this.collapse = (dist, d) => {
       if (d.children) {
@@ -182,22 +179,15 @@ const Dendrogram = (function(){
         , svgString = new XMLSerializer().serializeToString(d3.select("#templates svg").node())
         , graphSVG = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"})
         , DOMURL = window.URL || window.webkitURL || window
-        , url = DOMURL.createObjectURL(graphSVG)
-        , canvasWidth = this.templateCanvas.width
-        , canvasHeight = this.templateCanvas.height;
+        , url = DOMURL.createObjectURL(graphSVG);
 
       return new Promise((function(resolve){
 
         img.onload = function() {
-          /* Clear the canvas and draw the image */
-          // me.templateCTX.fillStyle = "white";
-          // me.templateCTX.fillRect(0, 0, canvasWidth, canvasHeight);
           me.templateCTX.drawImage(img, 0, 0);
-
           /* Access the PNG source, clean up the image, and resolve the promise */
           let png = me.templateCanvas.toDataURL("image/png");
           DOMURL.revokeObjectURL(png);
-
           resolve(png);
         };
         img.src = url;
@@ -218,8 +208,8 @@ const Dendrogram = (function(){
 
   Dendrogram.prototype.update = function() {
 
-    let self = this
-      , nodes = cluster.nodes(data);
+    let self = this,
+      nodes = cluster.nodes(data);
 
     /* Reset the coloring variables */
     self.colorIndex = 0;
@@ -232,15 +222,7 @@ const Dendrogram = (function(){
     });
 
     /* Assign color based on the cut */
-    App.graphUtilities.iterativeInOrder(nodes[0], function(node){
-      self.setColor(self.cut, node);
-      // App.graphUtilities.getGroupConsensus(cluster);
-
-      if(node.cluster && node.cluster.length > 0) {
-        console.log(node.cluster);
-      }
-
-    });
+    App.graphUtilities.iterativeInOrder(nodes[0], function(node){ self.setColor(self.cut, node);});
 
     svg.selectAll("path.link").remove();
     svg.selectAll("g").remove();
@@ -270,7 +252,7 @@ const Dendrogram = (function(){
     //
     // node.append("text")
     //   .attr("dx", function(d) { return d.children ? -8 : 8; })
-    //   // .attr("dy", 3)
+    //   .attr("dy", 3)
     //   .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
     //   .text(function(d) {
     //     return d.node_id;
@@ -314,8 +296,11 @@ const Dendrogram = (function(){
     /* Setup the y-axis*/
     self.setupYAxis(data);
 
+    /* Setup consensus groups*/
+    App.graphUtilities.getGroupConsensus(cluster.nodes(data));
+
+
     data.children.forEach(self.collapse.bind(this, 2.3));
-    // self.update(data);
   };
 
   Dendrogram.prototype.setCut = function(cut) { this.cut = cut;};

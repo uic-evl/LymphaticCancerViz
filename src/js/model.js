@@ -624,12 +624,8 @@ function Patients() {
         let centers = {};
         clusters.forEach(function(cluster,i){
             let pat = _.find(cluster, function(o) {return o["patientId"] == patient});
-            if(pat) {
-                centers[labels[i]] = parseInt(pat[key]);
-            }
-            else {
-                centers[labels[i]] = -1
-            }
+            if(pat) {centers[labels[i]] = parseInt(pat[key]);}
+            else {centers[labels[i]] = -1}
         });
         return centers;
     }
