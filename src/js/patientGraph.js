@@ -47,13 +47,37 @@ const PatientGraph = (function(){
         .attr("stroke-linejoin", "round")
         .attr("opacity", "0.6");
 
+
       bubbleSet.selectAll(".hull_left")
-        .attr("fill", "#1b9e77")
-        .attr("stroke", "#1b9e77");
+      .attr("fill", "#1b9e77")
+      .attr("stroke", "#1b9e77");
 
       bubbleSet.selectAll(".hull_right")
-        .attr("fill", "#7570b3")
-        .attr("stroke", "#7570b3");
+      .attr("fill", "#7570b3")
+      .attr("stroke", "#7570b3");
+
+      // if(laterality)
+      // {
+      //   if(laterality === "R") {
+      //     bubbleSet.selectAll(".hull_right")
+      //     .attr("fill", "#7570b3")
+      //     .attr("stroke", "#7570b3");
+      //   }
+      //   else if(laterality === "L"){
+      //     bubbleSet.selectAll(".hull_left")
+      //     .attr("fill", "#1b9e77")
+      //     .attr("stroke", "#1b9e77");
+      //   }
+      // }
+      // else {
+      //   bubbleSet.selectAll(".hull_left")
+      //   .attr("fill", "#1b9e77")
+      //   .attr("stroke", "#1b9e77");
+      //
+      //   bubbleSet.selectAll(".hull_right")
+      //   .attr("fill", "#7570b3")
+      //   .attr("stroke", "#7570b3");
+      // }
 
     };
 
@@ -132,7 +156,7 @@ const PatientGraph = (function(){
       return svg;
     };
 
-    this.extractBubbleGroups = function(i_nodes) {
+    this.extractBubbleGroups = function(i_nodes, laterality) {
       /* Store the two groups of nodes for the convex hull -- left and right */
       let self = this,
           groups = [], involvement = _.clone(i_nodes);
@@ -167,10 +191,15 @@ const PatientGraph = (function(){
           groups.push({
             orientation: function() {
 
-              if(i === 0) return "left";
-              else if(i === 1) return "right";
+              if(!laterality) {
+                if(i === 0) return "left";
+                else if(i === 1) return "right";
 
-              if(t.length > 0) return (t[0][0]==="R") ? "right" : "left";
+                if(t.length > 0) return (t[0][0]==="R") ? "right" : "left";
+              }
+              else {
+                return (laterality === "R") ? "right" : "left"
+              }
 
             }(),
             nodes: group_nodes,
