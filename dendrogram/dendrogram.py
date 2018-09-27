@@ -23,7 +23,8 @@ def get_children(root):
             fringe.append(dict( node=node.right ))
 
         if not node.left and not node.right:
-            children.append(names[node.id].split(" ")[1])
+            name = names[node.id].split(" ")[1]
+            children.append(name)
 
         if len(fringe):
             current = fringe.pop()
@@ -36,7 +37,7 @@ def get_children(root):
 #https://joernhees.de/blog/2015/08/26/scipy-hierarchical-clustering-and-dendrogram-tutorial/
 # Create a nested dictionary from the ClusterNode's returned by SciPy
 def add_node(node, parent):
-    global leaves
+    global leaves, names
     # First create the new node and append it to its parent's children
     newNode = dict( node_id=node.id, children=[], count=node.count, dist=node.dist, cluster=[] )
     parent["children"].append( newNode )
@@ -50,8 +51,11 @@ def add_node(node, parent):
         left_children = get_children(node.left)
         right_children = get_children(node.right)
 
-        newNode['cluster'] = sorted(left_children + right_children)
+        if len(left_children) == 0 and len(right_children) == 0:
+           left_children.append(names[node.id].split(" ")[1])
 
+        newNode['cluster'] = left_children + right_children
+        newNode['cluster'].sort(key=int)
 
 # Label each node with the names of each leaf in its subtree
 def label_tree( n ):
@@ -72,25 +76,55 @@ def label_tree( n ):
 
     return leafNames
 
+
+def iterativeInOrder(root):
+    stack = []
+    current = root
+
+    while len(stack) > 0 or current:
+        if current:
+            stack.append(current)
+            current = current["children"][0] if len(current["children"]) else None
+        else:
+            current = stack.pop()
+            # do something
+            print current["node_id"]
+            current = current["children"][1] if len(current["children"]) > 1 else None
+
+
+def postOrder(root):
+    if root:
+        postOrder(root["children"][0] if len(root["children"]) else None)
+        postOrder(root["children"][1] if len(root["children"]) > 1 else None)
+
+        if(len(root["cluster"]) == 0 and len(root["children"])):
+            if len(root["children"]) > 1:
+                root["cluster"] = root["children"][0]["cluster"] + root["children"][1]["cluster"]
+                root["cluster"].sort(key=int)
+            else:
+                root["cluster"] = root["children"][0]["cluster"]
+                root["cluster"].sort(key=int)
+
+
 similarity_matrix_file = sys.argv[1]
-similarity_matrix = pd.read_csv(similarity_matrix_file, index_col=False, usecols=range(1,584))
+similarity_matrix = pd.read_csv(similarity_matrix_file, index_col=False, usecols=range(1,583))
 
 names = similarity_matrix.columns
 
-labels = np.asarray(range(1, 584))
+labels = np.asarray(names)
 id2name = dict(zip(range(len(labels)), labels))
 
 Z = linkage(similarity_matrix, 'weighted')
 
-plt.figure(figsize=(25, 10))
+plt.figure(figsize=(30, 10))
 plt.title('Hierarchical Clustering Dendrogram')
 plt.xlabel('sample index')
 plt.ylabel('distance')
 
 tree = dendrogram(
     Z,
-    truncate_mode='lastp',
-    p=25,
+    # truncate_mode='lastp',
+    # p=30,
     leaf_rotation=90.,  # rotates the x axis labels
     leaf_font_size=8,  # font size for the x axis labels
     color_threshold=5.4,
@@ -102,7 +136,10 @@ leaves = hierarchy.leaves_list(Z)
 
 d3Dendro = dict(children=[], name="Root1")
 add_node( T, d3Dendro )
+
+postOrder(d3Dendro["children"][0])
+
 #label_tree( d3Dendro["children"][0] )
 json.dump(d3Dendro, open("d3-dendrogram.json", "w"), sort_keys=True, indent=4)
 
-plt.show()
+# plt.show()
