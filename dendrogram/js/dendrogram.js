@@ -292,7 +292,7 @@ const Dendrogram = (function(){
       .attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
 
     node.append("circle")
-      .attr("r", 4.5)
+      .attr("r", 6)
       .on("click", self.click);
     //
     // node.append("text")
