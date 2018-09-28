@@ -10,7 +10,7 @@ var App = App || {};
 
   function init() {
     queue()
-      .defer(d3.json, "d3-dendrogram.json")
+      .defer(d3.json, "non-spatial_hierarchy.json")
       .defer(d3.json, "../data/1.3.1/json/tanimoto_weighted_UPPER.json")
       .await(function(err, dendrogram, patients){
 
