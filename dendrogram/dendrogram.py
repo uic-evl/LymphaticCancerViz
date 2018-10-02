@@ -108,8 +108,8 @@ def postOrder(root):
 sp_similarity_matrix_file = sys.argv[1]
 sp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
 
-# nsp_similarity_matrix_file = sys.argv[2]
-# nsp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
+nsp_similarity_matrix_file = sys.argv[2]
+nsp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
 
 names = sp_similarity_matrix.columns
 
@@ -118,7 +118,7 @@ id2name = dict(zip(range(len(labels)), labels))
 
 Z = linkage(sp_similarity_matrix, 'weighted')
 
-fig = pylab.figure(figsize=(30, 20))
+fig = pylab.figure(figsize=(8,8))
 ax1 = fig.add_axes([0.09,0.1,0.2,0.6])
 # plt.title('Hierarchical Clustering Dendrogram')
 # plt.xlabel('sample index')
@@ -128,40 +128,38 @@ tree = dendrogram(
     Z,
     # truncate_mode='lastp',
     # p=30,
-    leaf_rotation=90.,  # rotates the x axis labels
-    leaf_font_size=8,  # font size for the x axis labels
+    # leaf_rotation=90.,  # rotates the x axis labels
+    # leaf_font_size=8,  # font size for the x axis labels
     color_threshold=5.4,
-    labels=labels, orientation='left'
+    # labels=labels,
+    orientation='left'
 )
-
 ax1.set_xticks([])
 ax1.set_yticks([])
 
-# ax2 = fig.add_axes([0.3,0.71,0.6,0.2])
-# Y = linkage(nsp_similarity_matrix, 'weighted')
-#
-# axmatrix = fig.add_axes([0.3,0.1,0.6,0.6])
-# tree2 = dendrogram(
-#     Y,
-#     # truncate_mode='lastp',
-#     # p=30,
-#     leaf_rotation=90.,  # rotates the x axis labels
-#     leaf_font_size=8,  # font size for the x axis labels
-#     color_threshold=5.4,
-#     labels=labels, orientation='left'
-# )
-# ax2.set_xticks([])
-# ax2.set_yticks([])
+ax2 = fig.add_axes([0.3,0.71,0.6,0.2])
+Z2 = linkage(sp_similarity_matrix, 'weighted')
+tree2 = dendrogram(
+    Z2,
+    # truncate_mode='lastp',
+    # p=30,
+    # leaf_rotation=90.,  # rotates the x axis labels
+    # leaf_font_size=8,  # font size for the x axis labels
+    color_threshold=5.4,
+    # labels=labels, orientation='top'
+)
+ax2.set_xticks([])
+ax2.set_yticks([])
 
 
 # Plot distance matrix.
 M = sp_similarity_matrix.values
 axmatrix = fig.add_axes([0.3,0.1,0.6,0.6])
 idx1 = tree['leaves']
-# idx2 = Z2['leaves']
+idx2 = tree2['leaves']
 D = M[idx1,:]
-D = D[:,idx1]
-im = axmatrix.matshow(M, aspect='auto', origin='lower', cmap=pylab.cm.YlGnBu)
+D = D[:,idx2]
+im = axmatrix.matshow(D, aspect='auto', origin='lower', cmap=pylab.cm.YlGnBu)
 axmatrix.set_xticks([])
 axmatrix.set_yticks([])
 
