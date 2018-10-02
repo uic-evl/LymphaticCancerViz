@@ -72,9 +72,9 @@ const Dendrogram = (function(){
           .orient("left")
           .scale(yAxisScale)
           /* Grid lines */
-          .innerTickSize(-width)
-          .outerTickSize(0)
-          .tickPadding(10)
+          // .innerTickSize(-width)
+          // .outerTickSize(0)
+          // .tickPadding(10)
       ;
 
       /* Add the axis to the svg */
