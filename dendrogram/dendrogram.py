@@ -1,7 +1,6 @@
 from matplotlib import pyplot as plt
 from scipy.cluster import hierarchy
 from scipy.cluster.hierarchy import dendrogram, linkage
-import scipy.spatial
 import json
 import numpy as np
 import sys
