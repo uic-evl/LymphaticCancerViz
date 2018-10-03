@@ -11,6 +11,7 @@ body {
 
 .node {
   font: 10px sans-serif;
+  cursor: pointer;
 }
 .parent, .grandparent {
   fill: lightsteelblue
