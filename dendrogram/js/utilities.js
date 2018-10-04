@@ -95,6 +95,19 @@ const Utilities = (function() {
       return (false);
     };
 
+   this.getPath = function(d) {
+    let path = [], node = null;
+    while (d && d.parent !== null) {
+      node = _.clone(d);
+      node.color = "red";
+
+      path.unshift(node);
+
+      d = d.parent;
+    }
+    return path;
+  }
+
   }
 
   Utilities.prototype.iterativeInOrder = function(node, cb) {
