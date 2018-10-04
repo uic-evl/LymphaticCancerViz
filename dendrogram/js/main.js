@@ -16,12 +16,14 @@ var App = App || {};
 
         App.graphUtilities.parsePatientData(patients);
 
+        let queryID = App.graphUtilities.getQueryVariable("id");
+
         App.GraphFactory.init({width:250, height:250, radius: 15})
           .then(O_o => {
 
             App.GraphFactory.newGraph("#templates");
 
-            App.dendrogram.init(dendrogram, {width:250, height:250, radius: 15});
+            App.dendrogram.init(dendrogram, {width:250, height:250, radius: 15, id:queryID});
 
             App.dendrogram.update();
 
