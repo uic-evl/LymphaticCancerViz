@@ -99,7 +99,8 @@ const Dendrogram = (function(){
     this.setupXAxis = function(values) {
 
       let imageSize = _.clamp(Math.ceil((cluster.size()[0] + width_offset)/values.length), 20, margin.bottom/2.25)
-        , radius = Math.floor(Math.sqrt(2.0 * imageSize * imageSize)/2.0 * 0.72);
+        , radius = Math.floor(Math.sqrt(2.0 * imageSize * imageSize )/2.0 * 0.72)
+        , offsetCX = Math.floor(imageSize / 250 * 8.3);
 
       let axis = d3.select(svg.node().parentNode).insert("g", ":first-child")
       .attr("class", "x axis")
@@ -147,7 +148,7 @@ const Dendrogram = (function(){
         .attr("r", radius)
         .attr("fill", "red")
         .style("fill-opacity", .25)
-        .attr("cx", function(d) {return d.x })
+        .attr("cx", function(d) {return d.x - offsetCX})
         .attr("cy", function(d, i) { return margin.top + d.size * i + radius });
 
       /* Tick marks under the axis */
