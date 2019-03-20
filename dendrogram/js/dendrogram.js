@@ -13,6 +13,7 @@ const Dendrogram = (function(){
     self.colorScale = colorScale || colorbrewer.Set1["9"];
     self.cut = 0;
     self.images = {};
+    self.lateralityMap = ["L", "R", "N", "N"];
 
     /* Ensures all the colros have been used before skipping to the next */
     self.usedColors = new Array(self.colorScale.length);
@@ -194,35 +195,19 @@ const Dendrogram = (function(){
       }));
     };
 
-    /**/
-    this.addInvolvementImages = function(data) {
-
-      let self = this;
-
-      self.graphSVG = d3.select("#templates svg").node();
-      let values = data.filter((d) => {if(d.y === cluster.size()[1]) return d.x})
-          , imageSize = _.clamp(Math.ceil((cluster.size()[0] + width_offset)/values.length), 20, margin.bottom/2.25)
-          , consensus = App.graphUtilities.getConsensus(_.map(values, "node_id"))
-          , promises = [], order = [];
-
-      _.forIn(consensus, function(involvement, key){
-
-        order.push(parseInt(key));
-        promises.push(new Promise(function(resolve){
-
-          let group_promises = [];
-          involvement.sort((a, b) => {return b.length - a.length;})
+    this.renderBubbles = function(key, consensus, non_consensus, cb){
+      let group_promises = [], involvement = [consensus[0],consensus[1], non_consensus[0], non_consensus[1]];
+      consensus
           .forEach(function(inv,i){
 
             /* No nodes */
-            if(!inv.length) {return group_promises.push(Promise.resolve(null))}
+            if(!inv.length && !non_consensus[i].length) {return group_promises.push(Promise.resolve(null))}
 
             /* Get the hash id based on the nodal involvements */
             let hash = key + i //inv.sort().join("").replace(/\D/g,'')
                 , consensusSVG = d3.select(`#templates #s${hash}`), canvas;
 
             if(!self.images[hash]) {
-
               /* Clone the graph SVG and canvas templates */
               let graphSVG = self.graphSVG.cloneNode(true);
               graphSVG.setAttribute("id", `s${hash}`);
@@ -233,7 +218,7 @@ const Dendrogram = (function(){
               consensusSVG = d3.select(`#templates #s${hash}`);
 
               /* Create the connected components for the bubble groups */
-              let bubbles = App.GraphFactory.extractBubbleGroups([inv, []], (i) ? "L":"R");
+              let bubbles = App.GraphFactory.extractBubbleGroups([inv, non_consensus[i]], [self.lateralityMap[i], self.lateralityMap[i+2]]);
               App.GraphFactory.createBubbles(consensusSVG, bubbles);
 
               group_promises.push(new Promise(function(resolve){
@@ -253,11 +238,33 @@ const Dendrogram = (function(){
             }
           });
 
-          /* Resolve with the two images */
-          Promise.all(group_promises).then((values)=>{
-            resolve(values);
-          })
+      /* Resolve with the two images */
+      Promise.all(group_promises).then((values)=>{
+        cb(values);
+      })
 
+    };
+
+
+    /**/
+    this.addInvolvementImages = function(data) {
+
+      let self = this;
+
+      self.graphSVG = d3.select("#templates svg").node();
+      let values = data.filter((d) => {if(d.y === cluster.size()[1]) return d.x})
+          , imageSize = _.clamp(Math.ceil((cluster.size()[0] + width_offset)/values.length), 20, margin.bottom/2.25)
+          , consensus = App.graphUtilities.getConsensus(_.map(values, "node_id"))
+          , promises = [], order = [];
+
+      _.forIn(consensus, function(involvement, key){
+
+        order.push(parseInt(key));
+        promises.push(new Promise(function(resolve){
+          self.renderBubbles(key,
+              involvement.consensus.sort((a, b) =>  b.length - a.length),
+              involvement.non_consensus.sort((a, b) =>  b.length - a.length),
+              resolve);
         }));
 
       });
