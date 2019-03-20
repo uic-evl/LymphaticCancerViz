@@ -200,9 +200,7 @@ const Dendrogram = (function(){
       let group_promises = [];
       consensus
           .forEach(function(inv,i){
-
-            console.log(consensus)
-
+            
             /* No nodes */
             if(!inv.length && !non_consensus[i].length) {return group_promises.push(Promise.resolve(null))}
 
