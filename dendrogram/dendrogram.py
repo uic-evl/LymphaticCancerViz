@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import pylab
 from scipy.cluster import hierarchy
 from scipy.cluster.hierarchy import dendrogram, linkage
 import json
@@ -31,7 +32,6 @@ def get_children(root):
             current = None
 
     return children
-
 
 #https://joernhees.de/blog/2015/08/26/scipy-hierarchical-clustering-and-dendrogram-tutorial/
 # Create a nested dictionary from the ClusterNode's returned by SciPy
@@ -105,40 +105,80 @@ def postOrder(root):
                 root["cluster"].sort(key=int)
 
 
-similarity_matrix_file = sys.argv[1]
-similarity_matrix = pd.read_csv(similarity_matrix_file, index_col=False, usecols=range(1,583))
+sp_similarity_matrix_file = sys.argv[1]
+sp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
 
-names = similarity_matrix.columns
+nsp_similarity_matrix_file = sys.argv[2]
+nsp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
+
+names = sp_similarity_matrix.columns
 
 labels = np.asarray(names)
 id2name = dict(zip(range(len(labels)), labels))
 
-Z = linkage(similarity_matrix, 'weighted')
+Z = linkage(sp_similarity_matrix, 'weighted')
 
-plt.figure(figsize=(30, 10))
-plt.title('Hierarchical Clustering Dendrogram')
-plt.xlabel('sample index')
-plt.ylabel('distance')
+fig = pylab.figure(figsize=(8,8))
+ax1 = fig.add_axes([0.09,0.1,0.2,0.6])
+# plt.title('Hierarchical Clustering Dendrogram')
+# plt.xlabel('sample index')
+# plt.ylabel('distance')
 
 tree = dendrogram(
     Z,
     # truncate_mode='lastp',
     # p=30,
-    leaf_rotation=90.,  # rotates the x axis labels
-    leaf_font_size=8,  # font size for the x axis labels
+    # leaf_rotation=90.,  # rotates the x axis labels
+    # leaf_font_size=8,  # font size for the x axis labels
     color_threshold=5.4,
-    labels=labels, orientation='top'
+    # labels=labels,
+    orientation='left'
 )
+ax1.set_xticks([])
+ax1.set_yticks([])
 
-T = hierarchy.to_tree( Z , rd=False )
-leaves = hierarchy.leaves_list(Z)
+ax2 = fig.add_axes([0.3,0.71,0.6,0.2])
+Z2 = linkage(sp_similarity_matrix, 'weighted')
+tree2 = dendrogram(
+    Z2,
+    # truncate_mode='lastp',
+    # p=30,
+    # leaf_rotation=90.,  # rotates the x axis labels
+    # leaf_font_size=8,  # font size for the x axis labels
+    color_threshold=5.4,
+    # labels=labels, orientation='top'
+)
+ax2.set_xticks([])
+ax2.set_yticks([])
 
-d3Dendro = dict(children=[], name="Root1")
-add_node( T, d3Dendro )
 
-postOrder(d3Dendro["children"][0])
+# Plot distance matrix.
+M = sp_similarity_matrix.values
+axmatrix = fig.add_axes([0.3,0.1,0.6,0.6])
+idx1 = tree['leaves']
+idx2 = tree2['leaves']
+D = M[idx1,:]
+D = D[:,idx2]
+im = axmatrix.matshow(D, aspect='auto', origin='lower', cmap=pylab.cm.YlGnBu)
+axmatrix.set_xticks([])
+axmatrix.set_yticks([])
 
-#label_tree( d3Dendro["children"][0] )
-json.dump(d3Dendro, open("d3-dendrogram.json", "w"), sort_keys=True, indent=4)
+
+# Plot colorbar.
+axcolor = fig.add_axes([0.91,0.1,0.02,0.6])
+pylab.colorbar(im, cax=axcolor)
+fig.show()
+fig.savefig('dendrogram.png')
+
+# T = hierarchy.to_tree( Z , rd=False )
+# leaves = hierarchy.leaves_list(Z)
+#
+# d3Dendro = dict(children=[], name="Root1")
+# add_node( T, d3Dendro )
+#
+# postOrder(d3Dendro["children"][0])
+#
+# #label_tree( d3Dendro["children"][0] )
+# json.dump(d3Dendro, open("d3-dendrogram.json", "w"), sort_keys=True, indent=4)
 
 # plt.show()

@@ -16,6 +16,8 @@ var App = App || {};
 
         App.graphUtilities.parsePatientData(patients);
 
+        let queryID = App.graphUtilities.getQueryVariable("id");
+
         App.GraphFactory.init({width:250, height:250, radius: 15})
           .then(O_o => {
 

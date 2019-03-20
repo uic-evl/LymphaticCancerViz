@@ -48,7 +48,7 @@ var App = App || {};
     function connected_components(infected_nodes, all_nodes) {
 
       let visited = {},
-        touched_nodes = [];
+          touched_nodes = [];
 
       infected_nodes.forEach(function (node) {
 
@@ -64,30 +64,43 @@ var App = App || {};
 
     function read_input_files(cb) {
 
-        queue()
-            .defer(d3.json, "data/1.3.1/json/tanimoto_weighted_UPPER.json")
+      queue()
+      .defer(d3.json, "data/1.3.1/json/tanimoto_weighted_UPPER.json")
 
-            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=3.csv")
-            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=4.csv")
-            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=6.csv")
-            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_complete_weighted_9_2018_k=3.csv")
-            // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_complete_weighted_9_2018_k=4.csv")
-            .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=6.csv")
-            .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=6.csv")
-            // .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_weighted_9_2018_k=30.csv")
-            // .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_bigrams_6_2018_k=6.csv")
-            // .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=4.csv")
-            // .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=4.csv")
-            // .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=6.csv")
-            // .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=30.csv")
-            // .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=30.csv")
-            // .defer(d3.csv, "data/csv/clusters/06_06_2018/differences/diffs_node_bigram.csv")
-            .await(cb)
+      // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=3.csv")
+      // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=4.csv")
+      // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=6.csv")
+      // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_complete_weighted_9_2018_k=3.csv")
+      // .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_complete_weighted_9_2018_k=4.csv")
+      .defer(d3.csv, "data/1.3.1/clusters/weighted/cluster_weighted_weighted_9_2018_k=6.csv")
+      .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=6.csv")
+      // .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_weighted_9_2018_k=30.csv")
+      // .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_bigrams_6_2018_k=6.csv")
+      // .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=4.csv")
+      // .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=4.csv")
+      // .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=6.csv")
+      // .defer(d3.csv, "data/1.3.1/clusters/nodes/cluster_weighted_nodes_9_2018_k=30.csv")
+      // .defer(d3.csv, "data/csv/clusters/06_06_2018/cluster_weighted_nodes_6_2018_k=30.csv")
+      // .defer(d3.csv, "data/csv/clusters/06_06_2018/differences/diffs_node_bigram.csv")
+      .await(cb)
+    }
+
+    function getQueryVariable(variable) {
+      var query = window.location.search.substring(1);
+      var vars = query.split("&");
+      for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0] == variable) {
+          return pair[1];
+        }
+      }
+      return (false);
     }
 
     return {
-      connectedComponents: connected_components
-        , readFiles : read_input_files
+      connectedComponents: connected_components,
+      readFiles : read_input_files,
+      getQueryVariable : getQueryVariable
     }
 
   }
