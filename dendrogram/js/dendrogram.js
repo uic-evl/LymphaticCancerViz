@@ -122,7 +122,8 @@ const Dendrogram = (function(){
 
       let ticksRow1 = axis.selectAll(".ximages")
       .data(values).enter()
-      .append("g");
+      .append("g")
+          .attr("id", function(d) { return d.node_id; })
 
       // let ticksRow2 = axis.selectAll(".ximages")
       //   .data(_.map(values, 'x')).enter()
@@ -196,9 +197,11 @@ const Dendrogram = (function(){
     };
 
     this.renderBubbles = function(key, consensus, non_consensus, cb){
-      let group_promises = [], involvement = [consensus[0],consensus[1], non_consensus[0], non_consensus[1]];
+      let group_promises = [];
       consensus
           .forEach(function(inv,i){
+
+            console.log(consensus)
 
             /* No nodes */
             if(!inv.length && !non_consensus[i].length) {return group_promises.push(Promise.resolve(null))}
@@ -245,7 +248,6 @@ const Dendrogram = (function(){
 
     };
 
-
     /**/
     this.addInvolvementImages = function(data) {
 
@@ -261,14 +263,22 @@ const Dendrogram = (function(){
 
         order.push(parseInt(key));
         promises.push(new Promise(function(resolve){
+          let swapped = 1;
+
+          involvement.consensus = involvement.consensus.sort((a, b) => {
+            swapped = b.length - a.length;
+            return b.length - a.length;
+          });
+
+          involvement.non_consensus = involvement.non_consensus.sort(O_o => {return swapped});
+
           self.renderBubbles(key,
-              involvement.consensus.sort((a, b) =>  b.length - a.length),
-              involvement.non_consensus.sort((a, b) =>  b.length - a.length),
+              involvement.consensus,
+              involvement.non_consensus,
               resolve);
         }));
 
       });
-
 
       Promise.all(promises).then(function(images){
         images.forEach(function(pngs,i){
@@ -370,7 +380,6 @@ const Dendrogram = (function(){
     .attr("height", height)
     .append("g")
     .attr("transform",`translate(${margin.left/2.0},${margin.top})`);
-
 
     /* Create the Y scale and axis */
     yScale = d3.scale.linear()

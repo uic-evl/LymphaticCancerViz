@@ -18,6 +18,7 @@ const Utilities = (function() {
         }
         else {
           if(value.length === 2 && value[1] === "2"){
+
             result.push(value[0] + value[1] + 'A');
             result.push(value[0] + value[1] + 'B');
           }
@@ -184,12 +185,15 @@ const Utilities = (function() {
         , threshold_B = _.pickBy(involvement_occurrences["b"], value=> _.gt(value, threshold))
         , threshold_C = _.pickBy(involvement_occurrences["a"], value=> _.lte(value, threshold))
         , threshold_D = _.pickBy(involvement_occurrences["b"], value=> _.lte(value, threshold))
-        , non_consensus = _.merge(threshold_C, threshold_D)
+        , swapped = false, all_non = _.merge(threshold_C, threshold_D)
         , involvedA = [], involvedB = [], involvedC = [], involvedD = [];
 
       _.keys(threshold_A).forEach(function(inv){
         if(threshold_A.length > threshold_B.length) { involvedA.push(`L${inv}`) }
-        else { involvedA.push(`R${inv}`) }
+        else {
+          involvedA.push(`R${inv}`);
+          swapped = true;
+        }
       });
 
       _.keys(threshold_B).forEach(function(inv){
@@ -197,41 +201,48 @@ const Utilities = (function() {
         else { involvedB.push(`R${inv}`) }
       });
 
-      _.keys(threshold_C).forEach(function(inv){
-        if(threshold_A.length > threshold_B.length) { involvedC.push(`L${inv}`) }
-        else { involvedC.push(`R${inv}`) }
+      if(node.node_id === 1133) {
+        console.log(involvedA);
+      }
+
+      _.keys(all_non).forEach(inv => {
+        if(node.node_id === 1133) {
+          console.log(inv);
+        }
+
+        if(involvedA.indexOf(`L${inv}`) < 0 && involvedA.indexOf(`R${inv}`) < 0) {
+          if(threshold_A.length > threshold_B.length) { involvedC.push(`R${inv}`) }
+          else { involvedC.push(`L${inv}`) }
+        }
+        else {
+          if(threshold_B.length > threshold_A.length) { involvedD.push(`R${inv}`) }
+          else { involvedD.push(`L${inv}`) }
+        }
+
       });
 
-      _.keys(threshold_D).forEach(function(inv){
-        if(threshold_B.length > threshold_A.length) { involvedD.push(`L${inv}`) }
-        else { involvedD.push(`R${inv}`) }
-      });
-
-      // _.keys(non_consensus).forEach(function(inv){
-      //   if(involvedA.indexOf( `L${inv}` ) < 0 && involvedA.indexOf( `R${inv}`) < 0 ) {
-      //     if(threshold_A.length > threshold_B.length) { involvedC.push(`L${inv}`) }
-      //     else { involvedC.push(`R${inv}`) }
+      // _.keys(threshold_C).forEach(function(inv){
+      //   if(swapped) {
+      //     involvedC.push( `R${inv}` );
       //   }
       //   else {
-      //     if(threshold_B.length > threshold_A.length) { involvedD.push(`L${inv}`) }
-      //     else { involvedD.push(`R${inv}`) }
+      //     involvedC.push( `L${inv}` );
       //   }
       // });
-
+      //
+      // _.keys(threshold_D).forEach(function(inv){
+      //   if(swapped) {
+      //     involvedD.push( `L${inv}` );
+      //   }
+      //   else {
+      //     involvedD.push( `R${inv}` );
+      //   }
+      // });
 
       /* Save the percentages */
       self.consensus[node.node_id] = {};
       self.consensus[node.node_id].consensus = [involvedA, involvedB];
-      self.consensus[node.node_id].non_consensus = [];
-
-      if(involvedC.length === 0) {
-        self.consensus[node.node_id].non_consensus.push(involvedD);
-        self.consensus[node.node_id].non_consensus.push(involvedC);
-      }
-      else {
-        self.consensus[node.node_id].non_consensus.push(involvedC);
-        self.consensus[node.node_id].non_consensus.push(involvedD);
-      }
+      self.consensus[node.node_id].non_consensus = [involvedC, involvedD];
 
     });
   };
