@@ -27,6 +27,11 @@ body {
     stroke: #7570b3;
 }
 
+.hull_non {
+    fill: #e41a1c;
+    stroke: #e41a1c;
+}
+
 h2.tumor {
     float: right;
     font-size: 12px !important;
