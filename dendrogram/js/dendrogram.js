@@ -98,7 +98,6 @@ const Dendrogram = (function(){
     };
 
     this.setupXAxis = function(values) {
-
       let imageSize = _.clamp(Math.ceil((cluster.size()[0] + width_offset)/values.length), 20, margin.bottom/2.25);
 
       let axis = d3.select(svg.node().parentNode).insert("g", ":first-child")
@@ -123,7 +122,7 @@ const Dendrogram = (function(){
       let ticksRow1 = axis.selectAll(".ximages")
       .data(values).enter()
       .append("g")
-          .attr("id", function(d) { return d.node_id; })
+          .attr("id", function(d) { return d.node_id; });
 
       // let ticksRow2 = axis.selectAll(".ximages")
       //   .data(_.map(values, 'x')).enter()
@@ -390,7 +389,7 @@ const Dendrogram = (function(){
     /* Setup consensus groups*/
     App.graphUtilities.getGroupConsensus(cluster.nodes(data), 0.66);
 
-    data.children.forEach(self.collapse.bind(this, 2.3));
+    data.children.forEach(self.collapse.bind(this, 6.0));
   };
 
   Dendrogram.prototype.setCut = function(cut) { this.cut = cut;};

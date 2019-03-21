@@ -10,7 +10,7 @@ var App = App || {};
 
   function init() {
     queue()
-      .defer(d3.json, "spatial_hierarchy.json")
+      .defer(d3.json, "d3-dendrogram.json")
       .defer(d3.json, "../data/1.3.1/json/tanimoto_weighted_UPPER.json")
       .await(function(err, dendrogram, patients){
 
@@ -23,7 +23,7 @@ var App = App || {};
 
             App.GraphFactory.newGraph("#templates");
 
-            App.dendrogram.init(dendrogram, {width:250, height:250, radius: 15});
+            App.dendrogram.init(dendrogram, {width:300, height:300, radius: 15});
 
             App.dendrogram.update();
 
