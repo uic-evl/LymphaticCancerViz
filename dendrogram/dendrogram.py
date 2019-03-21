@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
+import pylab
 from scipy.cluster import hierarchy
 from scipy.cluster.hierarchy import dendrogram, linkage
-import scipy.spatial
 import json
 import numpy as np
 import sys
@@ -57,6 +57,7 @@ def add_node(node, parent):
         newNode['cluster'] = left_children + right_children
         newNode['cluster'].sort(key=int)
 
+
 # Label each node with the names of each leaf in its subtree
 def label_tree( n ):
     # If the node is a leaf, then we have its name
@@ -106,30 +107,68 @@ def postOrder(root):
                 root["cluster"].sort(key=int)
 
 
-similarity_matrix_file = sys.argv[1]
-similarity_matrix = pd.read_csv(similarity_matrix_file, index_col=False, usecols=range(1,583))
+sp_similarity_matrix_file = sys.argv[1]
+sp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
 
-names = similarity_matrix.columns
+nsp_similarity_matrix_file = sys.argv[2]
+nsp_similarity_matrix = pd.read_csv(nsp_similarity_matrix_file, index_col=False, usecols=range(1,583))
+
+names = sp_similarity_matrix.columns
 
 labels = np.asarray(names)
 id2name = dict(zip(range(len(labels)), labels))
 
-Z = linkage(similarity_matrix, 'ward')
-
-plt.figure(figsize=(30, 10))
-plt.title('Hierarchical Clustering Dendrogram')
-plt.xlabel('sample index')
-plt.ylabel('distance')
+Z = linkage(sp_similarity_matrix, 'weighted')
+fig = pylab.figure(figsize=(8,8))
+ax1 = fig.add_axes([0.09,0.1,0.2,0.6])
+# plt.title('Hierarchical Clustering Dendrogram')
+# plt.xlabel('sample index')
+# plt.ylabel('distance')
 
 tree = dendrogram(
     Z,
     # truncate_mode='lastp',
     # p=30,
-    leaf_rotation=90.,  # rotates the x axis labels
-    leaf_font_size=8,  # font size for the x axis labels
+    # leaf_rotation=90.,  # rotates the x axis labels
+    # leaf_font_size=8,  # font size for the x axis labels
     color_threshold=5.4,
-    labels=labels, orientation='top'
+    # labels=labels,
+    orientation='left'
 )
+ax1.set_xticks([])
+ax1.set_yticks([])
+
+ax2 = fig.add_axes([0.3,0.71,0.6,0.2])
+Z2 = linkage(sp_similarity_matrix, 'weighted')
+tree2 = dendrogram(
+    Z2,
+    # truncate_mode='lastp',
+    # p=30,
+    # leaf_rotation=90.,  # rotates the x axis labels
+    # leaf_font_size=8,  # font size for the x axis labels
+    color_threshold=5.4,
+    # labels=labels, orientation='top'
+)
+ax2.set_xticks([])
+ax2.set_yticks([])
+
+
+# Plot distance matrix.
+M = sp_similarity_matrix.values
+axmatrix = fig.add_axes([0.3,0.1,0.6,0.6])
+idx1 = tree['leaves']
+idx2 = tree2['leaves']
+D = M[idx1,:]
+D = D[:,idx2]
+im = axmatrix.matshow(D, aspect='auto', origin='lower', cmap=pylab.cm.YlGnBu)
+axmatrix.set_xticks([])
+axmatrix.set_yticks([])
+
+# Plot colorbar.
+axcolor = fig.add_axes([0.91,0.1,0.02,0.6])
+pylab.colorbar(im, cax=axcolor)
+fig.show()
+fig.savefig('spatial_heatmap_weighted.png')
 
 T = hierarchy.to_tree( Z , rd=False )
 leaves = hierarchy.leaves_list(Z)
