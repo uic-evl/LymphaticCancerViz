@@ -116,7 +116,7 @@ names = sp_similarity_matrix.columns
 labels = np.asarray(names)
 id2name = dict(zip(range(len(labels)), labels))
 
-Z = linkage(sp_similarity_matrix, 'weighted')
+Z = linkage(sp_similarity_matrix, 'ward')
 
 fig = pylab.figure(figsize=(8,8))
 ax1 = fig.add_axes([0.09,0.1,0.2,0.6])
@@ -138,7 +138,7 @@ ax1.set_xticks([])
 ax1.set_yticks([])
 
 ax2 = fig.add_axes([0.3,0.71,0.6,0.2])
-Z2 = linkage(sp_similarity_matrix, 'weighted')
+Z2 = linkage(nsp_similarity_matrix, 'ward')
 tree2 = dendrogram(
     Z2,
     # truncate_mode='lastp',
