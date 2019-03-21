@@ -114,7 +114,7 @@ names = similarity_matrix.columns
 labels = np.asarray(names)
 id2name = dict(zip(range(len(labels)), labels))
 
-Z = linkage(similarity_matrix, 'weighted')
+Z = linkage(similarity_matrix, 'ward')
 
 plt.figure(figsize=(30, 10))
 plt.title('Hierarchical Clustering Dendrogram')
