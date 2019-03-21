@@ -18,6 +18,7 @@ const Utilities = (function() {
         }
         else {
           if(value.length === 2 && value[1] === "2"){
+
             result.push(value[0] + value[1] + 'A');
             result.push(value[0] + value[1] + 'B');
           }
@@ -95,19 +96,6 @@ const Utilities = (function() {
       return (false);
     };
 
-   this.getPath = function(d) {
-    let path = [], node = null;
-    while (d && d.parent !== null) {
-      node = _.clone(d);
-      node.color = "red";
-
-      path.unshift(node);
-
-      d = d.parent;
-    }
-    return path;
-  }
-
   }
 
   Utilities.prototype.iterativeInOrder = function(node, cb) {
@@ -153,10 +141,10 @@ const Utilities = (function() {
 
   Utilities.prototype.getGroupConsensus = function(clusters, threshold) {
     let self = this;
+
     self.iterativeInOrder(clusters[0], function(node){
       /* Make sure the node has the clustered patients */
       if(!(node.cluster && node.cluster.length > 0)) return;
-
       let involvement_occurrences = { "a":{}, "b":{} };
       /* Iterate over the ids and get the patients' nodes */
       node.cluster.forEach(function(p_id) {
@@ -195,11 +183,17 @@ const Utilities = (function() {
 
       let threshold_A = _.pickBy(involvement_occurrences["a"], value=> _.gt(value, threshold))
         , threshold_B = _.pickBy(involvement_occurrences["b"], value=> _.gt(value, threshold))
-        , involvedA = [], involvedB = [];
+        , threshold_C = _.pickBy(involvement_occurrences["a"], value=> _.lte(value, threshold))
+        , threshold_D = _.pickBy(involvement_occurrences["b"], value=> _.lte(value, threshold))
+        , swapped = false, all_non = _.merge(threshold_C, threshold_D)
+        , involvedA = [], involvedB = [], involvedC = [], involvedD = [];
 
       _.keys(threshold_A).forEach(function(inv){
         if(threshold_A.length > threshold_B.length) { involvedA.push(`L${inv}`) }
-        else { involvedA.push(`R${inv}`) }
+        else {
+          involvedA.push(`R${inv}`);
+          swapped = true;
+        }
       });
 
       _.keys(threshold_B).forEach(function(inv){
@@ -207,14 +201,61 @@ const Utilities = (function() {
         else { involvedB.push(`R${inv}`) }
       });
 
+      if(node.node_id === 1133) {
+        console.log(involvedA);
+      }
+
+      _.keys(all_non).forEach(inv => {
+        if(node.node_id === 1133) {
+          console.log(inv);
+        }
+
+        if(involvedA.indexOf(`L${inv}`) < 0 && involvedA.indexOf(`R${inv}`) < 0) {
+          if(threshold_A.length > threshold_B.length) { involvedC.push(`R${inv}`) }
+          else { involvedC.push(`L${inv}`) }
+        }
+        else {
+          if(threshold_B.length > threshold_A.length) { involvedD.push(`R${inv}`) }
+          else { involvedD.push(`L${inv}`) }
+        }
+
+      });
+
+      // _.keys(threshold_C).forEach(function(inv){
+      //   if(swapped) {
+      //     involvedC.push( `R${inv}` );
+      //   }
+      //   else {
+      //     involvedC.push( `L${inv}` );
+      //   }
+      // });
+      //
+      // _.keys(threshold_D).forEach(function(inv){
+      //   if(swapped) {
+      //     involvedD.push( `L${inv}` );
+      //   }
+      //   else {
+      //     involvedD.push( `R${inv}` );
+      //   }
+      // });
+
       /* Save the percentages */
-      self.consensus[node.node_id] = [involvedA, involvedB];
+      self.consensus[node.node_id] = {};
+      self.consensus[node.node_id].consensus = [involvedA, involvedB];
+      self.consensus[node.node_id].non_consensus = [involvedC, involvedD];
+
     });
   };
 
   Utilities.prototype.getConsensus = function(id) {
-    if(_.isArray(id)) return _.pick(this.consensus, id);
-    else {return (id) ? this.consensus[id] : this.consensus}
+    let consensus;
+    if(_.isArray(id)) {
+      consensus = _.pick(this.consensus, id);
+    }
+    else {
+      consensus =  (id) ? this.consensus[id] : this.consensus
+    }
+    return consensus;
   };
 
   return Utilities;

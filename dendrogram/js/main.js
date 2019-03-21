@@ -23,7 +23,7 @@ var App = App || {};
 
             App.GraphFactory.newGraph("#templates");
 
-            App.dendrogram.init(dendrogram, {width:250, height:250, radius: 15, id:queryID});
+            App.dendrogram.init(dendrogram, {width:250, height:250, radius: 15});
 
             App.dendrogram.update();
 

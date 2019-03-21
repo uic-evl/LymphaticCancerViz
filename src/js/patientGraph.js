@@ -26,8 +26,6 @@ const PatientGraph = (function(){
         ).join("L") + "Z";
     };
 
-    let groupFill = function (d) { return (d.orientation === "left"); };
-
     this.createBubbles = function(svg, groups) {
       /* Adds the convex hulls */
       let bubbleSet = svg.append("g")
@@ -38,15 +36,15 @@ const PatientGraph = (function(){
         .enter().insert("path", "circle")
         .classed("hull", true)
         .classed("between_nodes", (d)=>{return d.between_nodes})
-        .classed("hull_left", (d)=>{return groupFill(d)})
-        .classed("hull_right", (d)=>{return !groupFill(d)})
+        .classed("hull_left", (d)=>d.orientation === "left")
+        .classed("hull_right", (d)=>d.orientation === "right")
+        .classed("hull_non", (d)=>d.orientation === "non")
         .attr("d", function (d) {if (d.nodes.length > 0) { return groupPath(d.nodes[0]); }});
 
       bubbleSet.selectAll(".hull")
         .attr("stroke-width", "40px")
         .attr("stroke-linejoin", "round")
         .attr("opacity", "0.6");
-
 
       bubbleSet.selectAll(".hull_left")
       .attr("fill", "#1b9e77")
@@ -55,6 +53,11 @@ const PatientGraph = (function(){
       bubbleSet.selectAll(".hull_right")
       .attr("fill", "#7570b3")
       .attr("stroke", "#7570b3");
+
+      bubbleSet.selectAll(".hull_non")
+          .attr("fill", "#e41a1c")
+          .attr("stroke", "#e41a1c");
+
 
       // if(laterality)
       // {
@@ -198,7 +201,11 @@ const PatientGraph = (function(){
                 if(t.length > 0) return (t[0][0]==="R") ? "right" : "left";
               }
               else {
-                return (laterality === "R") ? "right" : "left"
+                switch(laterality[i]) {
+                  case 'R': return "right";
+                  case 'L': return "left";
+                  case 'N': return "non";
+                }
               }
 
             }(),

@@ -8,9 +8,8 @@ var App = App || {};
     function modified_bfs(source, selected_nodes, all_pairs, visited) {
 
       let q = [],
-          current_group = [],
-          i, nextVertex, pair,
-          length_all_pairs = all_pairs.length;
+        current_group = [], i, nextVertex, pair,
+        length_all_pairs = all_pairs.length;
 
       q.push(source);
 
