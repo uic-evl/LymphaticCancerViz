@@ -11,6 +11,7 @@ body {
 
 .node {
   font: 10px sans-serif;
+  cursor: pointer;
 }
 .parent, .grandparent {
   fill: lightsteelblue
@@ -19,6 +20,13 @@ body {
 .link {
   fill: none;
   stroke-width: 3px;
+  shape-rendering: crispEdges;
+}
+
+.highlight {
+  fill: none;
+  stroke-width: 10px;
+  opacity: 0.65;
   shape-rendering: crispEdges;
 }
 

@@ -18,6 +18,8 @@ const Dendrogram = (function(){
     self.usedColors = new Array(self.colorScale.length);
     self.usedColors.fill(0);
 
+    self.selectedCluster = null;
+
     this.elbow = (d) => { return  "M" + d.source.x + "," + d.source.y + "H" + d.target.x + "V" + d.target.y ; };
 
     this.collapse = (dist, d) => {
@@ -72,9 +74,9 @@ const Dendrogram = (function(){
           .orient("left")
           .scale(yAxisScale)
           /* Grid lines */
-          .innerTickSize(-width)
-          .outerTickSize(0)
-          .tickPadding(10)
+          // .innerTickSize(-width)
+          // .outerTickSize(0)
+          // .tickPadding(10)
       ;
 
       /* Add the axis to the svg */
@@ -98,7 +100,9 @@ const Dendrogram = (function(){
 
     this.setupXAxis = function(values) {
 
-      let imageSize = _.clamp(Math.ceil((cluster.size()[0] + width_offset)/values.length), 20, margin.bottom/2.25);
+      let imageSize = _.clamp(Math.ceil((cluster.size()[0] + width_offset)/values.length), 20, margin.bottom/2.25)
+        , radius = Math.floor(Math.sqrt(2.0 * imageSize * imageSize )/2.0 * 0.72)
+        , offsetCX = Math.floor(imageSize / 250 * 8.3);
 
       let axis = d3.select(svg.node().parentNode).insert("g", ":first-child")
       .attr("class", "x axis")
@@ -123,27 +127,26 @@ const Dendrogram = (function(){
       .data(values).enter()
       .append("g");
 
-      // let ticksRow2 = axis.selectAll(".ximages")
-      //   .data(_.map(values, 'x')).enter()
-      //   .append("g")
-      //   .filter((d,i)=>{ return i % 2 });
-
       /* First row of graphs */
       ticksRow1.selectAll("involvements")
-      .data(function(d,i){return d.images;}).enter().append("image")
+      .data(function(d){return d.images;}).enter().append("image")
       .attr("x", function(d) {return d.x - d.size/2.0})
       .attr("y", function(d, i) { return margin.top + d.size * i})
       .attr("width", d => d.size)
       .attr("height", d => d.size)
       .attr("xlink:href", d => d.src);
 
-      // /* Second row of graphs */
-      // ticksRow2.append("image")
-      //   .attr("height", imageSize)
-      //   .attr("x", (d)=> d - imageSize/2.0)
-      //   .attr("y", imageSize + margin.top )
-      //   .attr("width", imageSize)
-      //   .attr("xlink:href", png);
+      // ticksRow1.selectAll("highlights")
+      //   .data(function(d){return d.images ;})
+      //   .enter().append("g")
+      //   .filter(function(d){ return d.highlight && d.src })
+      //   .append("circle")
+      //   .attr("class", "highlights")
+      //   .attr("r", radius)
+      //   .attr("fill", "red")
+      //   .style("fill-opacity", .25)
+      //   .attr("cx", function(d) {return d.x - offsetCX})
+      //   .attr("cy", function(d, i) { return margin.top + d.size * i + radius });
 
       /* Tick marks under the axis */
       // ticksRow1.append("line")
@@ -162,7 +165,6 @@ const Dendrogram = (function(){
       .attr("font-weight", "bold")
       .attr("dy", "1em")
       .text("Nodal Involvement");
-
     };
 
     this.setupTemplate = function(id) {
@@ -194,7 +196,6 @@ const Dendrogram = (function(){
       }));
     };
 
-    /**/
     this.addInvolvementImages = function(data) {
 
       let self = this;
@@ -252,29 +253,41 @@ const Dendrogram = (function(){
               group_promises.push(Promise.resolve(self.images[hash]))
             }
           });
-
           /* Resolve with the two images */
           Promise.all(group_promises).then((values)=>{
             resolve(values);
           })
-
         }));
 
       });
 
+      return new Promise(function(resolve, reject){
 
-      Promise.all(promises).then(function(images){
-        images.forEach(function(pngs,i){
-          let value = _.find(values, {"node_id":order[i]});
+        Promise.all(promises).then(function(images){
+          images.forEach(function(pngs,i){
+            let value = _.find(values, {"node_id":order[i]}), cluster = -1;
+            value.images = [];
 
-          value.images = [];
-          pngs.forEach(png=>{
-            value.images.push({src: png, size:imageSize, x: value.x, y: value.y})
+            if(self.queryID) {
+              cluster = value.cluster.indexOf(self.queryID);
+              if(cluster > -1) {
+                self.selectedCluster = value;
+              }
+            }
+
+            pngs.forEach(png=>{
+              value.images.push({src: png, size:imageSize, x: value.x, y: value.y, highlight: (self.queryID && cluster > -1)})
+            });
+
           });
 
+          self.setupXAxis(values);
+          resolve();
         });
-        self.setupXAxis(values);
+
       });
+
+
 
     };
   }
@@ -295,16 +308,34 @@ const Dendrogram = (function(){
     });
 
     /* Assign color based on the cut */
-    App.graphUtilities.iterativeInOrder(nodes[0], function(node){ self.setColor(self.cut, node);});
+    App.graphUtilities.iterativeInOrder(nodes[0], function(node){self.setColor(self.cut, node);});
 
     svg.selectAll("path.link").remove();
+    svg.selectAll("path.highlight").remove();
     svg.selectAll("g").remove();
     d3.selectAll(".x.axis").remove();
 
-    self.addInvolvementImages(nodes);
+    self.addInvolvementImages(nodes).then(function(){
+
+      if(self.selectedCluster) {
+        let path = App.graphUtilities.getPath(self.selectedCluster);
+
+        let highlight = cluster.links(path.filter(d=>{return !d.name}))
+          .filter(d=>{ return d.source.cluster.indexOf(self.queryID) > -1 && d.target.cluster.indexOf(self.queryID) > -1});
+
+        svg.selectAll("highlight")
+          .data(highlight)
+          .enter().append("path")
+          .attr("class", "highlight")
+          .attr("d", self.elbow)
+          .attr("stroke", "red");
+
+      }
+
+    });
 
     let links = cluster.links(nodes)
-        , link = svg.selectAll(".link")
+      , link = svg.selectAll(".link")
     .data(links)
     .enter().append("path")
     .attr("class", "link")
@@ -322,18 +353,13 @@ const Dendrogram = (function(){
     node.append("circle")
     .attr("r", 6)
     .on("click", self.click);
-    //
-    // node.append("text")
-    //   .attr("dx", function(d) { return d.children ? -8 : 8; })
-    //   .attr("dy", 3)
-    //   .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
-    //   .text(function(d) {
-    //     return d.node_id;
-    //   });
+
   };
 
   Dendrogram.prototype.init = function(hier, options) {
     let self = this;
+    self.queryID = options.id;
+
     data = hier;
 
     width = document.getElementsByTagName("body")[0].offsetWidth;
@@ -363,7 +389,6 @@ const Dendrogram = (function(){
     .attr("height", height)
     .append("g")
     .attr("transform",`translate(${margin.left/2.0},${margin.top})`);
-
 
     /* Create the Y scale and axis */
     yScale = d3.scale.linear()
