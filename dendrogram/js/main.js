@@ -30,7 +30,7 @@ var App = App || {};
           });
       });
 
-    App.dendrogram.setCut(5.4);
+    App.dendrogram.setCut(34);
   }
 
   /* start the application once the DOM is ready */
