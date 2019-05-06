@@ -79,7 +79,7 @@ def write_to_json(current_patient, patient_order, scores):
     f.write('"nodes": ["' + output_writer + '"] }')
 
     # check for end of data
-    if current_patient.get_id() == patients_pointer.keys()[-1]:
+    if current_patient.get_id() == list(patients_pointer.keys())[-1]:
         f.write("\n")
     else:
         f.write(",\n")
@@ -101,8 +101,8 @@ def write_to_scores(fileName, header):
     # iterate over the json attributes and write them out
     count = 0
     for atr in json_data:
-        values = atr.values()
-        json_header = atr.keys()
+        values = list(atr.values())
+        json_header = list(atr.keys())
         values_all = []
         if count == 0:
             header_titles = []
@@ -143,10 +143,10 @@ def write_to_scores(fileName, header):
 
 def write_patient_data(scores_all):
     global patients_pointer
-    for keyA, patientA in patients_pointer.iteritems():
+    for keyA, patientA in patients_pointer.items():
         scores = scores_all[keyA]
         write_to_csv(patientA, scores[0], scores[1])
-        write_to_json(patientA, scores[0], scores[1])
+#        write_to_json(patientA, scores[0], scores[1])
 
 
 def init_matrix_file(m_header):
@@ -234,7 +234,7 @@ def sort_by_scores(scores, other_patients):
 
     # small function to sort the patients by their scores
     def get_score(m_idx):
-        jj = other_patients.keys().index(m_idx)
+        jj = list(other_patients.keys()).index(m_idx)
         # we want the first element to stay the same
         return scores[jj]
 
@@ -256,7 +256,7 @@ def compute_similarity(patient_list):
     other_patients = copy.deepcopy(patients_pointer)
 
     # iterate over the patients and compute the similarity
-    for keyA, patientA in patients_pointer.iteritems():
+    for keyA, patientA in patients_pointer.items():
 
         # if keyA != 10013:
         #     continue
@@ -269,7 +269,7 @@ def compute_similarity(patient_list):
         jaccard_scores = []
 
         # iterate over all of the other patients
-        for keyB, patientB in other_patients.iteritems():
+        for keyB, patientB in other_patients.items():
 
             # if keyB != 10023:
             #     continue
@@ -489,8 +489,8 @@ if __name__ == "__main__":
         # add the nodes to the graph
         tween = parse_graph_nodes(id, parsed_nodes)
 
-        if tween:
-            continue
+#        if tween:
+#            continue
 
         # set the max number of nodes
         right_nodes = right.get_nodes()
@@ -528,7 +528,7 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['nodes']:
+    for output in ['nodes', 'weighted']:
         if output == "edges":
             init_matrix_file(header)
             file_name = 'data/'+version+'/json/tanimoto_edges_' + parsing + '.json'
