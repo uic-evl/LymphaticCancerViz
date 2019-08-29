@@ -9,10 +9,10 @@ import pandas as pd
 import tanglegram as tg
 
 sp_similarity_matrix_file = sys.argv[1]
-sp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
+sp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=list(range(1,583)))
 
 nsp_similarity_matrix_file = sys.argv[2]
-nsp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
+nsp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=list(range(1,583)))
 
 fig = tg.gen_tangle(sp_similarity_matrix, nsp_similarity_matrix, optimize_order=False)
 # plt.show()

@@ -796,7 +796,6 @@ function Patients() {
                 ] ),
             between = [],
             nodes = extract_nodes(patient, between);
-
         // nodes[0] = _.uniqBy(nodes[0], function(e){return e});
         // nodes[1] = _.uniqBy(nodes[1], function(e){return e});
 

@@ -29,7 +29,7 @@ const PatientGraph = (function(){
     this.createBubbles = function(svg, groups) {
       /* Adds the convex hulls */
       let bubbleSet = svg.append("g")
-        .attr("transform", "translate(" + self.transformX + ",-" + self.transformY + ")");
+        .attr("transform", "translate(" + self.transformX + "," + (-self.transformY) + ")");
 
       bubbleSet.selectAll("path")
         .data(groups)
@@ -147,7 +147,7 @@ const PatientGraph = (function(){
       let g = svg.append("g")
         .attr("width", self.width)
         .attr("height", self.height)
-        .attr("transform", "translate(" + self.transformX + ",-" + self.transformY + ")")
+        .attr("transform", "translate(" + self.transformX + "," + (-self.transformY) + ")")
         .attr("id", "bubbleSet");
 
       /* Add the links to the network*/
@@ -235,8 +235,86 @@ const PatientGraph = (function(){
         .defer(d3.json, "../data/templates.json")
         .await(function(err, templates){
 
-          self.nodes = templates.nodes;
-          self.edges = templates.edges;
+          //self.nodes = templates.nodes;
+          //self.edges = templates.edges;
+		  self.nodes  = [
+				{
+					name: "1A",
+					x: 230,
+					y: 125,
+					index: 0
+				},
+				{
+					name: "1B",
+					x: 157,
+					y: 80,
+					index: 1
+				},
+				{
+					name: "2A",
+					x: 112,
+					y: 112,
+					index: 2
+				},
+				{
+					name: "2B",
+					x: 82,
+					y: 80,
+					index: 3
+				},
+				{
+					name: "3",
+					x: 132,
+					y: 140,
+					index: 4
+				},
+				{
+					name: "4",
+					x: 132,
+					y: 232,
+					index: 5
+				},
+				{
+					name: "5A",
+					x: 41,
+					y: 140,
+					index: 6
+				},
+				{
+					name: "5B",
+					x: 41,
+					y: 232,
+					index: 7
+				},
+				{
+					name: "6",
+					x: 230,
+					y: 186,
+					index: 8
+				},
+				{
+					name: "RP",
+					x: 17,
+					y: 20,
+					index: 9
+				},
+			];
+
+			self.edges = [
+				["1A", "1B"],
+				["1A", "6"],
+				["1B", "2A" ],
+				["2A", "2B" ],
+				["2A" , "3" ],
+				["2B" , "5A" ],
+				["3" , "4" ],
+				["3" , "5A" ],
+				["3" , "6" ],
+				["4" , "5B" ],
+				["4" , "6" ],
+				["5A" , "5B" ],
+			];
+			
           self.links =  [
             {
               source: _.find(self.nodes, {"name": "1A"}).index,

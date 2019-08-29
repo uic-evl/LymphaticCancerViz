@@ -62,8 +62,9 @@ def write_to_json(current_patient, patient_order, scores):
     f.write('{ "id": ' + str(current_patient.get_id()) + ', "gender": "' + current_patient.get_gender() + '", ')
     f.write('"position": "' + current_patient.get_tumor_position() + '", ')
 
-    for col_attr in patient_attr[str(current_patient.get_id())]:
-        val = patient_attr[str(current_patient.get_id())][col_attr]
+    for col_attr, val in patient_attr[str(current_patient.get_id())].items():
+        print(col_attr)
+        print(val)
         f.write('"' + col_attr + '": "' + val + '", ')
 
     output_writer = ",".join(str(e) for e in patient_order)
@@ -146,7 +147,7 @@ def write_patient_data(scores_all):
     for keyA, patientA in patients_pointer.items():
         scores = scores_all[keyA]
         write_to_csv(patientA, scores[0], scores[1])
-#        write_to_json(patientA, scores[0], scores[1])
+        write_to_json(patientA, scores[0], scores[1])
 
 
 def init_matrix_file(m_header):
@@ -345,6 +346,7 @@ def parse_input_data(m_reader):
     m_result = {}
     for row in m_reader:
         key = row.pop('Dummy ID')
+        valid = key.isdigit()
         if key in m_result:
             pass
         parsed = {}
@@ -352,8 +354,10 @@ def parse_input_data(m_reader):
             id = attr.split('(')[0].replace(" ", "_")
             if id[-1] == '_':
                 id = id[:-1]
+            if row[attr] is None:
+                valid = False
             parsed[id] = row[attr]
-        if key.isdigit():
+        if valid:
             m_result[int(key)] = parsed
     return m_result
 
@@ -422,9 +426,14 @@ def parse_graph_nodes(m_id, m_parsed_nodes):
 
 # Driver starts here
 if __name__ == "__main__":
-    data = sys.argv[1]
-    connectivity = sys.argv[2]
-    version = sys.argv[3]
+    if(len(sys.argv) == 4):
+        data = sys.argv[1]
+        connectivity = sys.argv[2]
+        version = sys.argv[3]
+    else:
+        data = '../data/tsv/Anonymized_644.Updated_cleaned_v1.3.2.tsv'
+        connectivity = '../data/connectivity_646.csv'
+        version = '1.3.1'
     parsing = "UPPER"
 
     patient_attr = {}
@@ -439,7 +448,7 @@ if __name__ == "__main__":
     # read in the adjacency matrix
     read_matrix_data(connectivity)
 
-    with open(data, 'r') as csvFile:
+    with open(data, 'r', encoding='iso8859-1') as csvFile:
         # create the csv reader
         reader = csv.DictReader(csvFile, delimiter='\t')
         # parse the rows
@@ -489,8 +498,8 @@ if __name__ == "__main__":
         # add the nodes to the graph
         tween = parse_graph_nodes(id, parsed_nodes)
 
-#        if tween:
-#            continue
+        if tween:
+            continue
 
         # set the max number of nodes
         right_nodes = right.get_nodes()
@@ -531,27 +540,27 @@ if __name__ == "__main__":
     for output in ['nodes', 'weighted']:
         if output == "edges":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/tanimoto_edges_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/tanimoto_edges_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_edges_output
         elif output == "nodes":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/tanimoto_nodes_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/tanimoto_nodes_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_nodes_output
         elif output == "weighted":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/tanimoto_weighted_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/tanimoto_weighted_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_weighted_output
         elif output == "bigram":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/tanimoto_bigrams_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/tanimoto_bigrams_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_bigrams_output
         elif output == "jaccard":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/jaccard_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/jaccard_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = jaccard_output
 

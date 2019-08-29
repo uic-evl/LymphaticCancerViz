@@ -135,7 +135,7 @@ const Utilities = (function() {
         "neck_boost" : patient["Neck_boost"] ? patient["Neck_boost"] : "NA",
       };
     });
-
+	console.log(parsed_patients);
     self.patients = parsed_patients;
   };
 
@@ -148,33 +148,37 @@ const Utilities = (function() {
       let involvement_occurrences = { "a":{}, "b":{} };
       /* Iterate over the ids and get the patients' nodes */
       node.cluster.forEach(function(p_id) {
+		if(self.patients[p_id] == undefined){
+			console.log(p_id);
+		}
+		else{
+			let patient_nodes = _.flatten(self.patients[p_id].nodes);
 
-        let patient_nodes = _.flatten(self.patients[p_id].nodes);
+			let levels = [];
+			patient_nodes.forEach(function (involvement) {
+			  levels.push(involvement.substr(1));
+			});
 
-        let levels = [];
-        patient_nodes.forEach(function (involvement) {
-          levels.push(involvement.substr(1));
-        });
+			let bilateral = _.filter(levels, (val, i, iteratee) => _.includes(iteratee, val, i + 1))
+			  , unilateral = _.difference(levels, bilateral);
 
-        let bilateral = _.filter(levels, (val, i, iteratee) => _.includes(iteratee, val, i + 1))
-          , unilateral = _.difference(levels, bilateral);
+			/* Add the bilateral nodes*/
+			bilateral.forEach(function(involvement){
+			  /* Check if the first side has recorded this involvement */
+			  if(_.has(involvement_occurrences["a"], involvement)) {involvement_occurrences["a"][involvement] += 1;}
+			  else {involvement_occurrences["a"][involvement] = 1;}
 
-        /* Add the bilateral nodes*/
-        bilateral.forEach(function(involvement){
-          /* Check if the first side has recorded this involvement */
-          if(_.has(involvement_occurrences["a"], involvement)) {involvement_occurrences["a"][involvement] += 1;}
-          else {involvement_occurrences["a"][involvement] = 1;}
+			  /* Check if the second side has recorded this involvement */
+			  if(_.has(involvement_occurrences["b"], involvement)) { involvement_occurrences["b"][involvement] += 1;}
+			  else {involvement_occurrences["b"][involvement] = 1;}
+			});
 
-          /* Check if the second side has recorded this involvement */
-          if(_.has(involvement_occurrences["b"], involvement)) { involvement_occurrences["b"][involvement] += 1;}
-          else {involvement_occurrences["b"][involvement] = 1;}
-        });
-
-        unilateral.forEach(function(involvement) {
-          /* Check if the first side has recorded this involvement */
-          if (_.has(involvement_occurrences["a"], involvement)) {involvement_occurrences["a"][involvement] += 1;}
-          else {involvement_occurrences["a"][involvement] = 1;}
-        });
+			unilateral.forEach(function(involvement) {
+			  /* Check if the first side has recorded this involvement */
+			  if (_.has(involvement_occurrences["a"], involvement)) {involvement_occurrences["a"][involvement] += 1;}
+			  else {involvement_occurrences["a"][involvement] = 1;}
+			});
+		  }
       });
 
       /* Get the percentage involvement */
