@@ -105,6 +105,7 @@ def postOrder(root):
                 root["cluster"] = root["children"][0]["cluster"]
                 root["cluster"].sort(key=int)
 
+#I'm just guessing with these file paths - ANdrew
 root = 'E:\\git_repos\\LymphaticCancerViz\\data\\1.3.1\\matrices\\'
 sp_similarity_matrix_file = root + 'weighted_UPPER_matrix.csv'# sys.argv[1]
 nsp_similarity_matrix_file = root + 'nodes_UPPER_matrix.csv' #sys.argv[2]

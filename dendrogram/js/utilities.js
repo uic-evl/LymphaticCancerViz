@@ -135,7 +135,6 @@ const Utilities = (function() {
         "neck_boost" : patient["Neck_boost"] ? patient["Neck_boost"] : "NA",
       };
     });
-	console.log(parsed_patients);
     self.patients = parsed_patients;
   };
 
@@ -148,10 +147,7 @@ const Utilities = (function() {
       let involvement_occurrences = { "a":{}, "b":{} };
       /* Iterate over the ids and get the patients' nodes */
       node.cluster.forEach(function(p_id) {
-		if(self.patients[p_id] == undefined){
-			console.log(p_id);
-		}
-		else{
+		if(self.patients[p_id] != undefined){//need to check here in case the data set for clusters and pateints are different
 			let patient_nodes = _.flatten(self.patients[p_id].nodes);
 
 			let levels = [];

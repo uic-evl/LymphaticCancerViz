@@ -18,12 +18,12 @@ var App = App || {};
 
         let queryID = App.graphUtilities.getQueryVariable("id");
 
-        App.GraphFactory.init({width:250, height:250, radius: 15})
+        App.GraphFactory.init({width:350, height:300, radius: 10})
           .then(O_o => {
 
             App.GraphFactory.newGraph("#templates");
 
-            App.dendrogram.init(dendrogram, {width:300, height:300, radius: 15});
+            App.dendrogram.init(dendrogram, {width:300, height:300, radius: 10});
 
             App.dendrogram.update();
 

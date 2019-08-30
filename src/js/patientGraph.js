@@ -230,165 +230,168 @@ const PatientGraph = (function(){
       self.radius = options.radius || 10;
 
       return new Promise(function(resolve) {
-      /* load the data template */
-      queue()
-        .defer(d3.json, "../data/templates.json")
-        .await(function(err, templates){
+      //this was previously a template file that I think was moved to hardcoding in javascript when the data file was made private
+	  //this template is assumed to be correct and just taken from main.js for the lymph vis, so I do not garuntee accuracy
+		self.nodes  = [
+			{
+				name: "1A",
+				x: 230,
+				y: 125,
+				index: 0
+			},
+			{
+				name: "1B",
+				x: 157,
+				y: 80,
+				index: 1
+			},
+			{
+				name: "2A",
+				x: 112,
+				y: 112,
+				index: 2
+			},
+			{
+				name: "2B",
+				x: 82,
+				y: 80,
+				index: 3
+			},
+			{
+				name: "3",
+				x: 132,
+				y: 140,
+				index: 4
+			},
+			{
+				name: "4",
+				x: 132,
+				y: 232,
+				index: 5
+			},
+			{
+				name: "5A",
+				x: 41,
+				y: 140,
+				index: 6
+			},
+			{
+				name: "5B",
+				x: 41,
+				y: 232,
+				index: 7
+			},
+			{
+				name: "6",
+				x: 230,
+				y: 186,
+				index: 8
+			},
+			{
+				name: "RP",
+				x: 17,
+				y: 20,
+				index: 9
+			},
+			// {
+        //   name: "2/3",
+        //   x: 83,
+        //   y: 125
+        // },
+        // {
+        //   name: "3/4",
+        //   x: 100,
+        //   y: 187
+        // }
+		];
 
-          //self.nodes = templates.nodes;
-          //self.edges = templates.edges;
-		  self.nodes  = [
-				{
-					name: "1A",
-					x: 230,
-					y: 125,
-					index: 0
-				},
-				{
-					name: "1B",
-					x: 157,
-					y: 80,
-					index: 1
-				},
-				{
-					name: "2A",
-					x: 112,
-					y: 112,
-					index: 2
-				},
-				{
-					name: "2B",
-					x: 82,
-					y: 80,
-					index: 3
-				},
-				{
-					name: "3",
-					x: 132,
-					y: 140,
-					index: 4
-				},
-				{
-					name: "4",
-					x: 132,
-					y: 232,
-					index: 5
-				},
-				{
-					name: "5A",
-					x: 41,
-					y: 140,
-					index: 6
-				},
-				{
-					name: "5B",
-					x: 41,
-					y: 232,
-					index: 7
-				},
-				{
-					name: "6",
-					x: 230,
-					y: 186,
-					index: 8
-				},
-				{
-					name: "RP",
-					x: 17,
-					y: 20,
-					index: 9
-				},
-			];
+		self.edges = [
+			["1A", "1B"],
+			["1A", "6"],
+			["1B", "2A" ],
+			["2A", "2B" ],
+			["2A" , "3" ],
+			["2B" , "5A" ],
+			["3" , "4" ],
+			["3" , "5A" ],
+			["3" , "6" ],
+			["4" , "5B" ],
+			["4" , "6" ],
+			["5A" , "5B" ],
+		];
+		
+		  self.links =  [
+			{
+			  source: _.find(self.nodes, {"name": "1A"}).index,
+			  target: _.find(self.nodes, {"name": "1B"}).index,
+			  name: "1A-1B"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "1A"}).index,
+			  target: _.find(self.nodes, {"name": "6"}).index,
+			  name: "1A-6"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "1B"}).index,
+			  target: _.find(self.nodes, {"name": "2A"}).index,
+			  name: "1B-2A"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "1B"}).index,
+			  target: _.find(self.nodes, {"name": "3"}).index,
+			  name: "1B-3"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "2A"}).index,
+			  target: _.find(self.nodes, {"name": "2B"}).index,
+			  name: "2A-2B"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "2A"}).index,
+			  target: _.find(self.nodes, {"name": "3"}).index,
+			  name: "2A-3"
+			},
 
-			self.edges = [
-				["1A", "1B"],
-				["1A", "6"],
-				["1B", "2A" ],
-				["2A", "2B" ],
-				["2A" , "3" ],
-				["2B" , "5A" ],
-				["3" , "4" ],
-				["3" , "5A" ],
-				["3" , "6" ],
-				["4" , "5B" ],
-				["4" , "6" ],
-				["5A" , "5B" ],
-			];
-			
-          self.links =  [
-            {
-              source: _.find(self.nodes, {"name": "1A"}).index,
-              target: _.find(self.nodes, {"name": "1B"}).index,
-              name: "1A-1B"
-            },
-            {
-              source: _.find(self.nodes, {"name": "1A"}).index,
-              target: _.find(self.nodes, {"name": "6"}).index,
-              name: "1A-6"
-            },
-            {
-              source: _.find(self.nodes, {"name": "1B"}).index,
-              target: _.find(self.nodes, {"name": "2A"}).index,
-              name: "1B-2A"
-            },
-            {
-              source: _.find(self.nodes, {"name": "1B"}).index,
-              target: _.find(self.nodes, {"name": "3"}).index,
-              name: "1B-3"
-            },
-            {
-              source: _.find(self.nodes, {"name": "2A"}).index,
-              target: _.find(self.nodes, {"name": "2B"}).index,
-              name: "2A-2B"
-            },
-            {
-              source: _.find(self.nodes, {"name": "2A"}).index,
-              target: _.find(self.nodes, {"name": "3"}).index,
-              name: "2A-3"
-            },
+			{
+			  source: _.find(self.nodes, {"name": "2B"}).index,
+			  target: _.find(self.nodes, {"name": "5A"}).index,
+			  name: "2B-5A"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "3"}).index,
+			  target: _.find(self.nodes, {"name": "4"}).index,
+			  name: "3-4"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "3"}).index,
+			  target: _.find(self.nodes, {"name": "5A"}).index,
+			  name: "3-5A"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "3"}).index,
+			  target: _.find(self.nodes, {"name": "6"}).index,
+			  name: "3-6"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "4"}).index,
+			  target: _.find(self.nodes, {"name": "5B"}).index,
+			  name: "4-5B"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "4"}).index,
+			  target: _.find(self.nodes, {"name": "6"}).index,
+			  name: "4-6"
+			},
+			{
+			  source: _.find(self.nodes, {"name": "5A"}).index,
+			  target: _.find(self.nodes, {"name": "5B"}).index,
+			  name: "5A-5B"
+			}
+		  ];
 
-            {
-              source: _.find(self.nodes, {"name": "2B"}).index,
-              target: _.find(self.nodes, {"name": "5A"}).index,
-              name: "2B-5A"
-            },
-            {
-              source: _.find(self.nodes, {"name": "3"}).index,
-              target: _.find(self.nodes, {"name": "4"}).index,
-              name: "3-4"
-            },
-            {
-              source: _.find(self.nodes, {"name": "3"}).index,
-              target: _.find(self.nodes, {"name": "5A"}).index,
-              name: "3-5A"
-            },
-            {
-              source: _.find(self.nodes, {"name": "3"}).index,
-              target: _.find(self.nodes, {"name": "6"}).index,
-              name: "3-6"
-            },
-            {
-              source: _.find(self.nodes, {"name": "4"}).index,
-              target: _.find(self.nodes, {"name": "5B"}).index,
-              name: "4-5B"
-            },
-            {
-              source: _.find(self.nodes, {"name": "4"}).index,
-              target: _.find(self.nodes, {"name": "6"}).index,
-              name: "4-6"
-            },
-            {
-              source: _.find(self.nodes, {"name": "5A"}).index,
-              target: _.find(self.nodes, {"name": "5B"}).index,
-              name: "5A-5B"
-            }
-          ];
-
-          self.graphWidth  = _.find(self.nodes, {"name": "6"}).x - _.find(self.nodes, {"name": "RP"}).x;
-          self.graphHeight = _.find(self.nodes, {"name": "4"}).y - _.find(self.nodes, {"name": "RP"}).y;
-
-          resolve();
-        });
+		  self.graphWidth  = _.find(self.nodes, {"name": "6"}).x - _.find(self.nodes, {"name": "RP"}).x;
+		  self.graphHeight = _.find(self.nodes, {"name": "4"}).y - _.find(self.nodes, {"name": "RP"}).y;
+		  resolve();
       });
     },
 
