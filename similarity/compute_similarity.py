@@ -62,8 +62,9 @@ def write_to_json(current_patient, patient_order, scores):
     f.write('{ "id": ' + str(current_patient.get_id()) + ', "gender": "' + current_patient.get_gender() + '", ')
     f.write('"position": "' + current_patient.get_tumor_position() + '", ')
 
-    for col_attr in patient_attr[str(current_patient.get_id())]:
-        val = patient_attr[str(current_patient.get_id())][col_attr]
+    for col_attr, val in patient_attr[str(current_patient.get_id())].items():
+        print(col_attr)
+        print(val)
         f.write('"' + col_attr + '": "' + val + '", ')
 
     output_writer = ",".join(str(e) for e in patient_order)
@@ -79,7 +80,7 @@ def write_to_json(current_patient, patient_order, scores):
     f.write('"nodes": ["' + output_writer + '"] }')
 
     # check for end of data
-    if current_patient.get_id() == patients_pointer.keys()[-1]:
+    if current_patient.get_id() == list(patients_pointer.keys())[-1]:
         f.write("\n")
     else:
         f.write(",\n")
@@ -101,8 +102,8 @@ def write_to_scores(fileName, header):
     # iterate over the json attributes and write them out
     count = 0
     for atr in json_data:
-        values = atr.values()
-        json_header = atr.keys()
+        values = list(atr.values())
+        json_header = list(atr.keys())
         values_all = []
         if count == 0:
             header_titles = []
@@ -143,7 +144,7 @@ def write_to_scores(fileName, header):
 
 def write_patient_data(scores_all):
     global patients_pointer
-    for keyA, patientA in patients_pointer.iteritems():
+    for keyA, patientA in patients_pointer.items():
         scores = scores_all[keyA]
         write_to_csv(patientA, scores[0], scores[1])
         write_to_json(patientA, scores[0], scores[1])
@@ -234,7 +235,7 @@ def sort_by_scores(scores, other_patients):
 
     # small function to sort the patients by their scores
     def get_score(m_idx):
-        jj = other_patients.keys().index(m_idx)
+        jj = list(other_patients.keys()).index(m_idx)
         # we want the first element to stay the same
         return scores[jj]
 
@@ -256,7 +257,7 @@ def compute_similarity(patient_list):
     other_patients = copy.deepcopy(patients_pointer)
 
     # iterate over the patients and compute the similarity
-    for keyA, patientA in patients_pointer.iteritems():
+    for keyA, patientA in patients_pointer.items():
 
         # if keyA != 10013:
         #     continue
@@ -269,7 +270,7 @@ def compute_similarity(patient_list):
         jaccard_scores = []
 
         # iterate over all of the other patients
-        for keyB, patientB in other_patients.iteritems():
+        for keyB, patientB in other_patients.items():
 
             # if keyB != 10023:
             #     continue
@@ -345,6 +346,7 @@ def parse_input_data(m_reader):
     m_result = {}
     for row in m_reader:
         key = row.pop('Dummy ID')
+        valid = key.isdigit()
         if key in m_result:
             pass
         parsed = {}
@@ -352,8 +354,10 @@ def parse_input_data(m_reader):
             id = attr.split('(')[0].replace(" ", "_")
             if id[-1] == '_':
                 id = id[:-1]
+            if row[attr] is None:
+                valid = False
             parsed[id] = row[attr]
-        if key.isdigit():
+        if valid:
             m_result[int(key)] = parsed
     return m_result
 
@@ -422,9 +426,14 @@ def parse_graph_nodes(m_id, m_parsed_nodes):
 
 # Driver starts here
 if __name__ == "__main__":
-    data = sys.argv[1]
-    connectivity = sys.argv[2]
-    version = sys.argv[3]
+    if(len(sys.argv) == 4):
+        data = sys.argv[1]
+        connectivity = sys.argv[2]
+        version = sys.argv[3]
+    else:
+        data = '../data/tsv/Anonymized_644.Updated_cleaned_v1.3.2.tsv'
+        connectivity = '../data/connectivity_646.csv'
+        version = '1.3.1'
     parsing = "UPPER"
 
     patient_attr = {}
@@ -439,7 +448,7 @@ if __name__ == "__main__":
     # read in the adjacency matrix
     read_matrix_data(connectivity)
 
-    with open(data, 'r') as csvFile:
+    with open(data, 'r', encoding='iso8859-1') as csvFile:
         # create the csv reader
         reader = csv.DictReader(csvFile, delimiter='\t')
         # parse the rows
@@ -528,30 +537,30 @@ if __name__ == "__main__":
 
     ids = all_patients
     header = ",".join(str("Patient " + str(x)) for x in sorted(ids))
-    for output in ['nodes']:
+    for output in ['nodes', 'weighted']:
         if output == "edges":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/tanimoto_edges_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/tanimoto_edges_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_edges_output
         elif output == "nodes":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/tanimoto_nodes_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/tanimoto_nodes_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_nodes_output
         elif output == "weighted":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/tanimoto_weighted_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/tanimoto_weighted_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_weighted_output
         elif output == "bigram":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/tanimoto_bigrams_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/tanimoto_bigrams_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = tanimoto_bigrams_output
         elif output == "jaccard":
             init_matrix_file(header)
-            file_name = 'data/'+version+'/json/jaccard_' + parsing + '.json'
+            file_name = '../data/'+version+'/json/jaccard_' + parsing + '.json'
             f = open(file_name, 'w')
             scores_out = jaccard_output
 

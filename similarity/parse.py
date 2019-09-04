@@ -12,7 +12,7 @@ for i in range(0, 291):
         header.append("")
     else:
         header.append("Patient " + str(i))
-print ','.join(map(str, header))
+print(','.join(map(str, header)))
 # print '~'
 with open(data, 'r') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
@@ -42,5 +42,5 @@ with open(data, 'r') as csvfile:
 for i in range(1,len(matrix)):
     patient = matrix[i].tolist()
     patient[0] = "Patient " + str(i)
-    print ','.join(map(str, patient))
+    print(','.join(map(str, patient)))
     # print '~'

@@ -189,10 +189,10 @@ class Patient(object):
         return sorted(self.right_graph.get_nodes() + self.left_graph.get_nodes())
 
     def get_all_edges(self):
-        return list(self.right_graph.get_edges().keys() + self.left_graph.get_edges().keys())
+        return list(list(self.right_graph.get_edges().keys()) + list(self.left_graph.get_edges().keys()))
 
     def get_all_unique_edges(self):
-        return list( set(self.right_graph.get_edges().keys() + self.left_graph.get_edges().keys()) )
+        return list( set(list(self.right_graph.get_edges().keys()) + list(self.left_graph.get_edges().keys())) )
 
     def get_all_unique_nodes(self):
         return list(set(self.left_graph.get_nodes() + self.right_graph.get_nodes()))

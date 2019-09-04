@@ -6,6 +6,7 @@ import json
 import numpy as np
 import sys
 import pandas as pd
+from functools import reduce
 
 def get_children(root):
     global names
@@ -87,7 +88,7 @@ def iterativeInOrder(root):
         else:
             current = stack.pop()
             # do something
-            print current["node_id"]
+            print(current["node_id"])
             current = current["children"][1] if len(current["children"]) > 1 else None
 
 
@@ -104,19 +105,20 @@ def postOrder(root):
                 root["cluster"] = root["children"][0]["cluster"]
                 root["cluster"].sort(key=int)
 
+#I'm just guessing with these file paths - ANdrew
+root = 'E:\\git_repos\\LymphaticCancerViz\\data\\1.3.1\\matrices\\'
+sp_similarity_matrix_file = root + 'weighted_UPPER_matrix.csv'# sys.argv[1]
+nsp_similarity_matrix_file = root + 'nodes_UPPER_matrix.csv' #sys.argv[2]
 
-sp_similarity_matrix_file = sys.argv[1]
-sp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
-
-nsp_similarity_matrix_file = sys.argv[2]
-nsp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=range(1,583))
+sp_similarity_matrix = pd.read_csv(sp_similarity_matrix_file, index_col=False, usecols=list(range(1,583)))
+nsp_similarity_matrix = pd.read_csv(nsp_similarity_matrix_file, index_col=False, usecols=list(range(1,583)))
 
 names = sp_similarity_matrix.columns
 
 labels = np.asarray(names)
-id2name = dict(zip(range(len(labels)), labels))
+id2name = dict(list(zip(list(range(len(labels))), labels)))
 
-Z = linkage(sp_similarity_matrix, 'weighted')
+Z = linkage(sp_similarity_matrix, 'ward')
 
 fig = pylab.figure(figsize=(8,8))
 ax1 = fig.add_axes([0.09,0.1,0.2,0.6])
@@ -130,7 +132,7 @@ tree = dendrogram(
     # p=30,
     # leaf_rotation=90.,  # rotates the x axis labels
     # leaf_font_size=8,  # font size for the x axis labels
-    color_threshold=5.4,
+    color_threshold=36.2,
     # labels=labels,
     orientation='left'
 )
@@ -138,7 +140,7 @@ ax1.set_xticks([])
 ax1.set_yticks([])
 
 ax2 = fig.add_axes([0.3,0.71,0.6,0.2])
-Z2 = linkage(sp_similarity_matrix, 'weighted')
+Z2 = linkage(sp_similarity_matrix, 'ward')
 tree2 = dendrogram(
     Z2,
     # truncate_mode='lastp',
@@ -164,21 +166,20 @@ axmatrix.set_xticks([])
 axmatrix.set_yticks([])
 
 
-# Plot colorbar.
-axcolor = fig.add_axes([0.91,0.1,0.02,0.6])
-pylab.colorbar(im, cax=axcolor)
-fig.show()
-fig.savefig('dendrogram.png')
+# # Plot colorbar.
+# axcolor = fig.add_axes([0.91,0.1,0.02,0.6])
+# pylab.colorbar(im, cax=axcolor)
+# fig.show()
+# fig.savefig('dendrogram.png')
 
-# T = hierarchy.to_tree( Z , rd=False )
-# leaves = hierarchy.leaves_list(Z)
-#
-# d3Dendro = dict(children=[], name="Root1")
-# add_node( T, d3Dendro )
-#
-# postOrder(d3Dendro["children"][0])
-#
+T = hierarchy.to_tree( Z , rd=False )
+leaves = hierarchy.leaves_list(Z)
+
+d3Dendro = dict(children=[], name="Root1")
+add_node( T, d3Dendro )
+
+postOrder(d3Dendro["children"][0])
 # #label_tree( d3Dendro["children"][0] )
-# json.dump(d3Dendro, open("d3-dendrogram.json", "w"), sort_keys=True, indent=4)
+json.dump(d3Dendro, open("d3-dendrogram.json", "w"), sort_keys=True, indent=4)
 
 # plt.show()

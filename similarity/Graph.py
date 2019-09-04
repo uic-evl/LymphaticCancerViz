@@ -52,7 +52,7 @@ class Graph(object):
 
     def get_edges(self):
         s = {}
-        for key in sorted(self.edges.iterkeys()):
+        for key in sorted(self.edges.keys()):
             s[key] = self.edges[key]
         return s
 
@@ -76,7 +76,7 @@ class Graph(object):
         return self.matrix[index, :]
 
     def print_matrix(self):
-        print ''.join('{:>4} '.format(x) for x in self.cols)
+        print(''.join('{:>4} '.format(x) for x in self.cols))
 
         for row in self.matrix:
-            print ''.join('{:>4} '.format(x) for x in row)
+            print(''.join('{:>4} '.format(x) for x in row))
