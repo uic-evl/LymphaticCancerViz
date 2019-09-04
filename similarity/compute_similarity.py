@@ -63,8 +63,6 @@ def write_to_json(current_patient, patient_order, scores):
     f.write('"position": "' + current_patient.get_tumor_position() + '", ')
 
     for col_attr, val in patient_attr[str(current_patient.get_id())].items():
-        print(col_attr)
-        print(val)
         f.write('"' + col_attr + '": "' + val + '", ')
 
     output_writer = ",".join(str(e) for e in patient_order)
@@ -94,7 +92,7 @@ def write_to_scores(fileName, header):
     idx = fileName.rfind('/')
     name = fileName[idx:-5] + '_Data_and_Scores_' + str(now.month) + '_' + str(now.year) + '.csv'
     name = name[1].upper() + name[2:]
-    csv_name = './data/'+version+'/scores/' + name
+    csv_name = '../data/'+version+'/scores/' + name
     csv_file = open(csv_name, 'w')
 
     # our writing object
@@ -152,7 +150,7 @@ def write_patient_data(scores_all):
 
 def init_matrix_file(m_header):
     global m
-    m = open('./data/'+version+'/matrices/' + output + '_' + parsing + '_' + 'matrix.csv', 'w')
+    m = open('../data/'+version+'/matrices/' + output + '_' + parsing + '_' + 'matrix.csv', 'w')
     m.write(",")
     m.write(m_header)
     m.write('\r')

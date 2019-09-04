@@ -738,67 +738,27 @@ function Patients() {
         // extract the clusters based on the patient's id
         let patient_groups = parse_clusters(patient.id,
             [
-              // bigrams_c2, bigrams_c3 , bigrams_c4,
-              // weighted_w3,
-              // weighted_w4,
               weighted_w6,
-              // weighted_c3,
-              // weighted_c4,
               weighted_n6,
-              // bigrams_w2, bigrams_w3 , bigrams_w4,
-              // bigrams_w6,
-              // nodes_c2, nodes_c3 , nodes_c4,
-              // nodes_c6,
-              // nodes_w2, nodes_w3 , nodes_w4,
-              //nodes_w4,// diffs_n_b
             ],
             "groupId",
             [
-              // "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4",
-              // "Weighted, Comp. k=6",
-              // "Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
               "Spatial k=6",                        // "Bigrams, Weight. k=6",
               "Non-Spatial k=6",                        // "Bigrams, Weight. k=6",
-              // "Bigrams, Weight. k=6",
-              // "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4",
-              // "Labels, Comp. k=6",
-              // "Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
-              // "Labels, Weight. k=4",// "Diffs, Labels & Bigrams"
             ] ),
             patient_dendogramIds = parse_clusters(patient.id,
                 [
-                  // bigrams_c2, bigrams_c3 , bigrams_c4,
                   weighted_w6,
                   weighted_n6,
-                  // bigrams_w2, bigrams_w3 , bigrams_w4,
-                  // bigrams_w6,
-                  // nodes_c2, nodes_c3 , nodes_c4,
-                  // nodes_c6,
-                  // nodes_w2, nodes_w3 , nodes_w4,
-                  // nodes_w4,// diffs_n_b
                 ],
                 "dendogramId",
                 [
-                  // "Bigrams, Comp. k=2", "Bigrams, Comp. k=3","Bigrams, Comp. k=4",
-                  // "Weighted, Comp. k=6",
-                  // "Bigrams, Weight. k=2", "Bigrams, Weight. k=3","Bigrams, Weight. k=4",
-                  // "Weighted, Weight. k=3",
-                  // "Weighted, Weight. k=4",
-                  // "Weighted, Weight. k=6",
-                  // "Weighted, Comp. k=3",
-                  // "Weighted, Comp. k=4",
                   "Spatial k=6",                        // "Bigrams, Weight. k=6",
                   "Non-Spatial k=6",                        // "Bigrams, Weight. k=6",
-                  // "Labels, Comp. k=2", "Labels, Comp. k=3","Labels, Comp. k=4",
-                  // "Labels, Comp. k=6",
-                  // "Labels, Weight. k=2", "Labels, Weight. k=3","Labels, Weight. k=4",
-                  //"Labels, Weight. k=4",// "Diffs, Labels & Bigrams"
                 ] ),
             between = [],
             nodes = extract_nodes(patient, between);
 
-        // nodes[0] = _.uniqBy(nodes[0], function(e){return e});
-        // nodes[1] = _.uniqBy(nodes[1], function(e){return e});
 
         let site = {
           "patient": patient.id,

@@ -58,30 +58,6 @@ const PatientGraph = (function(){
           .attr("fill", "#e41a1c")
           .attr("stroke", "#e41a1c");
 
-
-      // if(laterality)
-      // {
-      //   if(laterality === "R") {
-      //     bubbleSet.selectAll(".hull_right")
-      //     .attr("fill", "#7570b3")
-      //     .attr("stroke", "#7570b3");
-      //   }
-      //   else if(laterality === "L"){
-      //     bubbleSet.selectAll(".hull_left")
-      //     .attr("fill", "#1b9e77")
-      //     .attr("stroke", "#1b9e77");
-      //   }
-      // }
-      // else {
-      //   bubbleSet.selectAll(".hull_left")
-      //   .attr("fill", "#1b9e77")
-      //   .attr("stroke", "#1b9e77");
-      //
-      //   bubbleSet.selectAll(".hull_right")
-      //   .attr("fill", "#7570b3")
-      //   .attr("stroke", "#7570b3");
-      // }
-
     };
 
     function addNodes(svg, lymphNodes) {
@@ -100,15 +76,6 @@ const PatientGraph = (function(){
         .attr("fill", "#f0f0f0")
         .attr("stroke", "black")
         .attr("stroke-width", "2px");
-
-      /** Adds the text on top of the nodes **/
-      // nodes
-      //   .append("text")
-      //   .attr("x", (d) =>d.x )
-      //   .attr("y", (d) => d.y )
-      //   .attr("dy", ".35em")
-      //   .style({'text-anchor': 'middle', 'fill': 'black'})
-      //   .text((d) =>  d.name );
     }
 
     function addLinks(svg, nodes, links) {
