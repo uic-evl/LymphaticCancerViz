@@ -18,7 +18,7 @@ outcomeCols = {'Z','J','AL','AF','T','AO'};
 %Format of the output file name
 formatSpec = '%s_link=%s_k=%d.xlsx';
 outputFile = sprintf(formatSpec, outFile, link, k); %Output file name
-outputFile
+filename
 
 simMatrix =importdata(filename);    %read the similarity matrix
 SimilarityMatrix = simMatrix.data(:,1:rows);
@@ -46,32 +46,32 @@ leafOrder = optimalleaforder(Z,D);
 title([string(link)])
 % set(gca,'XTick',[]);
 
-%// Changing the colours
-% lineColors = cell2mat(get(H,'Color'));
-% colorList = unique(lineColors, 'rows');
-% 
-% myColors = [ 102,194,165;
-%              252,141,98;
-%              141,160,203;
-%              231,138,195;
-%              166,216,84;
-%              229,196,148;
-%              255,217,47;
-%              229,196,148;
-%              179,179,179
-%              ]/255;
-% 
-% for color = 2:size(colorList,1)
-%     %// Find which lines match this colour
-%     idx = ismember(lineColors, colorList(color,:), 'rows');
-%     %// Replace the colour for those lines
-%     lineColors(idx, :) = repmat(myColors(color-1,:),sum(idx),1);
-% end
-%    
-% %// Apply the new colours to the chart's line objects (line by line)
-% for line = 1:size(H,1)
-%     set(H(line), 'Color', lineColors(line,:));
-% end
+% Changing the colours
+lineColors = cell2mat(get(H,'Color'));
+colorList = unique(lineColors, 'rows');
+
+myColors = [ 102,194,165;
+             252,141,98;
+             141,160,203;
+             231,138,195;
+             166,216,84;
+             229,196,148;
+             255,217,47;
+             229,196,148;
+             179,179,179
+             ]/255;
+
+for color = 2:size(colorList,1)
+    %// Find which lines match this colour
+    idx = ismember(lineColors, colorList(color,:), 'rows');
+    %// Replace the colour for those lines
+    lineColors(idx, :) = repmat(myColors(color-1,:),sum(idx),1);
+end
+   
+%// Apply the new colours to the chart's line objects (line by line)
+for line = 1:size(H,1)
+    set(H(line), 'Color', lineColors(line,:));
+end
 
 %%Write the cluster assignments
 xlswrite(outputFile,{'patientId'},'clusters','A1');

@@ -1,6 +1,7 @@
-filename = '5_2018\weighted_matrix.csv';
-dataFile = '5_2018\Tanimoto_weighted_Data_and_Scores_5_2018.csv';
-outFile = '5_2018\Tanimoto_weighted_Data_and_Scores_5_2018';
+filename = '../data/clustering_results/weighted_matrix.csv';
+dataFile = '../data/clustering_results/Tanimoto_weighted_Data_and_Scores_5_2018.csv';
+outFile = '../data/clustering_results/Tanimoto_weighted_Data_and_Scores_5_2018';
+
 
 % linkage = {'complete','weighted'};
 linkage = {'complete'};
