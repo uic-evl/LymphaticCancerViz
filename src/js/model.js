@@ -720,10 +720,7 @@ function Patients() {
 
   function init() {
 
-    App.utils.readFiles(function (error, weighted,weighted_w6, weighted_n6,
-                                  /*weighted_c2, weighted_c3 , weighted_c4, weighted_c5, weighted_c6, weighted_w2, weighted_w3 , weighted_w4, weighted_w5,weighted_w6,
-                                  nodes_c2, nodes_c3 , nodes_c4, nodes_c5, nodes_c6, nodes_w2, nodes_w3 , nodes_w4, nodes_w5,nodes_w6 //diffs_n_b*/
-    )
+    App.utils.readFiles(function (error, weighted,weighted_w6, weighted_n6)
     {
       if (error){ return console.warn(error); }
 
