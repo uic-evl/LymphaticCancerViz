@@ -65,7 +65,7 @@ var App = App || {};
     function read_input_files(cb) {
 
       queue()
-      .defer(d3.json, "data/patients.json")
+      .defer(d3.json, "synthetic_data/example_patients.json")
       .defer(d3.csv, "data/bigram_clusters.csv")
       .defer(d3.csv, "data/unigram_clusters.csv")
       .await(cb)
