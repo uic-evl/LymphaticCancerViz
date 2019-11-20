@@ -289,13 +289,17 @@ def randomized_cohort_data(df, frac = .6):
     newdata.index = np.arange(newdata.shape[0]) + 1
     newdata.index.rename('Dummy ID',inplace=True)
     return newdata.dropna()
-    
-def dataset_to_json(dataset, path = 'example_dataset.json'):
-    #todo: get scores
+
+def json_ready_dataset(dataset):
     data = dataset.formatted_features()
     similarity_data = LN_similarity_result_matrix(dataset)
     data = pd.concat([data, similarity_data],axis=1)
     data['id'] = data.index.values.astype('int32')
+    return data
+    
+def dataset_to_json(dataset, path = 'example_dataset.json'):
+    #todo: get scores
+    data = json_ready_dataset(dataset)
     data.to_json(path, orient='records')
     
 def export_dataset(dataset,
