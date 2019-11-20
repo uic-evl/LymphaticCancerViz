@@ -401,9 +401,6 @@ function Patients() {
     /*Subscribe the the change in similarity metric */
     self.currentSorting.subscribe(changeCurrentSorting);
 
-    // self.currentPrediction.subscribe(changeProbabilityRange);
-    // self.currentPredictionVariable.subscribe(changeProbabilityVariable);
-
     // subscribe to the change of the how many patients to display
     self.currentDisplay.subscribe(changeNumberOfPatients);
 
@@ -621,11 +618,17 @@ function Patients() {
 
   function parse_clusters(patient, clusters, key, labels){
     /* iterate over the clusters and extract the patient's cluster */
+    console.log("parse clusters");
+    console.log(patient);
+    console.log(clusters);
+    console.log(key);
+    console.log(labels)
     let centers = {};
     clusters.forEach(function(cluster,i){
-      let pat = _.find(cluster, function(o) {return o["patientId"] == patient});
+      let pat = _.find(cluster, function(o) {return +o["patientId"] == +patient});
       if(pat) {centers[labels[i]] = parseInt(pat[key]);}
       else {centers[labels[i]] = -1}
+      console.log(centers[labels[i]])
     });
     return centers;
   }
@@ -748,14 +751,13 @@ function Patients() {
                   weighted_w6,
                   weighted_n6,
                 ],
-                "dendogramId",
+                "dendrogramId",
                 [
                   "Spatial k=6",                        // "Bigrams, Weight. k=6",
                   "Non-Spatial k=6",                        // "Bigrams, Weight. k=6",
                 ] ),
             between = [],
             nodes = extract_nodes(patient, between);
-
 
         let site = {
           "patient": patient.id,

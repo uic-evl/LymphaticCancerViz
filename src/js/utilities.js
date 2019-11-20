@@ -66,8 +66,8 @@ var App = App || {};
 
       queue()
       .defer(d3.json, "synthetic_data/example_patients.json")
-      .defer(d3.csv, "data/bigram_clusters.csv")
-      .defer(d3.csv, "data/unigram_clusters.csv")
+      .defer(d3.csv, "synthetic_data/example_bigram_clusters.csv")
+      .defer(d3.csv, "synthetic_data/example_unigram_clusters.csv")
       .await(cb)
     }
 

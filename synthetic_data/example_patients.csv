@@ -1,357 +1,357 @@
 id,Gender,Tm Laterality (R/L),Affected Lymph node UPPER,Neck boost (Y/N),Feeding tube 6m,Aspiration rate Pre-therapy,Aspiration rate Post-therapy,Aspiration rate(Y/N)
-113,Male,L,L2,Y,Y,N,N,N
-474,Male,L,L2,Y,N,N,N,Y
-481,Male,R,"L2, L3, L4, L5A",N,Y,N,N,N
-94,Male,R,"R2, L2,R RPLN",Y,N,N,N,N
-502,Male,L,"R RPLN, R5A",Y,N,N,N,N
-12,Female,R,"R1B, R2, R3, L2",Y,N,N,N,Y
-520,Male,R,R2,N,N,N,Y,N
-573,Male,L,"R2, L2",Y,N,N,N,N
-102,Male,R,R2,Y,N,N,N,Y
-291,Male,R,"L3, R2",Y,N,N,N,Y
-225,Male,R,"L2, R2",N,N,N,N,N
-431,Male,R,R2,Y,N,N,N,N
-187,Male,R,"R2, R3",Y,N,N,N,N
-385,Male,L,R2,N,N,N,N,Y
-534,Male,L,"L2, L3, L4",Y,N,N,N,Y
-472,Male,R,L2,Y,N,N,N,N
-349,Male,R,"R RPLN, R2",N,Y,N,N,Y
-84,Female,L,"L2, L3, L4",Y,N,N,N,N
-592,Male,R,R2,Y,N,N,Y,Y
-405,Male,R,R2,Y,Y,N,N,N
-308,Male,L,"R2, R3",Y,N,N,N,N
-426,Male,R,"R2, R3, R4, R5A",Y,Y,N,N,N
-185,Male,L,"R2, L2",Y,N,N,N,N
-236,Male,R,"R2, R3",Y,N,N,N,N
-396,Male,L,"R2, R3",N,N,Y,N,Y
-416,Male,L,"R2, R3, L3",Y,N,N,N,N
-49,Male,L,R2,Y,N,Y,N,N
-91,Male,L,"R2, R3",Y,N,N,N,N
-206,Male,L,"L1B, L2, L3",Y,N,N,N,N
-497,Male,L,"L2, L3",N,N,N,N,N
-581,Male,L,"L2, L RPLN",Y,N,N,N,N
-33,Male,L,"L2, L3/4, R2",N,N,N,N,N
-457,Male,R,L2,Y,Y,N,Y,N
-519,Male,L,"L2, L3",N,N,N,Y,N
-478,Female,R,"R2, R3",Y,N,N,N,N
-96,Female,R,L2,Y,Y,N,Y,Y
-446,Male,R,"L2, L3",Y,N,N,N,N
-256,Male,R,"L2, L3, R2",Y,N,N,N,N
-41,Male,L,R2,Y,N,N,N,N
-120,Male,R,R2,Y,Y,N,N,N
-227,Female,R,"L2, L3",Y,N,N,N,N
-124,Male,L,"L2, L3",Y,N,N,N,N
-425,Female,L,"L2, L3",Y,Y,N,N,N
-331,Male,L,"L1B, L2",Y,N,N,N,N
-376,Male,Bilateral,L2,Y,N,N,N,Y
-378,Male,L,"R2, R3",N,N,N,N,N
-531,Male,R,"L1B, L2",Y,N,N,N,Y
-566,Female,L,"R RPLN, R2, R3",N,Y,N,N,N
-254,Male,L,R2,N,N,N,Y,N
-303,Male,R,"R2, R3",N,Y,N,Y,N
-251,Male,R,L2,Y,N,N,N,N
-482,Male,R,"R2, R3, L2",Y,N,N,N,N
-433,Male,R,L2,N,N,N,N,Y
-217,Male,L,"L2, L3, R2",Y,N,N,N,N
-62,Male,R,"L2, L3",Y,N,N,N,N
-292,Male,L,L2,Y,Y,N,Y,N
-513,Female,R,"R2, R3, R4",N,N,N,N,N
-447,Male,L,R2,N,Y,N,N,N
-352,Male,R,R2,N,N,N,N,N
-272,Male,L,"R2, R3",N,N,N,N,N
-323,Female,R,"L3, R2, R3",Y,N,N,N,N
-34,Male,R,"L2, L3",N,N,N,N,N
-260,Male,R,"R2, R3",Y,N,N,N,N
-571,Male,L,"L2, L3",Y,N,N,N,N
-40,Male,R,"R3, R4",Y,N,N,Y,N
-64,Male,R,R2,Y,N,N,N,Y
-117,Male,R,"L2,L3",Y,N,N,N,N
-389,Male,R,R2,Y,N,N,N,Y
-302,Male,L,L2,Y,N,N,N,N
-395,Male,R,L2,Y,N,N,Y,N
-76,Male,L,"R2, R3",Y,N,N,N,N
-244,Male,R,L2,Y,N,N,N,N
-149,Male,R,"L2, L RPLN, L3, R2",N,Y,N,N,N
-337,Female,R,"R2, R3",Y,N,N,N,N
-53,Male,L,"L2, L3, R2, R3",Y,N,N,N,N
-518,Male,L,"L2, L3",Y,Y,N,N,N
-316,Male,L,R2,N,N,N,N,N
-50,Male,R,"R2, R3, R4, L2, L3, L4",Y,Y,N,N,N
-428,Male,L,R2,N,N,N,N,Y
-547,Female,R,L2,Y,N,N,N,Y
-362,Male,L,"L2, L3, L4",N,N,N,N,N
-363,Male,R,R4,Y,N,N,N,N
-311,Male,R,"L1B, L2, L3, R3, R4",Y,N,N,N,N
-17,Male,L,L2,Y,Y,Y,Y,N
-262,Female,R,L2,Y,N,N,N,N
-249,Male,R,"L2, L3",N,N,N,N,N
-476,Male,R,"L1B, L2",N,N,N,Y,N
-285,Female,L,L2,Y,N,N,N,N
-174,Male,L,L2,N,N,N,N,N
-87,Female,R,"R2, R3",N,N,N,N,N
-29,Male,L,"L2, R2",N,N,N,Y,Y
-541,Male,L,"L2, L3",Y,N,N,N,N
-239,Male,R,L2,N,N,N,N,N
-574,Male,L,"L2, L RPLN",N,N,N,N,N
-351,Male,R,"R2, R3",Y,N,N,Y,N
-152,Male,R,R2,Y,N,N,N,N
-515,Male,R,"L2, L3",Y,N,N,N,N
-485,Female,R,"L2, L3, L4",N,N,N,N,N
-105,Male,R,"L RPLN, R2, R3",Y,N,N,N,N
-78,Male,R,"R2, L2, L3",Y,N,N,N,N
-407,Male,L,"L3,L4,R4",Y,N,N,N,N
-325,Male,R,"R2, L2",Y,N,N,N,N
-329,Male,R,L2,N,Y,N,N,N
-57,Male,L,"R2, L2, R3, L3",N,N,N,N,N
-192,Male,L,"R2, R3, R4",Y,Y,N,Y,N
-358,Male,R,"L2, L3",Y,Y,N,N,N
-580,Male,R,L2,Y,Y,N,N,N
-356,Male,R,L3,N,N,N,N,Y
-330,Male,L,"R2, R3",Y,N,N,N,N
-231,Male,R,"R2, L2, L3",Y,Y,N,N,N
-190,Male,R,"L1B, L2, L3, R3, R4",N,Y,N,N,N
-165,Male,L,"R2, R3, R4",Y,N,N,N,N
-382,Male,L,"L2, L3",N,N,N,N,N
-561,Male,L,R2,Y,N,N,N,N
-535,Male,R,L2,N,Y,N,N,N
-79,Male,L,"L2, L3",Y,N,N,Y,N
-144,Male,R,"R2, R3",N,N,N,N,N
-415,Male,R,"L2, L3",Y,N,N,N,N
-526,Male,R,L2,Y,N,N,N,Y
-237,Male,R,"R2, R3",N,N,N,N,N
-167,Male,R,R2,N,N,N,N,N
-143,Male,L,R2,N,N,N,N,N
-441,Male,R,L2,N,N,N,N,N
-449,Male,R,"R2, R3, L2, L3",N,N,N,Y,Y
-142,Female,R,"L3, R2",N,N,N,N,N
-559,Male,L,R2,N,Y,N,N,N
-200,Male,Bilateral,"L2, L3",Y,N,N,N,N
-188,Male,R,"R2, L2",Y,N,N,N,N
-418,Male,R,"L2, R2",Y,Y,N,N,N
-52,Male,R,"R2, R3, L2, L3",N,N,N,N,N
-212,Male,L,"R2, R3, R4",N,N,N,N,N
-131,Male,R,"R RPLN, R2",Y,N,N,N,N
-175,Male,L,R2,Y,N,N,N,N
-161,Female,R,L2,Y,N,N,N,N
-498,Male,R,"R2, R5A, L2, L3, L5A",N,N,N,N,N
-264,Female,R,"L1B, L2",N,N,N,N,N
-133,Male,R,L2,Y,N,N,N,N
-68,Male,R,"L2, L3",Y,N,N,N,Y
-567,Male,R,L2,Y,N,N,N,N
-550,Male,R,"R RPLN, R2, R3",N,Y,N,N,N
-511,Male,L,L2,Y,N,Y,N,N
-89,Male,L,"R2, R3, R4, R5A",N,N,N,N,N
-506,Male,L,"R2, R3",Y,N,N,N,N
-208,Male,R,"R1A, R1B, R2, R3, R4, L1B, L2, L3, L4, R RPLN",N,N,N,N,N
-479,Male,R,"L2, L RPLN",Y,N,N,N,N
-74,Male,R,R2,Y,N,N,N,N
-243,Male,L,"L2, R2",Y,N,N,N,N
-354,Male,L,"R RPLN, R1B, R2, L3",Y,N,N,N,N
-540,Male,L,"R2,L2",Y,N,N,N,N
-289,Male,R,"R2, L2, R3, R4",Y,N,N,N,N
-107,Female,L,"L2, L3",Y,N,Y,N,Y
-473,Male,L,R2,N,N,N,N,Y
-58,Male,R,L3,N,Y,N,N,N
-126,Male,R,"L2, L3",N,N,Y,Y,N
-270,Male,L,L2,Y,N,N,N,N
-63,Male,R,"L2, L3, R2",N,Y,N,N,Y
-290,Male,L,R2,Y,N,N,N,N
-32,Male,R,L2,Y,N,N,Y,N
-410,Male,L,"L1B, L2",Y,N,N,N,N
-432,Female,R,"R1B, R2",Y,N,N,N,N
-232,Male,L,L2,N,N,N,N,Y
-565,Male,R,"R1B, R2, R3, L2",N,N,N,N,N
-183,Male,R,"L1B, L2",Y,Y,N,N,N
-38,Male,L,L2,N,N,N,Y,N
-72,Male,L,R2,Y,N,N,N,N
-45,Male,R,L2,Y,N,N,Y,N
-282,Male,R,"L2, L3, L4",Y,N,N,N,N
-582,Male,R,"L2, L RPLN",N,N,N,N,N
-335,Male,L,"R RPLN, R2, R3, R4, R5B, L2, L3, L4, L5B",N,N,N,N,N
-228,Male,R,R2,Y,N,N,Y,N
-151,Male,L,"R2, L2",Y,N,N,N,N
-451,Male,R,"R RPLN, R1B",Y,N,N,Y,N
-128,Male,L,R2,N,N,N,N,N
-543,Male,L,"R2, R3, R4",N,N,N,N,N
-197,Male,R,"L2, L3",Y,N,Y,N,Y
-545,Male,R,L2,N,N,N,N,Y
-587,Male,R,"R2, R3, R RPLN",Y,N,N,N,N
-460,Male,R,"L2, L3",Y,N,N,N,N
-145,Female,R,"R3, R4",Y,N,N,N,N
-564,Male,R,"R2, R3",Y,N,N,N,N
-505,Male,L,"L RPLN, L2, L3",Y,N,N,N,N
-295,Male,R,R2,N,N,N,N,N
-532,Female,L,"L2, L3",Y,N,N,N,N
-21,Male,R,"R2, L2, L3",Y,N,N,N,N
-31,Female,R,R3,Y,N,N,N,N
-241,Male,R,"L2, L3",N,Y,N,Y,N
-98,Male,L,"R2, L2, R5B",Y,N,N,N,N
-539,Male,L,L2,N,N,N,N,N
-284,Male,R,"R2, R3, L3",Y,N,N,Y,N
-214,Male,L,"L3,L4,R4",Y,N,N,N,Y
-375,Male,R,L2,Y,N,N,N,N
-576,Male,R,R2,Y,N,N,N,N
-230,Male,L,"R2, R3",Y,N,N,N,N
-127,Male,L,"R RPLN, R2, R5A",Y,N,N,N,N
-322,Male,L,L2,Y,N,N,N,N
-278,Male,R,"L1B, L2, L3",N,N,N,N,N
-235,Male,L,"R2, R3",Y,N,N,Y,N
-221,Male,R,"L1A, L2",Y,N,N,N,N
-334,Male,R,"R2, L2",Y,N,N,N,N
-103,Male,R,R2,Y,N,N,N,N
-54,Female,L,R2,Y,N,N,N,N
-245,Male,R,"R2, R3",Y,N,N,N,Y
-294,Female,R,"R2,R3, L2",N,N,N,Y,N
-226,Male,R,L2,Y,Y,N,N,N
-121,Male,L,L RPLN,Y,N,N,N,N
-119,Male,L,"L2, L3",Y,Y,N,N,N
-83,Female,L,"L1B, L2",N,N,N,N,N
-136,Male,L,"R2, R3, L2, L3",N,N,N,N,N
-194,Male,L,"R2, R3",Y,N,N,N,N
-163,Female,L,"R2, R3",N,Y,N,Y,N
-484,Male,L,"R2, L2",Y,Y,N,N,N
-346,Male,L,R2,N,N,N,N,Y
-527,Male,L,R2,Y,N,N,N,N
-166,Male,L,L2,Y,N,N,N,N
-364,Male,L,L2,Y,N,N,N,Y
-501,Male,R,R2,N,N,N,N,N
-414,Male,R,L2,Y,N,N,N,N
-471,Male,L,"L1B, L2, L3, L4",N,N,N,N,N
-318,Female,L,"R2, R3, R4",Y,N,N,Y,N
-20,Male,R,"L2, L3",Y,N,N,N,Y
-586,Male,R,"L2, L3, R2",Y,N,N,N,N
-500,Male,L,"R2, L2, L3",Y,Y,N,Y,N
-569,Male,R,L2,N,Y,N,N,N
-306,Male,L,R2,Y,N,N,N,N
-467,Male,R,"L RPLN, L2",N,N,N,Y,N
-122,Male,R,"R2, R3",N,N,N,N,Y
-26,Male,R,"R2, L2",N,Y,N,N,N
-387,Male,R,"L1A, L1B, L2, L3, L4, R2, R3, R4",N,N,N,N,N
-268,Male,R,L2,Y,Y,N,N,N
-81,Female,L,"L2, L3/4, R2",N,N,N,N,N
-560,Male,L,"R2, R3, R RPLN",N,N,N,Y,N
-172,Female,L,"L1B, L2",N,N,N,N,N
-293,Male,R,"R2, R3",Y,N,N,N,Y
-155,Male,R,R2,N,N,N,N,N
-590,Male,R,R2,Y,Y,N,Y,N
-374,Male,Bilateral,"R2, L2, L5A",N,N,N,N,N
-307,Male,L,"R2, L1B, L2",Y,Y,N,Y,Y
-399,Male,R,"L1B, L2, L3, R2, R3",Y,N,N,N,N
-110,Male,L,"R2, R3, R4",Y,Y,N,Y,N
-101,Male,R,R2,Y,N,N,Y,N
-93,Male,L,"L2, L3, L4, R2",Y,N,Y,N,Y
-551,Male,L,"R2, R3",Y,N,N,N,N
-398,Male,R,L2,Y,N,N,N,N
-436,Male,Bilateral,R2,Y,N,N,N,Y
-253,Male,L,L2,Y,N,N,N,N
-275,Male,R,"R2, R3",Y,N,N,N,N
-381,Male,R,"L2, L3, L4",Y,N,N,N,N
-386,Male,L,R2,Y,N,Y,N,N
-556,Male,R,"L RPLN, L2",Y,N,N,N,N
-246,Male,L,"R RPLN, R2, R3, R4, R5B, L2, L3, L4, L5B",Y,N,N,N,N
-184,Male,R,"L1B, L2, L3, R2, R3",Y,N,N,N,N
-15,Male,R,R2,Y,N,N,N,N
-585,Male,L,L2,N,N,N,N,N
-5,Male,R,"R2, L2",N,N,N,N,N
-507,Male,R,L2,N,N,N,Y,N
-36,Female,R,L2,Y,N,N,N,N
-51,Male,R,R2,Y,N,N,N,N
-204,Male,R,"L2, L3",Y,N,N,N,Y
-25,Male,L,"L2, L3, R2, R3",Y,N,N,N,N
-470,Male,R,L2,N,N,N,N,Y
-496,Male,R,"R2, R3",N,N,N,N,N
-371,Male,L,"R1B, R2, R3, R4, L2",Y,N,N,N,N
-408,Male,L,"R2, L2",Y,N,N,N,N
-77,Male,R,"R2, L2",Y,N,N,N,N
-372,Male,R,"L2, L3, L4, L5B, R3, R4",Y,N,Y,N,Y
-299,Male,Bilateral,"L2, L3",Y,N,N,N,N
-160,Male,R,R2,Y,N,N,N,N
-477,Male,L,L2,Y,N,N,N,N
-589,Male,R,R3,N,N,N,N,N
-138,Male,R,L2,N,N,Y,N,N
-397,Male,R,"R2, R3, R1B",Y,Y,N,Y,N
-570,Male,R,"L RPLN, L2, R2, R4",Y,N,N,N,N
-300,Male,R,"L2, L3",Y,N,Y,N,Y
-199,Male,L,"R2, R3",Y,N,N,Y,N
-443,Male,L,L2,Y,N,N,N,N
-366,Male,R,"R2, R3, R4, L2",N,N,N,N,Y
-444,Male,R,"L2, L3, L4, L5A",Y,N,N,N,N
-100,Male,L,L2,Y,N,N,Y,Y
-250,Male,R,"L2, L3, L5B",Y,N,N,N,N
-400,Female,R,R2,N,N,N,N,Y
-420,Male,R,"L2, L3, L4",Y,N,N,N,N
-193,Male,R,"L2, L3",Y,N,N,N,N
-529,Male,L,"L2, L3, R2",Y,N,N,N,N
-61,Male,L,R2,Y,N,N,Y,N
-365,Male,R,L2,N,N,N,N,N
-82,Male,R,"L2, L3, R2",Y,N,N,N,Y
-424,Male,R,L2,N,Y,N,Y,N
-377,Female,L,L2,N,N,N,Y,N
-342,Male,L,R2,Y,N,N,N,Y
-509,Male,L,L2,N,Y,N,N,N
-198,Male,R,"L2, L3",N,N,N,N,N
-413,Male,R,"L2, L3",N,N,Y,N,N
-503,Female,R,"L2, L3, R2",Y,Y,N,N,N
-462,Male,R,R2,Y,N,N,Y,N
-345,Male,L,R2,Y,N,N,N,N
-588,Male,R,"L2, L RPLN",N,N,N,N,N
-257,Male,R,L2,Y,Y,N,Y,N
-336,Male,L,"L2, L5A",Y,N,N,N,N
-95,Male,R,L2,Y,Y,N,N,N
-19,Male,R,R2,Y,N,N,N,N
-319,Male,L,R2,N,N,N,N,N
-528,Male,L,"R2, R3, R4",Y,N,N,Y,N
-305,Male,L,"R1A,R1B, R2, R3",Y,N,N,N,N
-483,Male,R,"L3, R2, R3",Y,Y,N,N,N
-421,Male,L,"R1B, R2",N,N,N,N,N
-394,Male,L,L2,Y,N,N,Y,Y
-417,Male,R,R2,N,N,N,Y,N
-195,Male,L,"R2, R3",Y,Y,N,N,N
-542,Male,R,"L2, L3",Y,N,N,N,N
-16,Male,L,L2,N,N,N,N,N
-572,Male,R,"L2, R2, R3",Y,N,N,N,Y
-90,Male,R,R RPLN,N,N,N,Y,N
-508,Male,R,"R1B, R2, L2",N,N,N,N,N
-24,Male,L,L2,N,N,N,N,Y
-266,Male,L,"R1B, R2",Y,N,N,N,N
-114,Male,L,L2,Y,Y,N,N,N
-56,Male,L,L2,N,N,N,N,N
-59,Male,R,"R2, L2",Y,Y,N,N,N
-370,Male,L,"R2, L2, L3",N,N,N,N,Y
-442,Male,L,"L2, L3",Y,N,Y,N,N
-401,Male,L,R2,Y,N,N,Y,N
-209,Male,R,L2,Y,N,N,N,N
-274,Male,L,"R2, R3, L2, L3, L4",N,N,N,N,N
-411,Male,R,L2,Y,N,N,N,Y
-9,Male,R,"R1B, R2, R3, L2",Y,N,N,N,N
-170,Male,L,R2,N,Y,N,N,N
-240,Male,R,R2,Y,Y,N,N,N
-150,Male,R,"R2, R3",Y,N,N,N,Y
-427,Male,R,"L1B, L2",Y,N,N,Y,N
-116,Male,L,"R RPLN, R2",Y,Y,Y,N,N
-277,Female,R,"L2, L3",Y,N,N,N,Y
-350,Male,R,L2,Y,Y,N,N,N
-348,Male,L,"R2, R3",Y,N,N,Y,N
-263,Male,R,R2,Y,N,N,N,N
-388,Male,R,R2,Y,N,N,N,N
-14,Male,L,R2,Y,N,N,N,N
-70,Female,L,"R2, L2",Y,N,N,N,N
-69,Male,L,L2,Y,N,N,N,N
-233,Male,L,"R1B, R2",Y,Y,N,N,N
-544,Male,L,R2,N,Y,N,N,N
-412,Female,L,L2,Y,Y,N,N,N
-314,Male,R,"L2, L3",Y,N,N,N,N
-521,Male,L,"R2, R3, R4",Y,N,N,N,N
-66,Male,R,R2,Y,N,N,N,N
-591,Male,R,"L2, R2",Y,N,N,N,N
-125,Male,L,L2,Y,N,Y,N,N
-3,Male,L,"R2, R3, L2, L3",Y,N,N,N,N
-465,Male,Bilateral,L2,Y,N,N,N,N
-538,Male,L,"R2, L2, R3, R4",Y,N,N,N,Y
-141,Male,R,"L2, L3, R2",Y,N,N,N,N
-355,Male,R,"R2, R3, R4",N,N,N,N,N
-554,Male,R,R2,Y,N,N,N,N
-171,Male,R,L2,N,N,N,N,Y
-134,Female,R,"R RPLN, R2, R3, R4",Y,N,N,N,N
-177,Male,L,R2,N,Y,N,N,N
-357,Male,L,L2,Y,N,N,N,Y
+1,Female,R,R2,Y,Y,N,N,N
+2,Male,L,"L2, L3",Y,N,N,N,Y
+7,Male,Bilateral,"L2, L3",Y,N,N,N,Y
+8,Male,R,"R2, R3",Y,N,N,Y,N
+11,Male,R,"R RPLN, R1B, R2, L3",Y,N,N,N,N
+12,Male,L,"L2, L5A",N,N,N,N,N
+13,Male,R,"L3, R2, R3",N,N,N,N,Y
+15,Male,R,R2,N,Y,N,Y,N
+17,Female,R,"R2, R3, R RPLN",Y,N,N,N,N
+18,Male,L,"L2, R2",Y,Y,N,N,N
+19,Female,R,"L RPLN, L2, R2, L3, R3",N,N,N,N,Y
+21,Female,R,"R RPLN, R2, R3",N,N,N,Y,N
+22,Male,R,"R2, L2",Y,N,N,N,N
+24,Male,R,"R2, R3, L2, L3, L4",Y,Y,N,N,N
+26,Male,R,L2,N,N,N,N,N
+27,Male,L,"L1B, L2, L3, L4",N,N,N,N,N
+28,Male,R,"L2, L5A, L5B",Y,N,N,N,N
+30,Male,R,"R2, R3, R4",N,N,N,Y,N
+31,Male,L,"R RPLN, R2, R3",Y,N,N,N,N
+33,Male,L,"R2, L2, R3, L3",Y,Y,N,N,N
+34,Male,L,L2,Y,N,N,N,N
+36,Male,R,"R2, R3, R4",Y,N,N,N,N
+38,Male,R,L3,N,N,N,N,N
+39,Male,L,"L2, L3, L4",Y,N,N,N,N
+41,Male,R,"R2, R3",Y,N,N,N,N
+42,Female,R,"L3, L4",N,N,N,N,Y
+43,Male,R,L2,N,N,N,N,N
+45,Male,R,"R2,L2",N,N,N,N,N
+46,Male,R,R2,Y,N,N,N,N
+47,Male,L,R2,Y,N,N,N,N
+49,Male,R,"L2, L3, L4",Y,N,N,N,N
+50,Male,L,"L2, R2",N,N,N,N,N
+51,Male,R,R2,N,N,N,N,Y
+52,Male,L,"L3, R2",Y,N,N,N,N
+54,Male,R,"R2, L2",N,N,N,N,N
+56,Male,R,"R2, R3, R4, L2",N,N,N,N,N
+57,Female,L,"L2, L3",N,N,N,N,N
+58,Male,L,R3,N,Y,Y,Y,N
+60,Male,L,"L3, R2",N,N,N,N,N
+62,Male,R,R RPLN,Y,N,N,N,N
+64,Male,L,"R RPLN,R2, L2, R3",Y,N,N,N,Y
+65,Male,R,L2,N,Y,N,N,N
+66,Male,L,L2,Y,N,Y,N,N
+69,Male,R,"R2, L2",N,N,N,N,N
+72,Male,L,"R2, L2, R3",Y,N,N,N,N
+73,Female,R,R2,Y,N,Y,N,Y
+75,Male,L,R2,N,N,N,N,N
+76,Male,R,R2,Y,N,N,N,N
+79,Male,L,L3,Y,N,N,Y,N
+81,Male,R,"R2, R3, L3",N,N,N,N,N
+82,Male,R,"R2, R3",Y,Y,N,Y,N
+83,Male,L,R2,Y,Y,N,Y,N
+84,Male,R,"L RPLN, L2",N,N,N,Y,N
+86,Female,L,"R2, L2, R3, L3",Y,N,N,N,Y
+87,Male,R,"R2, L2, R5B",N,N,N,N,N
+89,Male,L,"L2, R2",Y,Y,N,N,Y
+90,Male,L,"R2, R3",Y,Y,N,N,Y
+91,Male,L,R2,N,N,N,N,N
+92,Male,L,"R2, R3, L2",N,N,N,N,N
+93,Male,L,"L3, L4",Y,N,N,N,N
+95,Male,R,R2,Y,N,N,N,N
+96,Male,R,R2,Y,Y,Y,N,N
+97,Male,L,"L1B, L2, L3, L4, L5A, L5B, L RPLN, R2",N,Y,N,N,N
+98,Female,L,R2,Y,N,N,N,N
+102,Female,Bilateral,"L2, L3",Y,N,N,N,N
+106,Male,L,"R2, R3",Y,N,N,N,N
+111,Male,R,"R2, R3",Y,Y,N,N,Y
+112,Male,L,R2,N,N,N,N,N
+114,Male,R,"R2, R3, R4",Y,N,N,N,N
+123,Male,R,"R3, R4",N,N,N,N,N
+128,Male,L,R2,Y,N,Y,N,N
+129,Male,L,"L2, L3, L4",Y,N,N,N,N
+131,Male,R,L2,N,N,N,N,Y
+132,Female,L,"R2, R3",N,N,N,N,N
+136,Male,R,"R RPLN, R2",Y,N,N,N,N
+137,Male,R,"R2, R3, R RPLN",Y,Y,N,N,Y
+138,Male,R,R2,Y,N,N,N,N
+140,Female,L,"L2, L3, L4",Y,N,N,Y,N
+144,Female,R,L2,N,N,N,N,N
+146,Female,R,"L RPLN, L3",Y,N,N,N,N
+150,Male,L,R2,N,N,N,N,N
+152,Male,R,"L2,L3,R2",Y,N,N,N,N
+154,Male,L,"L2, L5A, L5B",Y,N,N,Y,N
+155,Male,R,"R1B, R2, R3/4, L1B, L2, L2/3/4",Y,N,N,N,N
+157,Female,L,"R2, R3",Y,N,N,N,N
+158,Male,R,L2,Y,N,N,Y,N
+159,Male,R,"L2, L3, L4",Y,N,N,N,N
+161,Male,L,"L2, L RPLN",Y,N,N,N,Y
+165,Female,R,"R2, R3, R4",N,N,N,Y,N
+166,Female,R,"R2, R3",Y,N,N,N,N
+167,Male,L,"L2, L3, R2",N,N,N,N,N
+168,Male,R,"R2, R3",N,Y,N,N,N
+169,Male,L,"L2, R2",Y,N,N,N,N
+170,Male,L,"L2, R2",Y,N,N,N,N
+171,Male,R,"R2, R3, R4",N,N,N,N,N
+173,Male,L,"L2, L3",Y,N,N,N,N
+174,Male,L,R RPLN,Y,N,N,N,N
+175,Male,R,"R2, R3",N,N,N,N,Y
+178,Male,L,"L2, L3, R2, R3",N,N,N,N,N
+179,Male,L,R2,N,Y,N,Y,N
+183,Male,L,"R2, R3",Y,N,N,N,N
+184,Male,L,L2,Y,N,N,N,N
+185,Female,L,"L2, L3",Y,N,N,Y,N
+188,Male,L,R RPLN,Y,Y,N,N,N
+189,Male,L,R2,N,N,N,N,N
+190,Male,R,"L1B, L2",Y,N,N,N,Y
+191,Male,R,"L2, L3, R2, R3",N,N,N,N,N
+192,Male,R,"R2, R3",Y,N,N,N,N
+193,Female,L,L2,Y,N,N,N,N
+195,Male,L,L2,N,N,N,N,N
+196,Male,Bilateral,"L2, R2",N,N,N,N,N
+197,Male,R,L2,Y,N,N,N,N
+199,Male,R,L2,Y,N,Y,N,Y
+200,Male,R,"R2, R3, R4",N,N,N,N,N
+202,Male,R,L2,N,N,N,N,Y
+205,Male,L,"R1B, R2, L2",Y,Y,N,N,N
+207,Male,L,"L2, L3",N,N,N,N,N
+208,Male,L,L2,Y,Y,N,N,N
+209,Male,L,"R1B, R2, R3, R4, L4",Y,N,N,N,N
+211,Male,L,R2,Y,N,N,N,N
+212,Male,R,"R2, L2",N,N,Y,N,N
+213,Male,R,R2,Y,N,N,N,Y
+214,Male,R,R2,N,N,N,N,Y
+215,Male,R,R2,Y,N,N,N,N
+216,Male,L,"L1B, L2, L3",N,N,N,N,N
+219,Male,R,"L1A, L1B, L2, L3, L4, R2, R3, R4",N,N,N,N,N
+220,Male,R,R2,Y,Y,N,Y,N
+221,Male,L,R2,Y,N,N,N,N
+224,Male,L,"R2, L1B, L2",N,N,N,N,Y
+225,Male,L,R2,N,Y,N,N,N
+226,Male,R,"L2, L3, R2, R3",Y,N,N,N,N
+227,Male,R,L2,N,Y,N,N,N
+228,Male,L,"L2, R2",Y,N,N,N,Y
+229,Male,R,"R1B, R2, R3, L2",Y,N,N,N,N
+230,Male,R,"R2, R3, R4",Y,N,N,N,N
+231,Male,R,"R2, R3",Y,Y,N,Y,N
+232,Male,R,"L2, L3",Y,Y,N,N,N
+234,Male,L,"L2,R2",Y,Y,N,N,N
+235,Male,L,"L2, L3",N,N,N,Y,N
+237,Male,L,"L1B, L2",N,N,N,N,N
+239,Male,Bilateral,R2,Y,Y,N,N,N
+241,Female,R,R4,Y,N,N,N,N
+242,Female,L,R2,Y,N,N,Y,N
+244,Male,L,"R2, R3, L2",Y,N,N,N,N
+245,Male,L,"L1B, L2, L3",N,Y,N,N,N
+248,Male,R,"R2, L2",Y,N,N,N,N
+249,Male,L,"L2, L3",Y,Y,N,N,N
+251,Male,R,"R2, L2",Y,N,N,N,Y
+252,Male,R,R3,Y,N,N,N,N
+253,Male,R,L2,Y,N,N,N,N
+254,Male,R,L2,Y,N,N,N,N
+256,Male,L,L2,Y,N,N,N,N
+258,Male,L,"R2, R3",N,N,N,N,Y
+259,Male,R,R2,N,N,N,N,N
+261,Male,R,L2,N,N,N,N,N
+265,Male,L,L2,Y,Y,N,N,Y
+266,Male,L,"R2, R3",N,N,N,N,N
+267,Male,R,L2,N,Y,N,N,N
+268,Male,R,"R2, R3, L2, L3",Y,N,N,N,N
+271,Male,L,R2,Y,Y,N,N,N
+272,Male,R,L2,Y,N,N,N,N
+274,Male,R,"R1B, R2, R3, R4, L2",Y,Y,N,Y,N
+278,Male,R,L2,Y,N,N,N,Y
+279,Male,L,L2,Y,Y,N,N,N
+280,Male,R,"R2,R3, L2",Y,N,Y,N,N
+282,Male,L,"L2, L3",Y,N,N,N,N
+283,Male,R,L2,Y,N,N,N,N
+284,Male,Bilateral,R2,Y,N,N,N,Y
+287,Male,R,"L2, L3, R2",Y,N,N,N,N
+288,Male,L,R2,N,N,N,Y,N
+291,Male,R,"R2, L2",N,N,N,N,N
+292,Female,L,L2,Y,Y,N,N,N
+293,Male,L,"R2, R3",Y,N,N,N,N
+294,Male,L,"R2, R3, L2, L3",Y,N,N,N,N
+299,Female,L,R2,Y,Y,N,N,Y
+303,Male,R,"R2, L2",N,Y,N,N,N
+306,Male,R,"R1B, R2, R3, R4, L2",Y,N,N,N,N
+307,Male,R,"R2, L2, R3",Y,N,N,Y,N
+308,Male,R,L2,Y,N,N,N,N
+309,Female,R,"L2, L3",N,N,N,N,N
+310,Male,L,"L1B, L2, L3, L4",N,N,N,N,N
+313,Male,R,"R1B, R2, R3, R4",N,N,N,Y,Y
+314,Male,L,"R2, R3",Y,Y,N,N,Y
+316,Male,L,"R2, R3",Y,N,N,N,N
+318,Male,R,"L2, L3",N,N,N,N,N
+320,Male,R,R2,Y,N,N,Y,N
+322,Female,R,"R2, R3, R RPLN",N,Y,N,N,N
+324,Male,L,"R2, L2",Y,N,N,N,N
+325,Male,R,"L2, L3",Y,N,N,Y,N
+327,Male,R,"L RPLN, L2, L3",N,N,N,N,N
+328,Male,Bilateral,R2,Y,N,N,N,N
+329,Male,R,R2,Y,N,N,N,N
+330,Male,R,"R2, R3, R4",N,N,N,N,N
+331,Male,L,"R2, R3",Y,N,N,N,N
+333,Male,R,"L2, L RPLN, L3, R2",N,N,N,Y,N
+335,Male,L,"R2, R3, R4",Y,N,N,N,N
+336,Male,L,L2,Y,N,N,N,N
+340,Male,R,R2,Y,N,N,N,N
+341,Male,L,L2,N,N,N,N,N
+343,Male,R,"R2, L2, R3, L3",Y,N,N,N,N
+348,Male,L,L2,N,Y,N,Y,N
+349,Male,R,"R2, R3",Y,N,N,N,N
+350,Female,Bilateral,"R2, L2",Y,N,Y,N,N
+352,Male,R,"R2, R3, L3",Y,Y,N,Y,Y
+353,Male,R,"L1B, L2",N,N,N,N,N
+354,Male,R,R2,N,N,N,N,N
+357,Male,L,"R2, R3, R4, R5A",N,N,N,N,N
+359,Male,L,R2,Y,N,N,N,N
+364,Male,L,R2,N,Y,N,Y,Y
+366,Male,R,R3,N,N,N,N,N
+368,Male,R,"R2, L2, L5A",N,N,N,N,N
+370,Male,R,"R2, R5B, L2, L3",Y,N,N,N,N
+371,Male,R,"L2, L3",Y,N,N,N,N
+374,Male,R,"R2, R3",Y,N,N,N,N
+375,Male,R,"L1B, L2",Y,N,N,N,N
+376,Male,R,"L3,L4,R4",Y,N,N,N,Y
+378,Male,R,L2,Y,N,N,N,N
+379,Male,L,"R2, R3, L2",Y,N,N,N,N
+380,Male,L,L2,Y,N,N,N,N
+381,Male,R,"R2, L2",N,N,N,N,N
+383,Male,L,"R2, L2",Y,Y,N,N,N
+384,Female,L,L3,N,N,N,N,N
+386,Male,R,"R2, R3",N,N,N,N,Y
+387,Male,R,"L3, L4",Y,N,N,N,N
+388,Female,R,"L2,L3",Y,N,N,Y,N
+391,Male,R,"L2, L3",Y,Y,N,Y,N
+393,Male,L,"L2, L3/4, R2",Y,N,N,N,N
+394,Female,R,"R2, R3",N,N,N,N,N
+395,Male,L,R2,N,N,N,Y,N
+397,Male,L,R2,N,N,N,N,N
+398,Male,L,"L1B, L2, L3",Y,N,N,Y,N
+400,Male,R,R2,Y,N,N,N,N
+403,Male,R,"L2, L5A",N,Y,N,N,N
+405,Male,L,L3,N,N,N,N,N
+408,Male,Bilateral,R2,Y,N,N,N,N
+409,Male,R,"L2, L3",N,N,N,N,N
+412,Male,L,R2,Y,N,N,Y,N
+413,Male,L,R4,Y,Y,N,Y,N
+414,Male,R,"L2, L3",Y,N,N,N,N
+416,Male,L,"R2, L2, R3, L3",Y,N,N,N,N
+418,Female,L,L2,Y,Y,N,N,N
+419,Male,R,"R2, R3",Y,N,N,N,N
+422,Male,L,"L2, L3, R2, R3",Y,N,N,N,Y
+423,Male,L,"L2, L3, R2",Y,N,N,N,Y
+424,Male,L,R2,N,N,N,Y,N
+425,Male,R,"L2, L3, L4",Y,N,N,N,N
+426,Male,R,L3,Y,N,N,N,N
+427,Male,R,L2,Y,N,N,N,N
+428,Male,R,"L3, R2",N,N,N,N,N
+429,Male,R,"L2, L3, L4, L5A",Y,N,N,N,N
+432,Male,R,R2,N,N,N,N,N
+433,Male,R,"R RPLN, R2, L2, R3, L3",N,Y,N,N,N
+434,Male,R,L2,N,N,N,N,N
+435,Male,R,"L1B, L2",Y,N,N,N,N
+436,Female,L,"R2, L1B, L2",N,N,N,N,Y
+439,Female,R,R2,Y,N,N,N,N
+440,Male,R,"L2, L3",Y,N,N,N,N
+442,Male,L,L2,N,N,N,N,N
+443,Male,R,"L3, L4, R2, R3, R4",Y,Y,N,N,N
+444,Female,R,"R2, R3",N,N,N,N,N
+446,Male,R,"R2, R3",N,N,N,N,N
+448,Female,L,"R2, L2, R3, R4",N,N,N,N,N
+449,Male,L,R2,N,N,Y,N,N
+451,Male,R,L2,Y,Y,N,N,Y
+452,Male,L,"R2, R3",Y,N,N,N,N
+453,Male,R,"R2, R3",Y,N,N,N,Y
+457,Male,R,"L2, L3",Y,N,N,N,N
+458,Male,R,R2,N,N,N,N,Y
+460,Male,R,L2,Y,N,N,N,N
+461,Male,L,"L2, L3, L4",Y,N,N,N,N
+464,Male,R,"R2, R3",Y,N,N,Y,N
+466,Male,L,R2,N,Y,N,N,N
+467,Male,L,R2,Y,N,N,N,N
+468,Female,R,R2,N,Y,N,Y,N
+469,Male,L,"L RPLN, L2",N,N,N,N,N
+470,Male,L,R2,Y,N,N,N,N
+472,Male,R,R2,Y,Y,N,N,N
+473,Male,R,L2,N,N,N,N,N
+474,Male,L,"L2, L3",Y,N,N,Y,N
+477,Male,R,"L2, L3, L4",Y,N,N,Y,N
+478,Male,R,"L1B, L2",Y,N,N,Y,Y
+479,Male,L,L2,Y,N,N,Y,Y
+480,Male,L,L2,N,N,N,Y,N
+481,Male,L,R3,Y,N,N,Y,N
+483,Male,L,"R2, R3, R4",Y,Y,N,N,N
+485,Male,L,L3,Y,N,N,N,N
+488,Male,R,L2,Y,N,N,N,Y
+489,Male,L,R2,Y,Y,N,Y,Y
+491,Male,L,R2,Y,N,N,N,N
+492,Female,L,L2,N,N,N,Y,Y
+495,Male,L,"R2, L2",N,Y,N,N,N
+497,Male,R,L2,Y,N,N,N,N
+498,Female,R,"L2, L3, L4",Y,N,N,N,N
+499,Male,L,"L RPLN, L2",N,N,N,N,N
+500,Male,L,L2,Y,N,N,N,N
+501,Female,L,"L2, L3",Y,N,N,N,N
+502,Female,L,R2,Y,N,N,N,N
+503,Male,R,"R2, L2",Y,N,N,N,N
+505,Male,R,"R2, R3",N,N,N,N,N
+506,Female,R,"L2, L3",Y,N,N,N,N
+508,Male,L,"R2, R3, R4, L2, L3, R5A",N,N,Y,N,N
+509,Male,R,L2,N,N,N,N,N
+511,Male,R,"L2, L3, R2",N,N,N,Y,N
+516,Male,L,"R2, L2",Y,N,N,N,N
+517,Male,R,"L2, L3, L4",N,N,N,N,N
+518,Female,L,"L3, L4, R2, R3, R4",Y,N,N,N,N
+521,Male,L,"L2, L3",Y,N,N,N,N
+522,Male,R,L2,N,N,N,N,N
+523,Male,R,L2,Y,N,N,N,N
+525,Male,Bilateral,R2,N,N,N,N,N
+526,Male,L,"R2, R3",Y,N,N,N,N
+527,Male,R,"R1B, R2, R3/4, L1B, L2, L2/3/4",Y,N,N,N,N
+529,Male,R,L2,N,N,N,N,N
+530,Male,R,"R RPLN, R2, R3",N,N,N,N,N
+531,Female,R,"R2, L2",Y,N,N,N,N
+532,Male,R,"R2, R3, R4",Y,N,N,N,N
+533,Male,L,R2,Y,N,N,N,Y
+534,Male,L,"R2, L2",Y,N,N,N,N
+536,Male,R,R2,Y,N,N,Y,N
+538,Male,L,R2,Y,Y,N,Y,N
+539,Male,L,L2,Y,N,N,N,N
+541,Male,L,"R2, L2",N,N,N,N,N
+543,Male,R,"R1B, R2",Y,Y,N,N,N
+544,Male,L,R2,Y,N,N,N,N
+545,Male,R,"L2, L3, L5A",N,N,N,N,N
+546,Male,L,R2,Y,Y,N,N,N
+553,Male,R,"R2, R3",N,N,N,N,N
+554,Male,L,L2,Y,Y,N,N,Y
+555,Female,L,"L2,R2",N,N,N,N,N
+556,Male,L,R2,N,Y,N,Y,N
+558,Male,L,"L2, L3",Y,N,N,Y,N
+559,Male,L,"L1B, L2, L3",Y,N,N,N,Y
+560,Male,L,"R2, R3, R4, R5A, R5B",Y,N,N,N,N
+562,Male,L,"R1B, R2, R3, R4, L4",Y,N,N,N,Y
+563,Male,L,L2,Y,N,N,N,N
+565,Female,L,L2,N,N,N,N,Y
+566,Male,L,"R2, R3, L2",Y,N,N,N,N
+567,Female,L,R2,Y,N,N,Y,N
+569,Male,R,"R2, R3",N,N,N,N,N
+570,Male,L,R2,Y,N,N,N,N
+573,Male,R,"L2, R2",Y,N,N,N,N
+574,Male,R,"L RPLN, L2, L3",Y,N,N,N,N
+577,Male,R,"R2, R3, L3",Y,N,Y,N,N
+578,Male,R,"L2, L3",Y,N,N,N,Y
+579,Male,R,L2,N,N,N,N,Y
+581,Male,R,R2,Y,Y,N,N,N
+582,Male,Bilateral,"R2, L2, L3",Y,N,N,N,N
+583,Male,R,L3,N,N,N,Y,N
+584,Male,R,"L2, L RPLN",N,N,N,N,Y
+585,Female,L,"L2,L3,L4,R2",Y,N,N,N,Y
+586,Male,Bilateral,L2,N,Y,N,N,N
+587,Female,R,"L2, L3, R2",Y,N,N,Y,Y
+588,Male,L,"R2, R3, R4, L2, L3, L4",Y,N,N,Y,N
+590,Male,L,L RPLN,Y,N,N,N,N
+592,Male,R,L2,Y,N,N,N,Y
+593,Male,L,L2,N,N,N,N,N
