@@ -41,8 +41,8 @@ leafOrder = optimalleaforder(Z,D);
 % [H,T,outperm] = dendrogram(Z);    %Generate the dendrogram
 % figure('units','normalized','outerposition',[0 0 1 1])
 
-% [H,T,outperm] =dendrogram(Z,'Reorder',leafOrder,'ColorThreshold',cut);    %Generate the dendrogram
-[H,T,outperm] =dendrogram(Z,'Reorder',leafOrder); 
+% [H,T,outperm] = dendrogram(Z,'Reorder',leafOrder,'ColorThreshold',cut);    %Generate the dendrogram
+[H,T,outperm] = dendrogram(Z,'Reorder',leafOrder); 
 title([string(link)])
 % set(gca,'XTick',[]);
 
