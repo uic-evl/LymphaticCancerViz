@@ -2,6 +2,11 @@ import pandas as pd
 import numpy as np
 import re
 
+#for getting the fisher exact test
+import rpy2.robjects.numpy2ri
+from rpy2.robjects.packages import importr
+rpy2.robjects.numpy2ri.activate()
+
 from scipy.cluster.hierarchy import fcluster, linkage, dendrogram
 from sklearn.base import ClusterMixin, BaseEstimator
 from scipy.spatial.distance import pdist, squareform
@@ -73,8 +78,18 @@ class LNDataset():
         self.monograms = self.get_monograms(self.data)
         self.dual_bigrams = self.setup_bigrams()
         self.dual_monograms = self.get_dual_monograms()
-        self.spatial = lambda : pd.concat([self.dual_bigrams, self.dual_monograms], axis = 1)
-        self.nonspatial = lambda : self.dual_monograms
+        self.bilateral_bonus = self.get_bilateral_bonus()
+        self.spatial = lambda : pd.concat(
+            [self.dual_bigrams, self.dual_monograms, self.bilateral_bonus],
+            axis = 1)
+        self.nonspatial = lambda : pd.concat(
+            [self.dual_monograms, self.bilateral_bonus], 
+            axis = 1)
+        
+    def get_bilateral_bonus(self):
+        bonus = self.dual_monograms.copy().apply(lambda l: np.sum([x for x in l if x > 1]), axis = 1)
+        bonus.rename('bilateral',inplace=True)
+        return bonus
         
     def clean_names(self,x):
         return [re.sub('^[LR]\s*','',x) for x in x.columns]
@@ -181,7 +196,7 @@ def tanimoto_dist(x1, x2):
         return 0
     tanimoto = x1.dot(x2)/(x1.dot(x1) + x2.dot(x2) - x1.dot(x2))
     #guadalupe used 1 - similarity for her clustering
-    return 1 - tanimoto
+    return 1/(1+tanimoto)
 
 def l2(x1, x2):
     return np.sqrt(np.sum((x1-x2)**2))
@@ -331,3 +346,53 @@ def gen_random_cohort(patient_path,
             print('error saving synthetic data as csv')
     export_dataset(dataset, target_json, target_bigram_cluster_csv, target_unigram_cluster_csv)
     return dataset
+
+def get_cluster_percentages(dataset, clusters, 
+                        outcomes = ['Feeding tube 6m', 'Aspiration rate(Y/N)','Neck boost (Y/N)']):
+    data = dataset.data.copy()
+    data['clusters'] = clusters
+    result_table = {}
+    for c in np.unique(clusters):
+        subset = data[data.clusters == c]
+        result_row = {}
+        n_patients = subset.shape[0]
+        result_row['Total Count'] = n_patients
+        for o in outcomes:
+            n_positive = (subset[o].values == 'Y').sum()
+            percent = np.round(100*n_positive/n_patients, 1)
+            result_row[o + ' count'] = n_positive
+            result_row['%'+o] = percent
+        result_table[c] = result_row
+    return pd.DataFrame(result_table).T
+
+def get_contingency_table(x, y):
+    #assumes x and y are two equal length vectors, creates a mxn contigency table from them
+    cols = sorted(list(np.unique(y)))
+    rows = sorted(list(np.unique(x)))
+    tabel = np.zeros((len(rows), len(cols)))
+    for row_index in range(len(rows)):
+        row_var = rows[row_index]
+        for col_index in range(len(cols)):
+            rowset = set(np.argwhere(x == row_var).ravel())
+            colset = set(np.argwhere(y == cols[col_index]).ravel())
+            tabel[row_index, col_index] = len(rowset & colset)
+    return tabel
+
+def fisher_exact_test(c_labels, y):
+    if len(np.unique(y)) == 1:
+        print('fisher test run with no positive class')
+        return 0
+    #call fishers test from r
+    contingency = get_contingency_table(c_labels, y)
+    stats = importr('stats')
+    pval = stats.fisher_test(contingency,workspace=2e8)[0][0]
+    return pval
+
+def get_cluster_correlations(dataset, clusters, 
+                        outcomes = ['Feeding tube 6m', 'Aspiration rate(Y/N)','Neck boost (Y/N)']):
+    data = dataset.data.copy()
+    result_table = {}
+    for o in outcomes:
+        pval = fisher_exact_test(clusters, (data[o].values == 'Y').astype('int'))
+        result_table[o] = pval
+    return pd.Series(result_table).rename('p-value')
