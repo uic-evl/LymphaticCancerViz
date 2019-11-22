@@ -18,4 +18,9 @@ For clustering, the user can view the results of clustering using different metr
 Because the data in this repo is synthetically generated, the clusters should show no correlation with toxicity.
 
 ##### The Data
-This repo currently uses synthetic data based on the original private dataset.  For a demo of what the dataset look like, see [here](https://github.com/uic-evl/LymphaticCancerViz/blob/master/synthetic_data/CohortAnalysis.ipynb)
+This repo currently uses synthetic data, located in the synthetic_data folder of the repo, based on a private cohort of 583 anonymized patients treated at the MD Anderson cancer center.  
+All features were randomly sampled from the original distribution of data found in the original cohort.  Affected lymph nodes were chosen randomly from the combinations of affected nodes, with their sample probility further weighted by the number of involved nodes so that larger, less common patterns are sampled.
+Given the sampling method, the data is likely to be biased towards having more of the common patterns and is likely missing several rare patterns of affected lymph nodes in the original cohort.  
+Any causal relationship between variables won't be reflected in the sample dataset, given that they were all sampled independently. Clustering results using the original methodology are included in the synthetic data, but wouldn't show the sample correlation with outcomes and are biased towards inbalanced clusters.
+
+For a demo of what the dataset look like, see [here](https://github.com/uic-evl/LymphaticCancerViz/blob/master/synthetic_data/CohortAnalysis.ipynb)
