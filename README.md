@@ -19,9 +19,11 @@ Because the data in this repo is synthetically generated, the clusters should sh
 
 ##### The Data
 This repo currently uses synthetic data, located in the synthetic_data folder, based on a private cohort of 583 anonymized patients treated at the MD Anderson cancer center.  
-All features were randomly sampled from the distribution of data found in the original cohort.  Affected lymph nodes were chosen randomly from the combinations present in the original cohort, with their sample probility further weighted by the number of involved nodes so that larger, less common patterns are sampled.
 
-The data was generated to give an accurate ideo of how the code and visualziation works, but isn't conductive to meaninful statistical insight.  Given the sampling method, the data is likely to be biased towards having more of the common patterns and is likely missing several rare patterns of affected lymph nodes in the original cohort.  
-Any causal relationship between variables won't be reflected in the sample dataset, given that they were all sampled independently. Clustering results using the original methodology are included in the synthetic data, but shouldn't show the sample correlation with outcomes, and are biased towards inbalanced clusters.
+All samples were randomly sampled from the distribution of data found in the original cohort. Specifically, affected lymph nodes were chosen randomly from the combinations present in the original cohort. The sampling probability was further weighed by the number of involved nodes so that larger, less common patterns are sampled.The synthetic data was generated to give an accurate idea of how the code and visualization works, but is not conducive to meaningful statistical insight. 
+
+Given the sampling method, the data is likely to be biased towards having more of the common patterns and is likely missing several rare patterns of affected lymph nodes in the original cohort. Furthermore, any causal relationship between variables won't be reflected in the synthetic dataset, given that they were all sampled independently. 
+
+Clustering results using the original methodology are also  included in the synthetic data. Because the data is synthetic, the resulting clusters do not correlate with any outcome (and should not). Because of our biased sampling strategy, the clusters are furthermore biased in their distribution.
 
 For a demo of what the dataset look like, see [here](https://github.com/uic-evl/LymphaticCancerViz/blob/master/synthetic_data/CohortAnalysis.ipynb)
